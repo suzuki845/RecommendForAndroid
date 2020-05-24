@@ -1,0 +1,8 @@
+rootProject.name='Recommend'
+include ':app'
+
+include ':imageutil'
+include ':util'
+
+project(':imageutil').projectDir = new File('../AndroidUtils/imageutil')
+project(':util').projectDir = new File('../AndroidUtils/util')
