@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/preview_background_color"
+        android:background="@drawable/rounded_button"
+        android:layout_gravity="center"
+        android:layout_margin="4dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
+
+    <Button
+        android:id="@+id/toolbar_background_color_button"
+        android:text="背景色"
+        android:layout_gravity="center"
+        android:layout_margin="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:id="@+id/preview_text_color"
+        android:background="@drawable/rounded_button"
+        android:layout_gravity="center"
+        android:layout_margin="4dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
+
+    <Button
+        android:id="@+id/toolbar_text_color_button"
+        android:text="文字色"
+        android:layout_gravity="center"
+        android:layout_margin="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

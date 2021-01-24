@@ -8,27 +8,61 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pin.recommend.CharacterDetailActivity;
 import com.pin.recommend.R;
 import com.pin.recommend.StoryDetailActivity;
-import com.pin.recommend.model.Story;
-import com.pin.recommend.model.StoryPicture;
+import com.pin.recommend.dialog.DeleteDialogFragment;
+import com.pin.recommend.dialog.DialogActionListener;
+import com.pin.recommend.model.entity.RecommendCharacter;
+import com.pin.recommend.model.entity.Story;
+import com.pin.recommend.model.entity.StoryPicture;
+import com.pin.recommend.model.viewmodel.StoryPictureViewModel;
+import com.pin.recommend.model.viewmodel.StoryViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.pin.recommend.ui.story.StoryFragment.INTENT_STORY;
+import static com.pin.recommend.main.StoryListFragment.INTENT_STORY;
 
 public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Story> stories = new ArrayList<>();
 
+    private StoryPictureViewModel storyPictureViewModel;
+    private StoryViewModel storyViewModel;
+
+    private Fragment fragment;
+
+    private boolean isEditMode = false;
+
+    private RecommendCharacter character;
+
+    public VerticalRecyclerViewAdapter(Fragment fragment, RecommendCharacter character){
+        this.storyViewModel = new ViewModelProvider(fragment.requireActivity()).get(StoryViewModel.class);
+        this.storyPictureViewModel = new ViewModelProvider(fragment.requireActivity()).get(StoryPictureViewModel.class);
+        this.fragment = fragment;
+        this.character = character;
+    }
+
     public void setList(List<Story> list) {
         stories = list;
+        notifyDataSetChanged();
+    }
+
+    public void updateCharacter(RecommendCharacter character){
+        this.character = character;
+        this.notifyDataSetChanged();
+    }
+
+    public void setEditMode(boolean editMode){
+        isEditMode = editMode;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -45,13 +79,53 @@ public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-        HorizontalRecycleViewHolder
+        final HorizontalRecycleViewHolder
                 horizontalRecycleViewHolder = (HorizontalRecycleViewHolder) holder;
         final Story story = stories.get(position);
 
         ((HorizontalRecycleViewHolder) holder).createdView.setText(story.getFormattedDate());
-        ((HorizontalRecycleViewHolder) holder).elapsedTimeView.setText(story.getDiffDays(Calendar.getInstance()) + "日");
-        ((HorizontalRecycleViewHolder) holder).commentView.setText(story.comment);
+        ((HorizontalRecycleViewHolder) holder).createdView.setTextColor(character.homeTextColor);
+        Calendar createdCharacterCalendar = Calendar.getInstance();
+        createdCharacterCalendar.setTime(character.created);
+        if(story.getDiffDays(createdCharacterCalendar) >= 0) {
+            ((HorizontalRecycleViewHolder) holder).elapsedTimeView
+                    .setText(story.getDiffDays(createdCharacterCalendar) + "日目");
+        }else{
+            ((HorizontalRecycleViewHolder) holder).elapsedTimeView
+                    .setText(-story.getDiffDays(createdCharacterCalendar) + "日前");
+        }
+        ((HorizontalRecycleViewHolder) holder).elapsedTimeView.setTextColor(character.homeTextColor);
+
+        ((HorizontalRecycleViewHolder) holder).commentView.setText(story.getShortComment(20));
+        ((HorizontalRecycleViewHolder) holder).commentView.setTextColor(character.homeTextColor);
+
+        ImageView delete = ((HorizontalRecycleViewHolder) holder).deleteView;
+        if(isEditMode){
+            delete.setVisibility(View.VISIBLE);
+        }else {
+            delete.setVisibility(View.GONE);
+        }
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isEditMode){
+                    DeleteDialogFragment dialog = new DeleteDialogFragment(new DialogActionListener<DeleteDialogFragment>() {
+                        @Override
+                        public void onDecision(DeleteDialogFragment dialog) {
+                            storyViewModel.deleteStory(story);
+                            horizontalRecycleViewHolder.bindViewHolder(story);
+                        }
+
+                        @Override
+                        public void onCancel() {
+
+                        }
+                    });
+                    dialog.show(fragment.getActivity().getSupportFragmentManager(), DeleteDialogFragment.Tag);
+                }
+            }
+        });
+
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +144,7 @@ public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         private TextView commentView;
         private TextView createdView;
         private TextView elapsedTimeView;
+        private ImageView deleteView;
 
         private RecyclerView mHorizontalRecyclerView;
         private HorizontalRecyclerViewAdapter mHorizontalRecyclerViewAdapter;
@@ -79,6 +154,7 @@ public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             commentView = itemView.findViewById(R.id.comment);
             createdView = itemView.findViewById(R.id.created);
             elapsedTimeView = itemView.findViewById(R.id.elapsedTime);
+            deleteView = itemView.findViewById(R.id.delete);
 
             mHorizontalRecyclerView = itemView.findViewById(R.id.horizontal_recycle_view);
             LinearLayoutManager linearLayoutManager =
@@ -88,9 +164,15 @@ public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             mHorizontalRecyclerView.setAdapter(mHorizontalRecyclerViewAdapter);
         }
 
-        public void bindViewHolder(Story story) {
-            mHorizontalRecyclerViewAdapter.setList(story.pictures());
-            mHorizontalRecyclerViewAdapter.notifyDataSetChanged();
+        public void bindViewHolder(final Story story) {
+            storyPictureViewModel.findByTrackedStoryId(story.id).observe(fragment, new Observer<List<StoryPicture>>() {
+                @Override
+                public void onChanged(List<StoryPicture> storyPictures) {
+                    mHorizontalRecyclerViewAdapter.setList(storyPictures);
+                    mHorizontalRecyclerViewAdapter.setStory(story);
+                    mHorizontalRecyclerViewAdapter.notifyDataSetChanged();
+                }
+            });
         }
     }
 
@@ -99,8 +181,15 @@ public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         private List<StoryPicture> pictures = new ArrayList<>();
 
+        private Story story;
+
+        private void setStory(Story story){
+            this.story = story;
+        }
+
         public void setList(List<StoryPicture> list) {
             pictures = list;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -116,9 +205,18 @@ public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
             StoryPicture picture = pictures.get(position);
-            ((ViewItemHolder) holder).picture.setImageBitmap(picture.testGetBitmap(((ViewItemHolder) holder).context, 50, 50));
+            ((ViewItemHolder) holder).picture.setImageBitmap(picture.getBitmap(((ViewItemHolder) holder).context, 150, 150));
+
+            ((ViewItemHolder) holder).picture.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(holder.itemView.getContext(), StoryDetailActivity.class);
+                    intent.putExtra(INTENT_STORY, story);
+                    holder.itemView.getContext().startActivity(intent);
+                }
+            });
         }
 
         class ViewItemHolder extends RecyclerView.ViewHolder {

@@ -2,7 +2,6 @@ package com.pin.recommend;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -13,28 +12,38 @@ import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexWrap;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.pin.imageutil.BitmapUtility;
 import com.pin.recommend.adapter.PickStoryPictureAdapter;
+import com.pin.recommend.main.StoryListFragment;
+import com.pin.recommend.model.entity.Account;
+import com.pin.recommend.model.entity.RecommendCharacter;
+import com.pin.recommend.model.entity.Story;
+import com.pin.recommend.model.entity.StoryPicture;
+import com.pin.recommend.model.viewmodel.AccountViewModel;
+import com.pin.recommend.model.viewmodel.StoryPictureViewModel;
+import com.pin.recommend.model.viewmodel.StoryViewModel;
+import com.pin.util.AdMobAdaptiveBannerManager;
 import com.pin.util.RuntimePermissionUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.util.List;
 
-import static com.pin.recommend.Application.REQUEST_PICK_IMAGE;
-import static com.pin.recommend.CharacterListActivity.isFixedCharacterDetail;
+import static com.pin.recommend.MyApplication.REQUEST_PICK_IMAGE;
 
 public class CreateStoryActivity extends AppCompatActivity {
 
@@ -43,14 +52,49 @@ public class CreateStoryActivity extends AppCompatActivity {
     private PickStoryPictureAdapter pickStoryPictureAdapter;
     private RecyclerView recyclerView;
 
+    private RecommendCharacter character;
+
+    private EditText editCommentView;
+
+    private AccountViewModel accountViewModel;
+    private StoryViewModel storyViewModel;
+    private StoryPictureViewModel storyPictureViewModel;
+
+    private AdMobAdaptiveBannerManager adMobManager;
+    private ViewGroup adViewContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_story);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
+        adViewContainer = this.findViewById(R.id.ad_container);
+        adMobManager = new AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id));
+        adMobManager.testMode(false);
+        adMobManager.setAllowAdClickLimit(6);
+        adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3);
+        adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14);
+
+        accountViewModel = MyApplication.getAccountViewModel(this);
+        storyViewModel = new ViewModelProvider(this).get(StoryViewModel.class);
+        storyPictureViewModel = new ViewModelProvider(this).get(StoryPictureViewModel.class);
+
+        character = getIntent().getParcelableExtra(StoryListFragment.INTENT_CREATE_STORY);
+
+        editCommentView = findViewById(R.id.comment);
         pickImageView = findViewById(R.id.pickImage);
+        recyclerView = findViewById(R.id.recycler_view);
+
+        pickStoryPictureAdapter = new PickStoryPictureAdapter(this);
+        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
+        flexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
+        flexboxLayoutManager.setFlexWrap(FlexWrap.WRAP);
+        flexboxLayoutManager.setJustifyContent(JustifyContent.CENTER);
+        flexboxLayoutManager.setAlignItems(AlignItems.FLEX_START);
+        recyclerView.setLayoutManager(flexboxLayoutManager);
+        recyclerView.setAdapter(pickStoryPictureAdapter);
+
+
         pickImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,18 +102,30 @@ public class CreateStoryActivity extends AppCompatActivity {
             }
         });
 
-        pickStoryPictureAdapter = new PickStoryPictureAdapter(this);
+        accountViewModel.getAccount().observe(this, new Observer<Account>() {
+            @Override
+            public void onChanged(Account account) {
+                initializeToolbar(account);
+            }
+        });
+    }
 
-        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
-        flexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
-        flexboxLayoutManager.setFlexWrap(FlexWrap.WRAP);
-        flexboxLayoutManager.setJustifyContent(JustifyContent.CENTER);
-        flexboxLayoutManager.setAlignItems(AlignItems.FLEX_START);
+    @Override
+    protected void onResume(){
+        super.onResume();
+        adMobManager.checkAndLoad();
+    }
 
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(flexboxLayoutManager);
-        recyclerView.setAdapter(pickStoryPictureAdapter);
-
+    private void initializeToolbar(Account account){
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(account.getToolbarBackgroundColor());
+        toolbar.setTitleTextColor(account.getToolbarTextColor());
+        Drawable drawable = DrawableCompat.wrap(toolbar.getOverflowIcon());
+        DrawableCompat.setTint(drawable, account.getToolbarTextColor());
+        MyApplication.setupStatusBarColor(this ,
+                account.getToolbarTextColor(),
+                account.getToolbarBackgroundColor());
+        setSupportActionBar(toolbar);
     }
 
     private static final int REQUEST_PICK_STORY_PICTURE = 3000;
@@ -128,12 +184,33 @@ public class CreateStoryActivity extends AppCompatActivity {
         return true;
     }
 
+    private void save(){
+        String comment = editCommentView.getText().toString();
+        Story story = new Story();
+        story.characterId = character.id;
+        story.comment = comment;
+        story.created = new Date();
+        storyViewModel.insertStoryWithPicture(story, new StoryViewModel.WithSavePicture() {
+            @Override
+            public void onSave(long insertId) {
+                List<Bitmap> pictures = pickStoryPictureAdapter.getList();
+                for(Bitmap bitmap : pictures){
+                    StoryPicture storyPicture = new StoryPicture();
+                    storyPicture.storyId = insertId;
+                    storyPicture.saveImage(CreateStoryActivity.this, bitmap);
+                    storyPictureViewModel.insert(storyPicture);
+                }
+            }
+        });
+
+        finish();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case R.id.action_save:
-                List<Bitmap> pictures = pickStoryPictureAdapter.getList();
-                finish();
+                save();
                 break;
         }
         return true;

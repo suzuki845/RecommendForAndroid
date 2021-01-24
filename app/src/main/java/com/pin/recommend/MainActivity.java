@@ -1,88 +1,71 @@
 package com.pin.recommend;
 
-
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.NavigationUI;
-import androidx.viewpager.widget.ViewPager;
+import androidx.arch.core.util.Function;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.tabs.TabLayout;
-import com.pin.recommend.main.SectionsPagerAdapter;
+import android.content.Intent;
+import android.os.Bundle;
 
-import static com.pin.recommend.CharacterListActivity.isFixedCharacterDetail;
+import com.pin.recommend.model.AppDatabase;
+import com.pin.recommend.model.dao.RecommendCharacterDao;
+import com.pin.recommend.model.entity.Account;
+import com.pin.recommend.model.entity.RecommendCharacter;
+import com.pin.recommend.model.viewmodel.AccountViewModel;
+
+import java.util.ArrayList;
+
+import static com.pin.recommend.CharacterDetailActivity.INTENT_CHARACTER;
+
 
 public class MainActivity extends AppCompatActivity {
+
+
+    public static final String INTENT_ACCOUNT = "com.pin.recommend.MainActivity.INTENT_ACCOUNT";
+
+    private AccountViewModel accountViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        final Intent characterListIntent = new Intent(this, CharacterListActivity.class);
+        final ArrayList<Intent> intents = new ArrayList<>();
+        intents.add(characterListIntent);
 
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-        ViewPager viewPager = findViewById(R.id.view_pager);
-        viewPager.setAdapter(sectionsPagerAdapter);
-        TabLayout tabs = findViewById(R.id.tabs);
-        tabs.setupWithViewPager(viewPager);
-        FloatingActionButton fab = findViewById(R.id.fab);
-
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem item = menu.findItem(R.id.fix_home);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        accountViewModel = MyApplication.getAccountViewModel(this);
+        LiveData<RecommendCharacter> fixedCharacter = Transformations.switchMap(accountViewModel.getAccount(), new Function<Account, LiveData<RecommendCharacter>>() {
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if(isFixedCharacterDetail) {
-                    item.setIcon(R.drawable.pin_outline);
-                    isFixedCharacterDetail = false;
-                }else{
-                    item.setIcon(R.drawable.pin_fill);
-                    isFixedCharacterDetail = true;
-                    Toast.makeText(MainActivity.this, "トップページ に固定しました", Toast.LENGTH_SHORT).show();
+            public LiveData<RecommendCharacter> apply(Account input) {
+                RecommendCharacterDao characterDao = AppDatabase.getDatabase(MainActivity.this)
+                        .recommendCharacterDao();
+                Long fixedCharacterId = -1L;
+                if(input != null) {
+                    fixedCharacterId = input.fixedCharacterId;
                 }
-                setMenuItemIconTint(item);
-                return false;
+                if(fixedCharacterId == null){
+                    fixedCharacterId = -1L;
+                }
+
+                return characterDao.findTrackedById(fixedCharacterId);
             }
         });
-        if(!isFixedCharacterDetail) {
-            item.setIcon(R.drawable.pin_outline);
-        }else{
-            item.setIcon(R.drawable.pin_fill);
-        }
-        setMenuItemIconTint(item);
-        return true;
+        fixedCharacter.observe(this, new Observer<RecommendCharacter>() {
+            @Override
+            public void onChanged(RecommendCharacter character) {
+                if(character != null){
+                    Intent characterDetailIntent = new Intent(MainActivity.this, CharacterDetailActivity.class);
+                    characterDetailIntent.putExtra(INTENT_CHARACTER, character);
+                    intents.add(characterDetailIntent);
+                }
+                startActivities(intents.toArray(new Intent[]{}));
+                finish();
+            }
+        });
     }
 
-    private void setMenuItemIconTint(MenuItem item){
-        Drawable drawable = item.getIcon();
-        drawable = DrawableCompat.wrap(drawable);
-        DrawableCompat.setTint(drawable, Color.parseColor("#ffffff"));
-    }
 
-    @Override
-    public void onBackPressed(){
-        if(isFixedCharacterDetail){
-            moveTaskToBack (true);
-        }else{
-            super.onBackPressed();
-        }
-    }
+
 
 }
-
