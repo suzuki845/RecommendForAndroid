@@ -79,7 +79,7 @@ public class CharactersAdapter extends BaseAdapter {
         name.setText(character.name);
 
         TextView elapsedTime = v.findViewById(R.id.elapsedTime);
-        elapsedTime.setText(character.getDiffDays(NOW) + "日");
+        elapsedTime.setText(character.getDiffDays(NOW));
 
         TextView created = v.findViewById(R.id.created);
         created.setText(character.getFormattedDate());

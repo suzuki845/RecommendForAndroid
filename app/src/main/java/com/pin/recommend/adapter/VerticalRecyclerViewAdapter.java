@@ -2,6 +2,7 @@ package com.pin.recommend.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,12 +88,16 @@ public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         ((HorizontalRecycleViewHolder) holder).createdView.setTextColor(character.homeTextColor);
         Calendar createdCharacterCalendar = Calendar.getInstance();
         createdCharacterCalendar.setTime(character.created);
-        if(story.getDiffDays(createdCharacterCalendar) >= 0) {
+        long elapsedDay = story.getDiffDays(createdCharacterCalendar);
+        if(elapsedDay == 0){
             ((HorizontalRecycleViewHolder) holder).elapsedTimeView
-                    .setText(story.getDiffDays(createdCharacterCalendar) + "日目");
+                    .setText("推し始めた日");
+        } else if(elapsedDay > -1) {
+            ((HorizontalRecycleViewHolder) holder).elapsedTimeView
+                    .setText(elapsedDay + "日前");
         }else{
             ((HorizontalRecycleViewHolder) holder).elapsedTimeView
-                    .setText(-story.getDiffDays(createdCharacterCalendar) + "日前");
+                    .setText(-elapsedDay+ "日目");
         }
         ((HorizontalRecycleViewHolder) holder).elapsedTimeView.setTextColor(character.homeTextColor);
 

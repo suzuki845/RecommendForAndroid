@@ -1,5 +1,6 @@
 package com.pin.recommend;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -36,10 +37,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -55,6 +60,9 @@ public class CreateStoryActivity extends AppCompatActivity {
     private RecommendCharacter character;
 
     private EditText editCommentView;
+
+    private TextView createdView;
+    private Date created = new Date();
 
     private AccountViewModel accountViewModel;
     private StoryViewModel storyViewModel;
@@ -81,9 +89,12 @@ public class CreateStoryActivity extends AppCompatActivity {
 
         character = getIntent().getParcelableExtra(StoryListFragment.INTENT_CREATE_STORY);
 
+        createdView = findViewById(R.id.created);
         editCommentView = findViewById(R.id.comment);
         pickImageView = findViewById(R.id.pickImage);
         recyclerView = findViewById(R.id.recycler_view);
+
+        createdView.setText(FORMAT.format(created));
 
         pickStoryPictureAdapter = new PickStoryPictureAdapter(this);
         FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
@@ -160,6 +171,30 @@ public class CreateStoryActivity extends AppCompatActivity {
         }
     }
 
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy年MM月dd日");
+    public void onShowDatePickerDialog(View v) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener(){
+            @Override
+            public void onDateSet(DatePicker dialog, int year, int month, int dayOfMonth) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
+                        !dialog.isShown()) {
+                    return;
+                }
+                Calendar newCalender = Calendar.getInstance();
+                newCalender.set(year, month, dayOfMonth);
+                Date date = newCalender.getTime();
+                createdView.setText(FORMAT.format(date));
+                created = date;
+            }
+        }, year, month, dayOfMonth);
+        //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        datePickerDialog.show();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (requestCode == REQUEST_PICK_STORY_PICTURE && resultCode == RESULT_OK) {
@@ -189,7 +224,7 @@ public class CreateStoryActivity extends AppCompatActivity {
         Story story = new Story();
         story.characterId = character.id;
         story.comment = comment;
-        story.created = new Date();
+        story.created = created;
         storyViewModel.insertStoryWithPicture(story, new StoryViewModel.WithSavePicture() {
             @Override
             public void onSave(long insertId) {

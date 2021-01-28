@@ -33,7 +33,7 @@ public interface StoryDao {
     @Query("SELECT * FROM Story WHERE characterId = :characterId")
     public List<Story> findByCharacterId(long characterId);
 
-    @Query("SELECT * FROM Story WHERE characterId = :characterId")
+    @Query("SELECT * FROM Story WHERE characterId = :characterId ORDER BY created DESC")
     public LiveData<List<Story>> findByTrackedCharacterId(long characterId);
 
 

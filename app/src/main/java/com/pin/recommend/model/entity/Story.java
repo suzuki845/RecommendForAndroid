@@ -50,11 +50,10 @@ public class Story implements Parcelable {
     public long getDiffDays(Calendar calendar1) {
         //modify
         TimeUtil.resetTime(calendar1);
-        calendar1.add(Calendar.DAY_OF_MONTH, 1);
 
         Calendar calendar2 = Calendar.getInstance();
         calendar2.setTime(created);
-
+        TimeUtil.resetTime(calendar2);
 
         long diffTime =  calendar1.getTimeInMillis() - calendar2.getTimeInMillis();
         long diffDays = diffTime / MILLIS_OF_DAY;
@@ -62,11 +61,13 @@ public class Story implements Parcelable {
     }
 
     public String getShortComment(int length){
-        if(comment.length() >= length){
-            return comment.substring(0, length);
+        String t = comment != null ? comment : "";
+        t = t.replace("\n"," ");
+        if(t.length() >= length){
+            return t.substring(0, length);
         }
 
-        return comment.substring(0, comment.length());
+        return t;
     }
 
     /*

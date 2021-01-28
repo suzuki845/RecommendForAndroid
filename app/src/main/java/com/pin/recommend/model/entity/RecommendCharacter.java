@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -40,12 +41,52 @@ public class RecommendCharacter implements Parcelable {
 
     public Date created = new Date();
 
+    public String iconImageUri;
+
+    public String backgroundImageUri;
+
+    public Integer backgroundColor = Color.WHITE;
+
+    public Integer toolbarBackgroundColor;
+
+    public Integer toolbarTextColor;
+
+    public Integer homeTextColor = Color.parseColor("#444444");
+
+
+    //v2
+    public String aboveText;
+
+    public String belowText;
+
+    @NonNull
+    @ColumnInfo(defaultValue = "0")
+    public boolean isZeroDayStart;
+
+    @NonNull
+    @ColumnInfo(defaultValue = "0")
+    public int elapsedDateFormat;
+
+    public String fontFamily;
+    //end v2
+
+
     @Ignore
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy年MM月dd日");
 
     public RecommendCharacter(){}
 
-    public String iconImageUri;
+    public String getFontFamily(){
+        return fontFamily != null ? fontFamily : "default";
+    }
+
+    public String getAboveText(){
+        return aboveText != null ?  aboveText : "を推してから";
+    }
+
+    public String getBelowText(){
+        return belowText != null ? belowText : "になりました";
+    }
 
     public boolean saveIconImage(Context context, Bitmap bitmap){
         if(BitmapUtility.fileExistsByPrivate(context,iconImageUri )){
@@ -59,8 +100,6 @@ public class RecommendCharacter implements Parcelable {
         iconImageUri = filename + ext;
         return success;
     }
-
-    public String backgroundImageUri;
 
     public boolean saveBackgroundImage(Context context, Bitmap bitmap){
         if(backgroundImageUri != null && BitmapUtility.fileExistsByPrivate(context, backgroundImageUri)){
@@ -130,10 +169,8 @@ public class RecommendCharacter implements Parcelable {
     }
 
 
-    public Integer backgroundColor = Color.WHITE;
     public Integer getBackgroundColor(){return backgroundColor;}
 
-    public Integer toolbarBackgroundColor;
     public Integer getToolbarBackgroundColor(Context context, int defaultColor){
         if(toolbarBackgroundColor != null) {
             return toolbarBackgroundColor;
@@ -141,7 +178,6 @@ public class RecommendCharacter implements Parcelable {
         return defaultColor;
     }
 
-    public Integer toolbarTextColor;
     public Integer getToolbarTextColor(Context context, int defaultColor){
         if(toolbarTextColor != null) {
             return toolbarTextColor;
@@ -149,7 +185,6 @@ public class RecommendCharacter implements Parcelable {
         return defaultColor;
     }
 
-    public Integer homeTextColor = Color.parseColor("#444444");
     public Integer getHomeTextColor(){ return homeTextColor; }
 
     public String getFormattedDate(){
@@ -158,34 +193,52 @@ public class RecommendCharacter implements Parcelable {
 
     @Ignore
     static final int MILLIS_OF_DAY = 1000 * 60 * 60 * 24;
-    public long getDiffDays(Calendar calendar1) {
-        TimeUtil.resetTime(calendar1);
+    public String getDiffDaysSingle(Calendar now) {
+        TimeUtil.resetTime(now);
 
         Calendar calendar2 = Calendar.getInstance();
         calendar2.setTime(created);
         TimeUtil.resetTime(calendar2);
 
         //modify
-        calendar2.add(Calendar.DAY_OF_MONTH, -1);
+        if(!isZeroDayStart){
+            calendar2.add(Calendar.DAY_OF_MONTH, -1);
+        }
 
-        long diffTime = calendar1.getTimeInMillis() - calendar2.getTimeInMillis();
+        long diffTime = now.getTimeInMillis() - calendar2.getTimeInMillis();
         long diffDays = diffTime / MILLIS_OF_DAY;
-        return diffDays;
+        return diffDays + "日";
     }
 
-    public long getDiffDays(Calendar calendar1, int days) {
-        TimeUtil.resetTime(calendar1);
+    public String getDiffDaysYMD(Calendar now){
+        TimeUtil.resetTime(now);
 
         Calendar calendar2 = Calendar.getInstance();
         calendar2.setTime(created);
         TimeUtil.resetTime(calendar2);
-        calendar2.add(Calendar.DAY_OF_MONTH, days);
 
-        long diffTime = calendar1.getTimeInMillis() - calendar2.getTimeInMillis();
-        long diffDays = diffTime / MILLIS_OF_DAY;
-        return diffDays;
+        if(!isZeroDayStart){
+            calendar2.add(Calendar.DAY_OF_MONTH, -1);
+        }
+
+        long diffTime = now.getTimeInMillis() - calendar2.getTimeInMillis();
+        Calendar diffCalendar = Calendar.getInstance();
+        diffCalendar.setTimeInMillis(diffTime);
+
+        return diffCalendar.get(Calendar.YEAR) - 1970 + "年"
+                + diffCalendar.get(Calendar.MONTH) + "ヶ月"
+                + diffCalendar.get(Calendar.DAY_OF_MONTH) + "日";
     }
 
+    public String getDiffDays(Calendar now){
+        if(elapsedDateFormat == 1){
+            return getDiffDaysYMD(now);
+        }
+        return getDiffDaysSingle(now);
+    }
+
+
+    /*/ v1
     @Override
     public int describeContents() {
         return 0;
@@ -211,6 +264,62 @@ public class RecommendCharacter implements Parcelable {
         this.name = in.readString();
         long tmpCreated = in.readLong();
         this.created = tmpCreated == -1 ? null : new Date(tmpCreated);
+        this.iconImageUri = in.readString();
+        this.backgroundImageUri = in.readString();
+        this.backgroundColor = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.toolbarBackgroundColor = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.toolbarTextColor = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.homeTextColor = (Integer) in.readValue(Integer.class.getClassLoader());
+    }
+
+    public static final Creator<RecommendCharacter> CREATOR = new Creator<RecommendCharacter>() {
+        @Override
+        public RecommendCharacter createFromParcel(Parcel source) {
+            return new RecommendCharacter(source);
+        }
+
+        @Override
+        public RecommendCharacter[] newArray(int size) {
+            return new RecommendCharacter[size];
+        }
+    };
+*/
+
+
+    //v2
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
+        dest.writeLong(this.accountId);
+        dest.writeString(this.name);
+        dest.writeLong(this.created != null ? this.created.getTime() : -1);
+        dest.writeString(this.aboveText);
+        dest.writeString(this.belowText);
+        dest.writeByte(this.isZeroDayStart ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.elapsedDateFormat);
+        dest.writeString(this.iconImageUri);
+        dest.writeString(this.backgroundImageUri);
+        dest.writeValue(this.backgroundColor);
+        dest.writeValue(this.toolbarBackgroundColor);
+        dest.writeValue(this.toolbarTextColor);
+        dest.writeValue(this.homeTextColor);
+    }
+
+    protected RecommendCharacter(Parcel in) {
+        this.id = in.readLong();
+        this.accountId = in.readLong();
+        this.name = in.readString();
+        long tmpCreated = in.readLong();
+        this.created = tmpCreated == -1 ? null : new Date(tmpCreated);
+        this.aboveText = in.readString();
+        this.belowText = in.readString();
+        this.isZeroDayStart = in.readByte() != 0;
+        this.elapsedDateFormat = in.readInt();
         this.iconImageUri = in.readString();
         this.backgroundImageUri = in.readString();
         this.backgroundColor = (Integer) in.readValue(Integer.class.getClassLoader());

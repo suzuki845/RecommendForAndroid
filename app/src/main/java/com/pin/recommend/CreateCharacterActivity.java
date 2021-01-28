@@ -151,12 +151,8 @@ public class CreateCharacterActivity extends AppCompatActivity {
                 createdData = date;
             }
         } , year, month, dayOfMonth);
-        datePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL,
-                "キャンセル", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+
         datePickerDialog.show();
     }
 

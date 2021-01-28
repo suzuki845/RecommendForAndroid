@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".EditCharacterActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".SlideShowActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

@@ -98,7 +98,7 @@ public class CharacterDetailActivity extends AppCompatActivity {
     }
 
     private void initializeBackground(RecommendCharacter character){
-        background.setBackground(character.getBackgroundDrawable(CharacterDetailActivity.this, 400, 400));
+        background.setBackground(character.getBackgroundDrawable(CharacterDetailActivity.this, 700, 700));
     }
 
     private void initializeTab(RecommendCharacter character){

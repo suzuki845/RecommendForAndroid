@@ -107,12 +107,15 @@ public class PickStoryPictureAdapter extends RecyclerView.Adapter<RecyclerView.V
         switch (position) {
             case 0:
                 layout.width = transformPos1();
+                layout.height = layout.width;
                 break;
             case 1:
                 layout.width = transformPos2();
+                layout.height = layout.width;
                 break;
             case 2:
                 layout.width = transformPos3();
+                layout.height = (int) (layout.width * 0.5);
         }
         previewImageView.setLayoutParams(layout);
 

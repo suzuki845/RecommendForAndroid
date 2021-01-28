@@ -20,7 +20,7 @@
 
                 <TextView
                     android:id="@+id/elapsedTime"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     android:text="0日"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -35,7 +35,7 @@
                     android:id="@+id/comment"
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 

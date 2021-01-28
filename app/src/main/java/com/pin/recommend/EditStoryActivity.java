@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -17,8 +18,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.flexbox.AlignItems;
@@ -37,7 +40,10 @@ import com.pin.recommend.model.viewmodel.StoryViewModel;
 import com.pin.util.AdMobAdaptiveBannerManager;
 import com.pin.util.RuntimePermissionUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static com.pin.recommend.MyApplication.REQUEST_PICK_IMAGE;
@@ -51,6 +57,9 @@ public class EditStoryActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
 
     private EditText editCommentView;
+
+    private TextView createdView;
+    private Date created = new Date();
 
     private Story story;
 
@@ -79,6 +88,7 @@ public class EditStoryActivity extends AppCompatActivity {
 
         story = getIntent().getParcelableExtra(INTENT_EDIT_STORY);
 
+        createdView = findViewById(R.id.created);
         pickImageView = findViewById(R.id.pickImage);
         editCommentView = findViewById(R.id.comment);
         recyclerView = findViewById(R.id.recycler_view);
@@ -105,6 +115,8 @@ public class EditStoryActivity extends AppCompatActivity {
             @Override
             public void onChanged(Story story) {
                 editCommentView.setText(story.comment);
+                created = story.created;
+                createdView.setText(FORMAT.format(story.created));
             }
         });
 
@@ -144,6 +156,31 @@ public class EditStoryActivity extends AppCompatActivity {
                 account.getToolbarBackgroundColor());
         toolbar.setTitle("ストーリー編集");
         setSupportActionBar(toolbar);
+    }
+
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy年MM月dd日");
+    public void onShowDatePickerDialog(View v) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(story.created);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener(){
+            @Override
+            public void onDateSet(DatePicker dialog, int year, int month, int dayOfMonth) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
+                        !dialog.isShown()) {
+                    return;
+                }
+                Calendar newCalender = Calendar.getInstance();
+                newCalender.set(year, month, dayOfMonth);
+                Date date = newCalender.getTime();
+                createdView.setText(FORMAT.format(date));
+                created = date;
+            }
+        }, year, month, dayOfMonth);
+        //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        datePickerDialog.show();
     }
 
     private static final int REQUEST_PICK_STORY_PICTURE = 3000;
@@ -202,6 +239,7 @@ public class EditStoryActivity extends AppCompatActivity {
     private void save(){
         String comment = editCommentView.getText().toString();
         story.comment = comment;
+        story.created = created;
         storyViewModel.updateWithPicture(story, new StoryViewModel.WithSavePicture() {
             @Override
             public void onSave(long storyId) {

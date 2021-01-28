@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -35,6 +36,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.pin.imageutil.BitmapUtility;
+import com.pin.recommend.EditCharacterActivity;
 import com.pin.recommend.MyApplication;
 import com.pin.recommend.R;
 import com.pin.recommend.dialog.ColorPickerDialogFragment;
@@ -64,6 +66,8 @@ import static com.pin.recommend.MyApplication.REQUEST_PICK_IMAGE;
  */
 public class HomeFragment extends Fragment {
 
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy年MM月dd日");
+
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private PageViewModel pageViewModel;
@@ -71,7 +75,6 @@ public class HomeFragment extends Fragment {
     private CircleImageView iconImageView;
     private Bitmap updateIconBitmap;
     private TextView characterNameView;
-    private EditText characterNameEditView;
     private TextView firstText;
     private TextView dateView;
     private TextView elapsedView;
@@ -79,7 +82,6 @@ public class HomeFragment extends Fragment {
     private Date updateDateTime;
     private Calendar calendar = Calendar.getInstance();
     private Calendar now = Calendar.getInstance();
-    private SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy年MM月dd日");
 
     private RecommendCharacterViewModel characterViewModel;
     private EditStateViewModel editStateViewModel;
@@ -119,30 +121,9 @@ public class HomeFragment extends Fragment {
         dateView = root.findViewById(R.id.created);
         firstText = root.findViewById(R.id.first_text);
         elapsedView = root.findViewById(R.id.elapsedTime);
-        characterNameEditView = root.findViewById(R.id.character_name_edit);
         characterNameView = root.findViewById(R.id.character_name);
 
         initializeText(character);
-
-        characterNameEditView.setVisibility(View.GONE);
-
-        iconImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (editStateViewModel.getEditMode().getValue()) {
-                    onSetIcon(null);
-                }
-            }
-        });
-
-        dateView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (editStateViewModel.getEditMode().getValue()) {
-                    onShowDatePickerDialog(null);
-                }
-            }
-        });
 
         LiveData<RecommendCharacter> characterLiveData = characterViewModel.getCharacter(character.id);
         characterLiveData.observe(getViewLifecycleOwner(), new Observer<RecommendCharacter>() {
@@ -150,7 +131,7 @@ public class HomeFragment extends Fragment {
             public void onChanged(RecommendCharacter character) {
                 if(character == null) return;
                 if(character.hasIconImage()) {
-                    iconImageView.setImageBitmap(character.getIconImage(getContext(), 300, 300));
+                    iconImageView.setImageBitmap(character.getIconImage(getContext(), 500, 500));
                 }
 
                 initializeText(character);
@@ -161,61 +142,32 @@ public class HomeFragment extends Fragment {
     }
 
     private void initializeText(RecommendCharacter character){
+        firstText.setText(character.getAboveText());
         firstText.setTextColor(character.getHomeTextColor());
-        dateView.setText(FORMAT.format(character.created) + "に出会いました");
+        dateView.setText(character.getBelowText());
         dateView.setTextColor(character.getHomeTextColor());
         elapsedView.setTextColor(character.getHomeTextColor());
-        elapsedView.setText(Long.toString(character.getDiffDays(now)) + "日");
+        elapsedView.setText(character.getDiffDays(now));
         characterNameView.setText(character.name);
         characterNameView.setTextColor(character.getHomeTextColor());
-        characterNameEditView.setText(character.name);
-        characterNameEditView.setTextColor(character.getHomeTextColor());
-    }
 
-    private void editMode(){
-        characterNameEditView.setVisibility(View.VISIBLE);
-        characterNameView.setVisibility(View.GONE);
-
-        GradientDrawable bgShape = new GradientDrawable();
-        bgShape.setColor(Color.parseColor("#559955"));
-        bgShape.setStroke(5, Color.parseColor("#559955"));
-        bgShape.setCornerRadius(4f);
-        dateView.setBackground(bgShape);
-        iconImageView.setBorderColor(Color.parseColor("#559955"));
-
-        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_save_24dp, null);
-        drawable = DrawableCompat.wrap(drawable);
-        DrawableCompat.setTint(drawable, Color.parseColor("#ffffff"));
-    }
-
-    public void exitEditMode(){
-        if(updateDateTime != null) {
-            character.created = updateDateTime;
-            dateView.setText(FORMAT.format(calendar.getTime()) + "に出会いました");
-            elapsedView.setText(Long.toString(character.getDiffDays(now)) + "日");
+        try{
+            if(character.fontFamily != null && !character.fontFamily.equals("default")){
+                Typeface font =Typeface.createFromAsset(getActivity().getAssets(), "fonts/" + character.fontFamily + ".ttf");
+                firstText.setTypeface(font);
+                dateView.setTypeface(font);
+                elapsedView.setTypeface(font);
+                characterNameView.setTypeface(font);
+            }else{
+                firstText.setTypeface(null);
+                dateView.setTypeface(null);
+                elapsedView.setTypeface(null);
+                characterNameView.setTypeface(null);
+            }
+        }catch(RuntimeException e){
+            System.out.println("font missing " + character.fontFamily);
         }
-        if(updateIconBitmap != null) {
-            character.saveIconImage(getContext(), updateIconBitmap);
-            iconImageView.setImageBitmap(character.getIconImage(getContext(), 300, 300));
-        }
-        character.name = characterNameEditView.getText().toString();
 
-        characterViewModel.update(character);
-
-        updateDateTime = null;
-        updateIconBitmap = null;
-
-        characterNameEditView.setVisibility(View.GONE);
-        characterNameView.setVisibility(View.VISIBLE);
-    }
-
-    private void normalMode(){
-        dateView.setBackground(null);
-        iconImageView.setBorderColor(Color.parseColor("#eeeeee"));
-
-        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_mode_edit_24dp, null);
-        drawable = DrawableCompat.wrap(drawable);
-        DrawableCompat.setTint(drawable, Color.parseColor("#ffffff"));
     }
 
     @Override
@@ -261,64 +213,14 @@ public class HomeFragment extends Fragment {
                 bodyTextPickerDialogFragment.show(getActivity().getSupportFragmentManager(), ToolbarSettingDialogFragment.TAG);
                 return true;
             case R.id.edit_mode:
-                if(!editStateViewModel.getEditMode().getValue()) {
-                    editStateViewModel.setEditMode(true);
-                    editMode();
-                }else{
-                    editStateViewModel.setEditMode(false);
-                    exitEditMode();
-                    normalMode();
-                }
+                Intent intent = new Intent(getContext(), EditCharacterActivity.class);
+                intent.putExtra(EditCharacterActivity.INTENT_EDIT_CHARACTER, character);
+                startActivity(intent);
                 return true;
         }
         return true;
     }
 
-    public void onShowDatePickerDialog(View view){
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(character.created);
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-
-        final DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker dialog, int year, int month, int dayOfMonth) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN &&
-                        Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
-                        !dialog.isShown()) {
-                    return;
-                    //api19はクリックするとonDateSetが２回呼ばれるため
-                }
-                Calendar newCalender = Calendar.getInstance();
-                newCalender.set(year, month, dayOfMonth);
-                Date date = newCalender.getTime();
-
-                updateDateTime = date;
-
-                dateView.setText(FORMAT.format(updateDateTime) + "に出会いました");
-
-                Calendar updateCalendar = Calendar.getInstance();
-                updateCalendar.setTime(updateDateTime);
-                //modify
-                updateCalendar.add(Calendar.DAY_OF_MONTH, -1);
-
-                TimeUtil.resetTime(now);
-                TimeUtil.resetTime(updateCalendar);
-
-                long diffDays = TimeUtil.getDiffDays(now, updateCalendar);
-                elapsedView.setText(Long.toString(diffDays) + "日");
-            }
-        } , year, month, dayOfMonth);
-        datePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL,
-                "キャンセル", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-        datePickerDialog.show();
-    }
 
     private static final int REQUEST_PICK_ICON = 2000;
     public void onSetIcon(View v){

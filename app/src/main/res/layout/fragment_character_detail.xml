@@ -16,7 +16,7 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/character_icon"
             android:layout_gravity="center"
-            android:layout_marginTop="-160dp"
+            android:layout_marginTop="-200dp"
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_centerInParent="true"
@@ -26,19 +26,11 @@
             app:civ_border_color="#eeeeee" />
 
         <LinearLayout
-            android:layout_marginTop="140dp"
+            android:layout_marginTop="160dp"
             android:layout_gravity="center"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
-            <EditText
-                android:visibility="gone"
-                android:id="@+id/character_name_edit"
-                android:textSize="20sp"
-                android:padding="4dp"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
             <TextView
                 android:id="@+id/character_name"
                 android:textSize="20sp"
