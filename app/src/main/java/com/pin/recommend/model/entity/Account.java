@@ -30,15 +30,15 @@ public class Account implements Parcelable {
     public int toolbarTextColor = Color.parseColor("#ffffff");
     public int getToolbarTextColor(){ return toolbarTextColor; }
 
-    public Long getFixedCharacterId(Context context){
+    public Long getFixedCharacterId(){
         return fixedCharacterId;
     }
 
-    public void removeFixedCharacter(Context context){
+    public void removeFixedCharacter(){
         fixedCharacterId = null;
     }
 
-    public void setFixedCharacter(Context context, long characterId){
+    public void setFixedCharacter(long characterId){
         fixedCharacterId = characterId;
     }
 

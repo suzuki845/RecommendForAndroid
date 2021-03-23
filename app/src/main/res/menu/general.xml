@@ -8,8 +8,19 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/setting_toolbar"
+        android:id="@+id/setting"
         android:orderInCategory="2"
+        android:title="設定"
+        app:showAsAction="ifRoom" />
+<!--
+    <item
+        android:id="@+id/passcode_lock"
+        android:orderInCategory="2"
+        android:title="パスコードロック設定"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/setting_toolbar"
+        android:orderInCategory="3"
         android:title="ツールバーの設定"
         app:showAsAction="never" />
 
@@ -17,5 +28,5 @@
         android:id="@+id/link_to_privacy_policy"
         android:title="プライバシーポリシー"
         android:orderInCategory="100" />
-
+-->
 </menu>

@@ -15,6 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".GlobalSettingActivity"
+            android:label="@string/title_activity_global_setting"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".EditCharacterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -51,6 +55,12 @@
         <activity
             android:name=".CharacterDetailActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PassCodeSetActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".PassCodeConfirmationActivity"
+            android:screenOrientation="portrait"></activity>
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

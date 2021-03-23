@@ -17,6 +17,8 @@ class FontAdapter: BaseAdapter {
     private var fonts = listOf(
             "default",
 
+            "huifont29",
+
             "NotoSans-Black",
             "NotoSans-BlackItalic",
             "NotoSans-Condensed",

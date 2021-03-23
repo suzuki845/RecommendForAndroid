@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "d35b975a90da68822ce9a84bfbd9682a",
+    "identityHash": "e87acc85ca4fe30d048b550b08bad9ab",
     "entities": [
       {
         "tableName": "Account",
@@ -44,7 +44,7 @@
       },
       {
         "tableName": "RecommendCharacter",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `accountId` INTEGER NOT NULL, `name` TEXT, `created` INTEGER, `iconImageUri` TEXT, `backgroundImageUri` TEXT, `backgroundColor` INTEGER, `toolbarBackgroundColor` INTEGER, `toolbarTextColor` INTEGER, `homeTextColor` INTEGER, `aboveText` TEXT, `belowText` TEXT, `isZeroDayStart` INTEGER NOT NULL DEFAULT 0, `elapsedDateFormat` INTEGER NOT NULL DEFAULT 0, `fontFamily` TEXT, FOREIGN KEY(`accountId`) REFERENCES `Account`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `accountId` INTEGER NOT NULL, `name` TEXT, `created` INTEGER, `iconImageUri` TEXT, `backgroundImageUri` TEXT, `backgroundColor` INTEGER, `toolbarBackgroundColor` INTEGER, `toolbarTextColor` INTEGER, `homeTextColor` INTEGER, `aboveText` TEXT, `belowText` TEXT, `isZeroDayStart` INTEGER NOT NULL DEFAULT 0, `elapsedDateFormat` INTEGER NOT NULL DEFAULT 0, `fontFamily` TEXT, `sortOrder` INTEGER NOT NULL, FOREIGN KEY(`accountId`) REFERENCES `Account`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -137,6 +137,12 @@
             "columnName": "fontFamily",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -285,7 +291,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd35b975a90da68822ce9a84bfbd9682a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e87acc85ca4fe30d048b550b08bad9ab')"
     ]
   }
 }

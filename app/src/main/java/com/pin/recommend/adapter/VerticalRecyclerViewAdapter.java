@@ -78,6 +78,7 @@ public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         return new HorizontalRecycleViewHolder(itemView);
     }
 
+    private Calendar now = Calendar.getInstance();
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         final HorizontalRecycleViewHolder
@@ -86,23 +87,27 @@ public class VerticalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         ((HorizontalRecycleViewHolder) holder).createdView.setText(story.getFormattedDate());
         ((HorizontalRecycleViewHolder) holder).createdView.setTextColor(character.homeTextColor);
-        Calendar createdCharacterCalendar = Calendar.getInstance();
-        createdCharacterCalendar.setTime(character.created);
-        long elapsedDay = story.getDiffDays(createdCharacterCalendar);
-        if(elapsedDay == 0){
+        ((HorizontalRecycleViewHolder) holder).createdView.setShadowLayer(4, 0 ,0, character.getHomeTextShadowColor());
+
+        long elapsedDay = story.getDiffDays(now);
+
+         if(elapsedDay < 0) {
             ((HorizontalRecycleViewHolder) holder).elapsedTimeView
-                    .setText("推し始めた日");
-        } else if(elapsedDay > -1) {
-            ((HorizontalRecycleViewHolder) holder).elapsedTimeView
-                    .setText(elapsedDay + "日前");
+                    .setText(-elapsedDay + "日後");
         }else{
-            ((HorizontalRecycleViewHolder) holder).elapsedTimeView
-                    .setText(-elapsedDay+ "日目");
+             if(elapsedDay == 0){
+                 ((HorizontalRecycleViewHolder) holder).elapsedTimeView
+                         .setText("今日");
+             }else{
+                 ((HorizontalRecycleViewHolder) holder).elapsedTimeView
+                         .setText(elapsedDay+ "日前");
+             }
         }
         ((HorizontalRecycleViewHolder) holder).elapsedTimeView.setTextColor(character.homeTextColor);
-
+        ((HorizontalRecycleViewHolder) holder).elapsedTimeView.setShadowLayer(4, 0 ,0, character.getHomeTextShadowColor());
         ((HorizontalRecycleViewHolder) holder).commentView.setText(story.getShortComment(20));
         ((HorizontalRecycleViewHolder) holder).commentView.setTextColor(character.homeTextColor);
+        ((HorizontalRecycleViewHolder) holder).commentView.setShadowLayer(4, 0 ,0, character.getHomeTextShadowColor());
 
         ImageView delete = ((HorizontalRecycleViewHolder) holder).deleteView;
         if(isEditMode){

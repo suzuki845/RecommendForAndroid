@@ -70,6 +70,21 @@ public class RecommendCharacter implements Parcelable {
     public String fontFamily;
     //end v2
 
+    //v3
+    public int storySortOrder;
+
+    @Ignore public static final int CREATED_AT_DESC = 0;
+    @Ignore public static final int CREATED_AT_ASC = 1;
+    @Ignore public static final int UPDATED_AT_DESC = 2;
+    @Ignore public static final int UPDATED_AT_ASC = 3;
+    //end v3
+
+    //v4
+    public float backgroundImageOpacity = 1;
+    public Integer homeTextShadowColor;
+    public Integer getHomeTextShadowColor(){ return homeTextShadowColor != null ? homeTextShadowColor : Color.parseColor("#ffffffff"); }
+    //end v4
+
 
     @Ignore
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy年MM月dd日");
@@ -159,7 +174,7 @@ public class RecommendCharacter implements Parcelable {
         return null;
     }
 
-    public boolean deleteImageBackgroundImage(Context context){
+    public boolean deleteBackgroundImage(Context context){
         if(backgroundImageUri != null){
              BitmapUtility.deletePrivateImage(context, backgroundImageUri);
              this.backgroundImageUri = null;
@@ -185,7 +200,7 @@ public class RecommendCharacter implements Parcelable {
         return defaultColor;
     }
 
-    public Integer getHomeTextColor(){ return homeTextColor; }
+    public Integer getHomeTextColor(){ return homeTextColor != null ? homeTextColor : Color.parseColor("#444444"); }
 
     public String getFormattedDate(){
         return FORMAT.format(created);

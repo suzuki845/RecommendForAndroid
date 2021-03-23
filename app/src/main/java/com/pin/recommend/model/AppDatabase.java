@@ -21,7 +21,7 @@ import com.pin.recommend.model.entity.StoryPicture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Account.class, RecommendCharacter.class, Story.class, StoryPicture.class}, version = 2, exportSchema = true)
+@Database(entities = {Account.class, RecommendCharacter.class, Story.class, StoryPicture.class}, version = 4, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -50,6 +50,8 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class, DATABASE_NAME)
                             .allowMainThreadQueries()
                             .addMigrations(MIGRATION_1_2)
+                            .addMigrations(MIGRATION_2_3)
+                            .addMigrations(MIGRATION_3_4)
                             .build();
                 }
             }
@@ -67,6 +69,22 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE RecommendCharacter ADD COLUMN fontFamily TEXT");
         }
     };
+
+    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE RecommendCharacter ADD COLUMN storySortOrder INTEGER DEFAULT 0 NOT NULL");
+        }
+    };
+
+    static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE RecommendCharacter ADD COLUMN backgroundImageOpacity REAL DEFAULT 1 NOT NULL");
+            database.execSQL("ALTER TABLE RecommendCharacter ADD COLUMN homeTextShadowColor INTEGER");
+        }
+    };
+
 
 
 }

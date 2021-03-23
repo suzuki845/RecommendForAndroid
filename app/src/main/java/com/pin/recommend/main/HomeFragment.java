@@ -36,13 +36,18 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.pin.imageutil.BitmapUtility;
+import com.pin.recommend.CharacterDetailActivity;
+import com.pin.recommend.Constants;
 import com.pin.recommend.EditCharacterActivity;
 import com.pin.recommend.MyApplication;
 import com.pin.recommend.R;
+import com.pin.recommend.dialog.BackgroundSettingDialogFragment;
 import com.pin.recommend.dialog.ColorPickerDialogFragment;
 import com.pin.recommend.dialog.DialogActionListener;
+import com.pin.recommend.dialog.TextSettingDialogFragment;
 import com.pin.recommend.dialog.ToolbarSettingDialogFragment;
 import com.pin.recommend.model.entity.Account;
+import com.pin.recommend.model.entity.AnniversaryManager;
 import com.pin.recommend.model.entity.RecommendCharacter;
 import com.pin.recommend.model.viewmodel.EditStateViewModel;
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel;
@@ -78,6 +83,7 @@ public class HomeFragment extends Fragment {
     private TextView firstText;
     private TextView dateView;
     private TextView elapsedView;
+    private TextView anniversaryView;
 
     private Date updateDateTime;
     private Calendar calendar = Calendar.getInstance();
@@ -87,6 +93,8 @@ public class HomeFragment extends Fragment {
     private EditStateViewModel editStateViewModel;
 
     private RecommendCharacter character;
+
+    private AnniversaryManager anniversaryManager;
 
     public static HomeFragment newInstance(int index) {
         HomeFragment fragment = new HomeFragment();
@@ -110,6 +118,8 @@ public class HomeFragment extends Fragment {
 
         character = getActivity().getIntent().getParcelableExtra(INTENT_CHARACTER);
 
+        anniversaryManager = new AnniversaryManager(character);
+
         setHasOptionsMenu(true);
     }
 
@@ -122,6 +132,7 @@ public class HomeFragment extends Fragment {
         firstText = root.findViewById(R.id.first_text);
         elapsedView = root.findViewById(R.id.elapsedTime);
         characterNameView = root.findViewById(R.id.character_name);
+        anniversaryView = root.findViewById(R.id.anniversary);
 
         initializeText(character);
 
@@ -130,8 +141,11 @@ public class HomeFragment extends Fragment {
             @Override
             public void onChanged(RecommendCharacter character) {
                 if(character == null) return;
-                if(character.hasIconImage()) {
-                    iconImageView.setImageBitmap(character.getIconImage(getContext(), 500, 500));
+                HomeFragment.this.character = character;
+
+                Bitmap image = character.getIconImage(getContext(), 500, 500);
+                if(image != null){
+                    iconImageView.setImageBitmap(image);
                 }
 
                 initializeText(character);
@@ -144,12 +158,24 @@ public class HomeFragment extends Fragment {
     private void initializeText(RecommendCharacter character){
         firstText.setText(character.getAboveText());
         firstText.setTextColor(character.getHomeTextColor());
+        firstText.setShadowLayer(4, 0 ,0, character.getHomeTextShadowColor());
+
         dateView.setText(character.getBelowText());
         dateView.setTextColor(character.getHomeTextColor());
+        dateView.setShadowLayer(4, 0 ,0, character.getHomeTextShadowColor());
+
         elapsedView.setTextColor(character.getHomeTextColor());
         elapsedView.setText(character.getDiffDays(now));
+        elapsedView.setShadowLayer(4, 0 ,0, character.getHomeTextShadowColor());
+
         characterNameView.setText(character.name);
         characterNameView.setTextColor(character.getHomeTextColor());
+        characterNameView.setShadowLayer(4, 0 ,0, character.getHomeTextShadowColor());
+
+        anniversaryManager.initialize(character);
+        anniversaryView.setText(anniversaryManager.nextOrIsAnniversary(now.getTime()));
+        anniversaryView.setTextColor(character.getHomeTextColor());
+        anniversaryView.setShadowLayer(4, 0 ,0, character.getHomeTextShadowColor());
 
         try{
             if(character.fontFamily != null && !character.fontFamily.equals("default")){
@@ -158,25 +184,27 @@ public class HomeFragment extends Fragment {
                 dateView.setTypeface(font);
                 elapsedView.setTypeface(font);
                 characterNameView.setTypeface(font);
+                anniversaryView.setTypeface(font);
             }else{
                 firstText.setTypeface(null);
                 dateView.setTypeface(null);
                 elapsedView.setTypeface(null);
                 characterNameView.setTypeface(null);
+                anniversaryView.setTypeface(null);
             }
         }catch(RuntimeException e){
             System.out.println("font missing " + character.fontFamily);
         }
 
     }
-
+    
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.edit_mode, menu);
         final MenuItem editMode = menu.findItem(R.id.edit_mode);
 
-        Account account = MyApplication.getAccountViewModel((AppCompatActivity) getActivity()).getAccount().getValue();
+        Account account = MyApplication.getAccountViewModel((AppCompatActivity) getActivity()).getAccountLiveData().getValue();
         final int textColor = character.getToolbarTextColor(getContext(), account.getToolbarTextColor());
         editStateViewModel.getEditMode().observe(this, new Observer<Boolean>() {
             @Override
@@ -197,21 +225,6 @@ public class HomeFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
-            case R.id.change_body_text_color:
-                ColorPickerDialogFragment bodyTextPickerDialogFragment = new ColorPickerDialogFragment(new DialogActionListener<ColorPickerDialogFragment>() {
-                    @Override
-                    public void onDecision(ColorPickerDialogFragment dialog) {
-                        character.homeTextColor = dialog.getColor();
-                        characterViewModel.update(character);
-                    }
-                    @Override
-                    public void onCancel() {
-
-                    }
-                });
-                bodyTextPickerDialogFragment.setDefaultColor(character.getHomeTextColor());
-                bodyTextPickerDialogFragment.show(getActivity().getSupportFragmentManager(), ToolbarSettingDialogFragment.TAG);
-                return true;
             case R.id.edit_mode:
                 Intent intent = new Intent(getContext(), EditCharacterActivity.class);
                 intent.putExtra(EditCharacterActivity.INTENT_EDIT_CHARACTER, character);
@@ -221,65 +234,6 @@ public class HomeFragment extends Fragment {
         return true;
     }
 
-
-    private static final int REQUEST_PICK_ICON = 2000;
-    public void onSetIcon(View v){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!RuntimePermissionUtils.hasSelfPermissions(getActivity(), android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                if(RuntimePermissionUtils.shouldShowRequestPermissionRationale(getActivity(), android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    RuntimePermissionUtils.showAlertDialog(getActivity().getFragmentManager(),
-                            "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください");
-                    return;
-                }else{
-                    requestPermissions(
-                            new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                            REQUEST_PICK_IMAGE);
-                    return;
-                }
-            }
-        }
-
-        if (Build.VERSION.SDK_INT < 19) {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_PICK_ICON);
-        } else {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_PICK_ICON);
-        }
-    }
-
-
-    private int pickMode = 0;
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent result) {
-        if (requestCode == REQUEST_PICK_ICON && resultCode == RESULT_OK) {
-            beginCropIcon(result.getData());
-            pickMode = REQUEST_PICK_ICON;
-        } else if (pickMode == REQUEST_PICK_ICON) {
-            handleCropIcon(resultCode, result);
-            pickMode = 0;
-        }
-
-        super.onActivityResult(requestCode, resultCode, result);
-    }
-
-    private void beginCropIcon(Uri source) {
-        Uri destination = Uri.fromFile(new File(getActivity().getCacheDir(), "cropped"));
-        Crop.of(source, destination).asSquare().start(getActivity(), this);
-    }
-
-    private void handleCropIcon(int resultCode, Intent result) {
-        if (resultCode == RESULT_OK) {
-            Uri uri = Crop.getOutput(result);
-            updateIconBitmap = BitmapUtility.decodeUri(getActivity(), uri, iconImageView.getWidth(), iconImageView.getHeight());
-            iconImageView.setImageBitmap(updateIconBitmap);
-        } else if (resultCode == Crop.RESULT_ERROR) {
-            Toast.makeText(getActivity(), Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
 
 
 }

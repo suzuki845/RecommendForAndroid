@@ -71,6 +71,8 @@ public class CreateStoryActivity extends AppCompatActivity {
     private AdMobAdaptiveBannerManager adMobManager;
     private ViewGroup adViewContainer;
 
+    private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,7 +115,9 @@ public class CreateStoryActivity extends AppCompatActivity {
             }
         });
 
-        accountViewModel.getAccount().observe(this, new Observer<Account>() {
+        toolbar = findViewById(R.id.toolbar);
+
+        accountViewModel.getAccountLiveData().observe(this, new Observer<Account>() {
             @Override
             public void onChanged(Account account) {
                 initializeToolbar(account);
@@ -128,7 +132,6 @@ public class CreateStoryActivity extends AppCompatActivity {
     }
 
     private void initializeToolbar(Account account){
-        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(account.getToolbarBackgroundColor());
         toolbar.setTitleTextColor(account.getToolbarTextColor());
         Drawable drawable = DrawableCompat.wrap(toolbar.getOverflowIcon());
@@ -158,7 +161,6 @@ public class CreateStoryActivity extends AppCompatActivity {
             }
         }
 
-        System.out.println("onPickImage 3");
         if (Build.VERSION.SDK_INT < 19) {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
@@ -210,6 +212,9 @@ public class CreateStoryActivity extends AppCompatActivity {
                 pickStoryPictureAdapter.add(bitmap);
             }
         }
+
+        getIntent().putExtra(Constants.PICK_IMAGE, true);
+
         super.onActivityResult(requestCode, resultCode, resultData);
     }
 

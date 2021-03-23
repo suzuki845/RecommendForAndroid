@@ -57,7 +57,7 @@ public class SlideShowActivity extends AppCompatActivity {
         sliderView = findViewById(R.id.slider);
         sliderView.stopAutoCycle();
 
-        accountViewModel.getAccount().observe(this, new Observer<Account>() {
+        accountViewModel.getAccountLiveData().observe(this, new Observer<Account>() {
             @Override
             public void onChanged(Account account) {
                 initializeToolbar(account);

@@ -65,6 +65,8 @@ class EditCharacterActivity : AppCompatActivity() {
     private lateinit var adMobManager: AdMobAdaptiveBannerManager
     private lateinit var adViewContainer: ViewGroup
 
+    private lateinit var toolbar: Toolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_character)
@@ -102,6 +104,8 @@ class EditCharacterActivity : AppCompatActivity() {
 
         characterLiveData.observe(this, Observer { character ->
             if (character == null) return@Observer
+            this.character = character
+
             character.getIconImage(this, 500, 500)?.let {
                 draftIcon = it
                 iconImageView.setImageBitmap(it)
@@ -123,7 +127,9 @@ class EditCharacterActivity : AppCompatActivity() {
             }
         })
 
-        accountViewModel.account.observe(this, Observer { account ->
+        toolbar = findViewById<Toolbar>(R.id.toolbar)
+
+        accountViewModel.accountLiveData.observe(this, Observer { account ->
             account?.let {
                 initializeToolbar(it)
             }
@@ -203,7 +209,6 @@ class EditCharacterActivity : AppCompatActivity() {
 
 
     private fun initializeToolbar(account: Account) {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         toolbar.setBackgroundColor(account.getToolbarBackgroundColor())
         toolbar.setTitleTextColor(account.getToolbarTextColor())
         val drawable = DrawableCompat.wrap(toolbar.overflowIcon!!)
@@ -246,12 +251,13 @@ class EditCharacterActivity : AppCompatActivity() {
     private var pickMode = 0
     override fun onActivityResult(requestCode: Int, resultCode: Int, result: Intent?) {
         if (requestCode == REQUEST_PICK_ICON && resultCode == RESULT_OK) {
-            beginCropIcon(result!!.data)
+            result?.let{beginCropIcon(it.data)}
             pickMode = REQUEST_PICK_ICON
         } else if (pickMode == REQUEST_PICK_ICON) {
-            handleCropIcon(resultCode, result!!)
+            result?.let { handleCropIcon(resultCode, it) }
             pickMode = 0
         }
+        this.intent.putExtra(Constants.PICK_IMAGE, true)
         return super.onActivityResult(requestCode, resultCode, result)
     }
 
@@ -282,7 +288,7 @@ class EditCharacterActivity : AppCompatActivity() {
             var drawable = item.icon
             if (drawable != null) {
                 drawable = DrawableCompat.wrap(drawable)
-                DrawableCompat.setTint(drawable, accountViewModel.account.value!!.getToolbarTextColor())
+                accountViewModel.accountLiveData.value?.getToolbarTextColor()?.let { DrawableCompat.setTint(drawable, it) }
             }
         }
     }

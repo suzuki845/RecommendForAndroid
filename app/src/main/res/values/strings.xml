@@ -4,7 +4,7 @@
 
     <!-- admob test
     <string name="ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-    -->
+-->
     <string name="admob_app_id">ca-app-pub-6083382584515170~8391014938</string>
 
     <string name="app_name">推して何日？</string>
@@ -17,5 +17,25 @@
     <string name="title_activity_main"></string>
     <string name="tab_text_1">ホーム</string>
     <string name="tab_text_2">ストーリー</string>
+
+    <!-- use pass code lock -->
+    <string name="image_error">image</string>
+    <string name="cancel">Cancel</string>
+    <string name="passcode_confirm">パスコードを入力してください</string>
+    <string name="passcode_lock">パスコードロック</string>
+    <string name="passcode_set">パスコードを設定してください</string>
+    <string name="passcode_input">パスコードを入力してください</string>
+    <string name="zero">0</string>
+    <string name="one">1</string>
+    <string name="two">2</string>
+    <string name="three">3</string>
+    <string name="four">4</string>
+    <string name="five">5</string>
+    <string name="six">6</string>
+    <string name="seven">7</string>
+    <string name="eight">8</string>
+    <string name="nine">9</string>
+    <string name="period">.</string>
+    <string name="title_activity_global_setting">GlobalSettingActivity</string>
 
 </resources>

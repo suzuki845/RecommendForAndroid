@@ -21,6 +21,7 @@
                 <TextView
                     android:id="@+id/elapsedTime"
                     android:textSize="20sp"
+                    android:textStyle="bold"
                     android:text="0日"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

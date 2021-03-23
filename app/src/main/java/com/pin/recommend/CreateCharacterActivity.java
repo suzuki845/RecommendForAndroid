@@ -61,6 +61,8 @@ public class CreateCharacterActivity extends AppCompatActivity {
     private AdMobAdaptiveBannerManager adMobManager;
     private ViewGroup adViewContainer;
 
+    private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +91,9 @@ public class CreateCharacterActivity extends AppCompatActivity {
             }
         });
 
-        LiveData<Account> accountLiveData = accountViewModel.getAccount();
+        toolbar = findViewById(R.id.toolbar);
+
+        LiveData<Account> accountLiveData = accountViewModel.getAccountLiveData();
         accountLiveData.observe(this, new Observer<Account>() {
             @Override
             public void onChanged(Account account) {
@@ -99,7 +103,6 @@ public class CreateCharacterActivity extends AppCompatActivity {
     }
 
     private void initializeToolbar(Account account){
-        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(account.getToolbarBackgroundColor());
         toolbar.setTitleTextColor(account.getToolbarTextColor());
         Drawable drawable = DrawableCompat.wrap(toolbar.getOverflowIcon());
@@ -110,7 +113,7 @@ public class CreateCharacterActivity extends AppCompatActivity {
 
     public void onCreateCharacter(){
         RecommendCharacter character = new RecommendCharacter();
-        character.accountId = accountViewModel.getAccount().getValue().id;
+        character.accountId = accountViewModel.getAccountLiveData().getValue().id;
         character.created = createdData;
         character.name = characterNameView.getText().toString();
         if(iconImageBitmap != null) {
@@ -195,6 +198,8 @@ public class CreateCharacterActivity extends AppCompatActivity {
             handleCropIcon(resultCode, result);
             pickMode = 0;
         }
+
+        getIntent().putExtra(Constants.PICK_IMAGE, true);
 
         super.onActivityResult(requestCode, resultCode, result);
     }

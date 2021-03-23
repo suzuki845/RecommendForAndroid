@@ -4,6 +4,7 @@ import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.pin.recommend.model.AppDatabase;
 import com.pin.recommend.model.dao.StoryDao;
@@ -18,7 +19,7 @@ public class StoryViewModel extends AndroidViewModel {
     private StoryDao storyDao;
     private StoryPictureDao storyPictureDao;
 
-    private LiveData<List<Story>> storiesLiveData;
+    private MutableLiveData<LiveData<List<Story>>> storiesLiveData = new MutableLiveData();
 
     public StoryViewModel(Application application){
         super(application);
@@ -26,11 +27,20 @@ public class StoryViewModel extends AndroidViewModel {
         storyPictureDao = AppDatabase.getDatabase(application).storyPictureDao();
     }
 
-    public LiveData<List<Story>> findByTrackedCharacterId(Long characterId){
-        if(storiesLiveData == null){
-            storiesLiveData = storyDao.findByTrackedCharacterId(characterId);
-        }
+    public MutableLiveData<LiveData<List<Story>>> getStories(){
         return storiesLiveData;
+    }
+
+    public void findByTrackedCharacterIdOrderDesc(Long characterId){
+        storiesLiveData.postValue(storyDao.findByTrackedCharacterIdOrderDesc(characterId));
+    }
+
+    public void findByTrackedCharacterIdOrderAsc(Long characterId){
+        storiesLiveData.postValue(storyDao.findByTrackedCharacterIdOrderAsc(characterId));
+    }
+
+    public LiveData<List<Story>> findByTrackedCharacterIdOrderByCreated(Long characterId, boolean isAsc){
+        return storyDao.findByTrackedCharacterIdOrderByCreated(characterId, isAsc);
     }
 
     public LiveData<Story> findByTrackedId(long id){

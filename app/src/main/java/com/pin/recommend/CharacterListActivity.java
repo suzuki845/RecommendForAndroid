@@ -46,6 +46,8 @@ public class CharacterListActivity extends AppCompatActivity {
     private AdMobAdaptiveBannerManager adMobManager;
     private ViewGroup adViewContainer;
 
+    private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +79,9 @@ public class CharacterListActivity extends AppCompatActivity {
             }
         });
 
-        LiveData<Account> accountLiveData = accountViewModel.getAccount();
+        toolbar = findViewById(R.id.toolbar);
+
+        LiveData<Account> accountLiveData = accountViewModel.getAccountLiveData();
         accountLiveData.observe(this, new Observer<Account>() {
             @Override
             public void onChanged(Account account) {
@@ -115,7 +119,6 @@ public class CharacterListActivity extends AppCompatActivity {
     }
 
     private void initializeToolbar(Account account){
-        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(account.getToolbarBackgroundColor());
         toolbar.setTitleTextColor(account.getToolbarTextColor());
         Drawable drawable = DrawableCompat.wrap(toolbar.getOverflowIcon());
@@ -148,7 +151,7 @@ public class CharacterListActivity extends AppCompatActivity {
     private void setMenuItemIconTint(MenuItem item){
         Drawable drawable = item.getIcon();
         drawable = DrawableCompat.wrap(drawable);
-        DrawableCompat.setTint(drawable, accountViewModel.getAccount().getValue().getToolbarTextColor());
+        DrawableCompat.setTint(drawable, accountViewModel.getAccountLiveData().getValue().getToolbarTextColor());
     }
 
     private void setAllMenuItemIconTint(Menu menu){
@@ -157,19 +160,23 @@ public class CharacterListActivity extends AppCompatActivity {
             Drawable drawable = item.getIcon();
             if (drawable != null) {
                 drawable = DrawableCompat.wrap(drawable);
-                DrawableCompat.setTint(drawable, accountViewModel.getAccount().getValue().getToolbarTextColor());
+                DrawableCompat.setTint(drawable, accountViewModel.getAccountLiveData().getValue().getToolbarTextColor());
             }
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        /*
         switch (item.getItemId()) {
+            case R.id.passcode_lock:
+                startActivity(PassCodeSetActivity.createIntent(getApplicationContext()));
+                return true;
             case R.id.setting_toolbar:
                 ToolbarSettingDialogFragment toolbarSettingDialogFragment = new ToolbarSettingDialogFragment(new DialogActionListener<ToolbarSettingDialogFragment>() {
                     @Override
                     public void onDecision(final ToolbarSettingDialogFragment dialog) {
-                        Account account = accountViewModel.getAccount().getValue();
+                        Account account = accountViewModel.getAccountLiveData().getValue();
                         account.toolbarBackgroundColor = dialog.getBackgroundColor();
                         account.toolbarTextColor = dialog.getTextColor();
                         accountViewModel.saveAccount(account);
@@ -179,8 +186,8 @@ public class CharacterListActivity extends AppCompatActivity {
 
                     }
                 });
-                toolbarSettingDialogFragment.setDefaultBackgroundColor(accountViewModel.getAccount().getValue().getToolbarBackgroundColor());
-                toolbarSettingDialogFragment.setDefaultTextColor(accountViewModel.getAccount().getValue().getToolbarTextColor());
+                toolbarSettingDialogFragment.setDefaultBackgroundColor(accountViewModel.getAccountLiveData().getValue().getToolbarBackgroundColor());
+                toolbarSettingDialogFragment.setDefaultTextColor(accountViewModel.getAccountLiveData().getValue().getToolbarTextColor());
                 toolbarSettingDialogFragment.show(getSupportFragmentManager(), ToolbarSettingDialogFragment.TAG);
                 return true;
             case R.id.edit_mode:
@@ -197,6 +204,23 @@ public class CharacterListActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+
+                        }
+         */
+        switch (item.getItemId()) {
+            case R.id.edit_mode:
+                if(editListViewModel.getEditMode().getValue()) {
+                    editListViewModel.setEditMode(false);
+                }else{
+                    editListViewModel.setEditMode(true);
+                }
+                return true;
+            case R.id.setting:
+                startActivity(new Intent(this, GlobalSettingActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
         }
     }
 

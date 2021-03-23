@@ -116,7 +116,7 @@ public class StoryDetailActivity extends AppCompatActivity {
             }
         });
 
-        accountViewModel.getAccount().observe(this, new Observer<Account>() {
+        accountViewModel.getAccountLiveData().observe(this, new Observer<Account>() {
             @Override
             public void onChanged(Account account) {
                 initializeToolbar(account);

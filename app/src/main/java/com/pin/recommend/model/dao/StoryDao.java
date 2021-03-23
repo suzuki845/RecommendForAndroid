@@ -34,7 +34,14 @@ public interface StoryDao {
     public List<Story> findByCharacterId(long characterId);
 
     @Query("SELECT * FROM Story WHERE characterId = :characterId ORDER BY created DESC")
-    public LiveData<List<Story>> findByTrackedCharacterId(long characterId);
+    public LiveData<List<Story>> findByTrackedCharacterIdOrderDesc(long characterId);
 
+    @Query("SELECT * FROM Story WHERE characterId = :characterId ORDER BY created ASC")
+    public LiveData<List<Story>> findByTrackedCharacterIdOrderAsc(long characterId);
+
+    @Query("SELECT * FROM Story WHERE characterId = :characterId " +
+            "ORDER BY CASE WHEN :isAsc = 1 THEN created END ASC, " +
+            "CASE WHEN :isAsc = 0 THEN created END DESC")
+    public LiveData<List<Story>> findByTrackedCharacterIdOrderByCreated(long characterId, boolean isAsc);
 
 }

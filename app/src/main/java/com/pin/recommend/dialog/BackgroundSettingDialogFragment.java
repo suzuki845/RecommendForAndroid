@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
@@ -14,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -21,6 +25,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.DialogFragment;
 
 import com.pin.imageutil.BitmapUtility;
+import com.pin.recommend.Constants;
 import com.pin.recommend.R;
 import com.pin.util.DisplaySizeCheck;
 import com.pin.util.RuntimePermissionUtils;
@@ -36,10 +41,9 @@ public class BackgroundSettingDialogFragment extends DialogFragment {
     public static final String TAG = "com.pin.recommend.BackgroundSettingDialogFragment";
 
     private ImageView backgroundImageView;
-    private View backgroundColorView;
-
-    private Button backgroundImageButton;
-    private Button backgroundColorButton;
+    private TextView imageOpacityLabel;
+    private SeekBar imageOpacityView;
+    private ImageView backgroundColorView;
 
     private DialogActionListener<BackgroundSettingDialogFragment> actionListener;
 
@@ -52,6 +56,10 @@ public class BackgroundSettingDialogFragment extends DialogFragment {
         backgroundImage = bitmap;
     }
     public Bitmap getBackgroundImage(){return backgroundImage;}
+
+    private float imageOpacity = 1.0f;
+    public void setDefaultImageOpacity(float o){imageOpacity = o;}
+    public float getImageOpacity(){return imageOpacity;}
 
     private int backgroundColor;
     public void setDefaultBackgroundColor(int color){
@@ -68,11 +76,44 @@ public class BackgroundSettingDialogFragment extends DialogFragment {
         builder.setTitle("背景の設定");
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View root = inflater.inflate(R.layout.dialog_background_setting, null);
+
         backgroundImageView = root.findViewById(R.id.preview_background_image);
+        imageOpacityLabel = root.findViewById(R.id.image_opacity_label);
+        imageOpacityView = root.findViewById(R.id.image_opacity);
+        backgroundColorView = root.findViewById(R.id.preview_background_color);
+
+        if(backgroundImage != null){
+            imageOpacityView.setVisibility(View.VISIBLE);
+            imageOpacityLabel.setVisibility(View.VISIBLE);
+        }else{
+            imageOpacityView.setVisibility(View.GONE);
+            imageOpacityLabel.setVisibility(View.GONE);
+        }
+        backgroundImageView.setAlpha(imageOpacity);
+
+        imageOpacityView.setProgress((int) (imageOpacity * 10));
+        imageOpacityView.setMax(10);
+        imageOpacityView.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(
+                            SeekBar seekBar, int progress, boolean fromUser) {
+                        float o = progress * 0.1f;
+                        BackgroundSettingDialogFragment.this.imageOpacity = o;
+                        backgroundImageView.setAlpha(o);
+                    }
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+                });
+
         backgroundImageView.setImageBitmap(backgroundImage);
-        backgroundImageView.setOnClickListener(new View.OnClickListener() {
+        backgroundImageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 PopupMenu popup = new PopupMenu(getActivity(), backgroundImageView);
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.pic_story_picture_popup, popup.getMenu());
@@ -83,30 +124,32 @@ public class BackgroundSettingDialogFragment extends DialogFragment {
                             case R.id.remove:
                                 backgroundImage = null;
                                 backgroundImageView.setImageBitmap(null);
+                                imageOpacityView.setVisibility(View.GONE);
+                                imageOpacityLabel.setVisibility(View.GONE);
                         }
                         return false;
                     }
                 });
                 popup.show();
+                return true;
             }
+
         });
-        backgroundImageButton = root.findViewById(R.id.background_image_button);
-        backgroundImageButton.setOnClickListener(new View.OnClickListener() {
+        backgroundImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onSetBackground(null);
             }
         });
-        backgroundColorView = root.findViewById(R.id.preview_background_color);
-        backgroundColorView.setBackgroundColor(backgroundColor);
-        backgroundColorButton = root.findViewById(R.id.background_color_button);
-        backgroundColorButton.setOnClickListener(new View.OnClickListener() {
+
+        backgroundColorView.setImageBitmap(colorToBitmap(30, 30, backgroundColor));
+        backgroundColorView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ColorPickerDialogFragment dialog = new ColorPickerDialogFragment(new DialogActionListener<ColorPickerDialogFragment>() {
                     @Override
                     public void onDecision(ColorPickerDialogFragment dialog) {
-                        backgroundColorView.setBackgroundColor(dialog.getColor());
+                        backgroundColorView.setImageBitmap(colorToBitmap(30, 30, dialog.getColor()));
                         backgroundColor = dialog.getColor();
                     }
                     @Override
@@ -134,6 +177,12 @@ public class BackgroundSettingDialogFragment extends DialogFragment {
         return builder.create();
     }
 
+    private Bitmap colorToBitmap(int w, int h, int color){
+        Bitmap bmp=Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+        Canvas canvas=new Canvas(bmp);
+        canvas.drawColor(color);
+        return bmp;
+    }
 
     private static final int REQUEST_PICK_BACKGROUND = 2001;
     public void onSetBackground(View v){
@@ -175,6 +224,9 @@ public class BackgroundSettingDialogFragment extends DialogFragment {
             handleCropBackground(resultCode, result);
             pickMode = 0;
         }
+
+        getActivity().getIntent().putExtra(Constants.PICK_IMAGE, true);
+
         super.onActivityResult(requestCode, resultCode, result);
     }
 
@@ -190,6 +242,8 @@ public class BackgroundSettingDialogFragment extends DialogFragment {
             Bitmap bitmap = BitmapUtility.decodeUri(getActivity(), uri);
             backgroundImageView.setImageBitmap(bitmap);
             backgroundImage = bitmap;
+            imageOpacityView.setVisibility(View.VISIBLE);
+            imageOpacityLabel.setVisibility(View.VISIBLE);
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(getActivity(), Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
         }

@@ -70,6 +70,8 @@ public class EditStoryActivity extends AppCompatActivity {
     private AdMobAdaptiveBannerManager adMobManager;
     private ViewGroup adViewContainer;
 
+    private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,7 +133,9 @@ public class EditStoryActivity extends AppCompatActivity {
             }
         });
 
-        accountViewModel.getAccount().observe(this, new Observer<Account>() {
+        toolbar = findViewById(R.id.toolbar);
+
+        accountViewModel.getAccountLiveData().observe(this, new Observer<Account>() {
             @Override
             public void onChanged(Account account) {
                 initializeToolbar(account);
@@ -146,7 +150,6 @@ public class EditStoryActivity extends AppCompatActivity {
     }
 
     private void initializeToolbar(Account account){
-        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(account.getToolbarBackgroundColor());
         toolbar.setTitleTextColor(account.getToolbarTextColor());
         Drawable drawable = DrawableCompat.wrap(toolbar.getOverflowIcon());
@@ -227,6 +230,9 @@ public class EditStoryActivity extends AppCompatActivity {
                 pickStoryPictureAdapter.add(bitmap);
             }
         }
+
+        getIntent().putExtra(Constants.PICK_IMAGE, true);
+
         super.onActivityResult(requestCode, resultCode, resultData);
     }
 

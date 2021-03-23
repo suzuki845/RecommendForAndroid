@@ -8,4 +8,19 @@
     <dimen name="appbar_padding">16dp</dimen>
     <dimen name="appbar_padding_top">8dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
+
+    <!-- use pass code lock -->
+    <dimen name="titlebar_height">45dip</dimen>
+    <dimen name="button_height">37dip</dimen>
+    <dimen name="button_width">50dip</dimen>
+    <dimen name="button_margin">5dip</dimen>
+    <dimen name="text_size_micro">12sp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_pre_medium">16sp</dimen>
+    <dimen name="text_size_medium">18sp</dimen>
+    <dimen name="text_size_large">22sp</dimen>
+    <dimen name="text_size_huge">26sp</dimen>
+    <dimen name="text_size_extra_huge">36sp</dimen>
+
 </resources>

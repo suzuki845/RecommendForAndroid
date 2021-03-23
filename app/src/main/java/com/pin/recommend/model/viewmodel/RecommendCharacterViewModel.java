@@ -82,7 +82,7 @@ public class RecommendCharacterViewModel extends AndroidViewModel {
             @Override
             public void run() {
                 character.deleteIconImage(getApplication());
-                character.deleteImageBackgroundImage(getApplication());
+                character.deleteBackgroundImage(getApplication());
 
                 List<Story> stories = storyDao.findByCharacterId(character.id);
                 for(Story story : stories){
