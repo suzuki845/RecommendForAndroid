@@ -1,6 +1,7 @@
 package com.pin.recommend.main
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -25,6 +26,7 @@ import com.pin.recommend.adapter.VerticalRecyclerViewAdapter
 import com.pin.recommend.dialog.ColorPickerDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.dialog.ToolbarSettingDialogFragment
+import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.EditStateViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
@@ -129,12 +131,16 @@ class StoryListFragment : Fragment() {
         verticalRecyclerViewAdapter.updateCharacter(character)
     }
 
+    private fun accountToolbarTextColor(account: Account?): Int {
+        return account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
         val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
-        val textColor = account?.getToolbarTextColor()?.let { character.getToolbarTextColor(context, it) }
+        val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
         editListViewModel.editMode.observe(this, Observer { mode ->
             val s: SpannableString = if (mode) {
                 SpannableString("完了")
