@@ -1,0 +1,42 @@
+package com.pin.recommend.model.entity
+
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+import java.util.*
+
+@Entity(
+        foreignKeys = [
+            ForeignKey(
+                    entity = RecommendCharacter::class,
+                    parentColumns = ["id"],
+                    childColumns = ["characterId"],
+                    onDelete = ForeignKey.CASCADE,
+                    onUpdate = ForeignKey.CASCADE)
+        ]
+)
+class Event(
+        @PrimaryKey(autoGenerate = true)
+        var id: Long,
+        var characterId: Long,
+        var title: String?,
+        var memo: String?,
+        var date: Date
+){
+    fun getShortTitle(length: Int): String? {
+        var t = title ?: ""
+        t = t.replace("\n", " ")
+        return if (t.length >= length) {
+            t.substring(0, length)
+        } else t
+    }
+
+    fun getShortMemo(length: Int): String? {
+        var t = memo ?: ""
+        t = t.replace("\n", " ")
+        return if (t.length >= length) {
+            t.substring(0, length)
+        } else t
+    }
+}

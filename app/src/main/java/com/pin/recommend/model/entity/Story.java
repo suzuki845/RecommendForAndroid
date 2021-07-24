@@ -24,7 +24,15 @@ import java.util.List;
 
 import static androidx.room.ForeignKey.CASCADE;
 
-@Entity(foreignKeys = @ForeignKey(entity = RecommendCharacter.class, parentColumns = "id", childColumns = "characterId", onDelete = CASCADE, onUpdate = CASCADE))
+@Entity(
+        foreignKeys = @ForeignKey(
+                entity = RecommendCharacter.class,
+                parentColumns = "id",
+                childColumns = "characterId",
+                onDelete = CASCADE,
+                onUpdate = CASCADE
+        )
+)
 public class Story implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)

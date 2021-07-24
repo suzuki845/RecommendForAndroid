@@ -3,6 +3,7 @@ package com.pin.recommend.model.entity;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -18,6 +19,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.pin.imageutil.BitmapUtility;
+import com.pin.recommend.R;
 import com.pin.recommend.model.AppDatabase;
 import com.pin.recommend.util.TimeUtil;
 

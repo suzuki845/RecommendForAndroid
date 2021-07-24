@@ -1,10 +1,10 @@
 <resources>
-    <!-- admob
+    <!-- admob -->
     <string name="ad_unit_id">ca-app-pub-6083382584515170/4632968983</string>
--->
-    <!-- admob test -->
-    <string name="ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 
+    <!-- admob test
+    <string name="ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+-->
     <string name="admob_app_id">ca-app-pub-6083382584515170~8391014938</string>
 
     <string name="app_name">推して何日？</string>
@@ -17,6 +17,7 @@
     <string name="title_activity_main"></string>
     <string name="tab_text_1">ホーム</string>
     <string name="tab_text_2">ストーリー</string>
+    <string name="tab_text_3">Pay ＆ 貯金</string>
 
     <!-- use pass code lock -->
     <string name="image_error">image</string>
@@ -37,5 +38,7 @@
     <string name="nine">9</string>
     <string name="period">.</string>
     <string name="title_activity_global_setting">GlobalSettingActivity</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

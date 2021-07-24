@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="com.pin.recommend.model.viewmodel.IntConverter"/>
+        <import type="com.pin.recommend.model.viewmodel.DateConverter"/>
+        <variable name="vm" type="com.pin.recommend.model.viewmodel.CreatePaymentViewModel"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#eeeeee"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:paddingLeft="6dp"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="6dp"
+                    android:text="Payか貯金の選択"
+                    android:labelFor="@+id/pay_or_savings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:id="@+id/pay_or_savings"
+                    android:background="#ffffff"
+                    android:padding="6dp"
+                    android:minHeight="46dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/pay"
+                        android:onClick="onPayType"
+                        android:text="Pay"
+                        android:textColor='@{vm.payColor}'
+                        android:textSize="20sp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+                    <TextView
+                        android:id="@+id/savings"
+                        android:onClick="onPayType"
+                        android:text="貯金"
+                        android:textColor='@{vm.savingsColor}'
+                        android:textSize="20sp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <TextView
+                    android:paddingLeft="6dp"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="6dp"
+                    android:text="日付"
+                    android:labelFor="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:background="#ffffff"
+                    android:paddingLeft="6dp"
+                    android:onClick="onShowDatePickerDialog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/date"
+                        android:text="@{DateConverter.toString(vm.date)}"
+                        android:minHeight="46dp"
+                        android:textSize="20sp"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <TextView
+                    android:paddingLeft="6dp"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="6dp"
+                    android:text="金額"
+                    android:labelFor="@+id/amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/amount"
+                        android:text="@={IntConverter.toString(vm.amount)}"
+                        android:inputType="number"
+                        android:minHeight="46dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <TextView
+                    android:paddingLeft="6dp"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="6dp"
+                    android:text="メモ"
+                    android:labelFor="@+id/memo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:background="#ffffff"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/memo"
+                        android:minHeight="46dp"
+                        android:text="@={vm.memo}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+
+                <TextView
+                    android:paddingLeft="6dp"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="6dp"
+                    android:text="タグ"
+                    android:labelFor="@+id/tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:background="#ffffff"
+                    android:paddingLeft="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tag"
+                        android:onClick="onShowTagDialog"
+                        android:text="@{vm.selectedTag.tagName}"
+                        android:minHeight="46dp"
+                        android:textSize="20sp"
+                        android:gravity="left|center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                    <View
+                        android:background="#eeeeee"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"/>
+                    <TextView
+                        android:onClick="toTagListActivity"
+                        android:id="@+id/to_edit"
+                        android:minHeight="46dp"
+                        android:textSize="20sp"
+                        android:text="編集"
+                        android:textColor="@color/blue_600"
+                        android:gravity="left|center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </ScrollView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

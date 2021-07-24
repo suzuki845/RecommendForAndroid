@@ -15,6 +15,9 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 
 import static com.pin.recommend.model.AppDatabase.MIGRATION_1_2;
+import static com.pin.recommend.model.AppDatabase.MIGRATION_2_3;
+import static com.pin.recommend.model.AppDatabase.MIGRATION_3_4;
+import static com.pin.recommend.model.AppDatabase.MIGRATION_4_5;
 
 @RunWith(AndroidJUnit4.class)
 public class MigrationTest {
@@ -32,7 +35,7 @@ public class MigrationTest {
     @Test
     public void migrateAll() throws IOException {
         // Create earliest version of the database.
-        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 2);
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 4);
         db.close();
 
         // Open latest version of the database. Room will validate the schema
@@ -48,5 +51,9 @@ public class MigrationTest {
 
     // Array of all migrations
     private static final Migration[] ALL_MIGRATIONS = new Migration[]{
-            MIGRATION_1_2};
+            //MIGRATION_1_2,
+            //MIGRATION_2_3,
+            //MIGRATION_3_4,
+            MIGRATION_4_5,
+    };
 }

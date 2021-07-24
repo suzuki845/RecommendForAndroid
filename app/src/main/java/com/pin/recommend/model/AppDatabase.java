@@ -2,6 +2,7 @@ package com.pin.recommend.model;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -10,10 +11,14 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.pin.recommend.model.dao.AccountDao;
+import com.pin.recommend.model.dao.PaymentDao;
+import com.pin.recommend.model.dao.PaymentTagDao;
 import com.pin.recommend.model.dao.RecommendCharacterDao;
 import com.pin.recommend.model.dao.StoryDao;
 import com.pin.recommend.model.dao.StoryPictureDao;
 import com.pin.recommend.model.entity.Account;
+import com.pin.recommend.model.entity.Payment;
+import com.pin.recommend.model.entity.PaymentTag;
 import com.pin.recommend.model.entity.RecommendCharacter;
 import com.pin.recommend.model.entity.Story;
 import com.pin.recommend.model.entity.StoryPicture;
@@ -21,7 +26,7 @@ import com.pin.recommend.model.entity.StoryPicture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Account.class, RecommendCharacter.class, Story.class, StoryPicture.class}, version = 4, exportSchema = true)
+@Database(entities = {Account.class, RecommendCharacter.class, Story.class, StoryPicture.class, Payment.class, PaymentTag.class }, version = 5, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -32,6 +37,10 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract StoryDao storyDao();
 
     public abstract StoryPictureDao storyPictureDao();
+
+    public abstract PaymentDao paymentDao();
+
+    public abstract PaymentTagDao paymentTagDao();
 
     private static final int NUMBER_OF_THREADS = 4;
 
@@ -52,6 +61,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             .addMigrations(MIGRATION_1_2)
                             .addMigrations(MIGRATION_2_3)
                             .addMigrations(MIGRATION_3_4)
+                            .addMigrations(MIGRATION_4_5)
                             .build();
                 }
             }
@@ -82,6 +92,48 @@ public abstract class AppDatabase extends RoomDatabase {
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE RecommendCharacter ADD COLUMN backgroundImageOpacity REAL DEFAULT 1 NOT NULL");
             database.execSQL("ALTER TABLE RecommendCharacter ADD COLUMN homeTextShadowColor INTEGER");
+        }
+    };
+
+
+    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL(
+                    "CREATE TABLE Payment (" +
+                            " id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                            " characterId INTEGER NOT NULL,"+
+                            " paymentTagId INTEGER,"+
+                            " amount REAL DEFAULT 0.0 NOT NULL," +
+                            " memo TEXT," +
+                            " type INTEGER DEFAULT 0 NOT NULL," +
+                            " createdAt INTEGER NOT NULL," +
+                            " updatedAt INTEGER NOT NULL," +
+                            " FOREIGN KEY(`characterId`) REFERENCES `RecommendCharacter`(`id`) ON UPDATE CASCADE ON DELETE CASCADE" +
+                            ");");
+            database.execSQL(
+                    "CREATE TABLE PaymentTag (" +
+                            " id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                            " tagName TEXT NOT NULL," +
+                            " type INTEGER DEFAULT 0 NOT NULL," +
+                            " createdAt INTEGER NOT NULL," +
+                            " updatedAt INTEGER NOT NULL" +
+                            ");");
+        }
+    };
+
+    static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL(
+                    "CREATE TABLE Event (" +
+                            " id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                            " characterId INTEGER NOT NULL,"+
+                            " title TEXT," +
+                            " memo TEXT," +
+                            " date INTEGER NOT NULL," +
+                            " FOREIGN KEY(`characterId`) REFERENCES `RecommendCharacter`(`id`) ON UPDATE CASCADE ON DELETE CASCADE" +
+                            ");");
         }
     };
 

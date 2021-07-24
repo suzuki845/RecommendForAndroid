@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="com.pin.recommend.model.viewmodel.DoubleConverter"/>
+        <import type="com.pin.recommend.model.viewmodel.IntConverter"/>
+        <import type="com.pin.recommend.model.viewmodel.DateConverter"/>
+        <import type="com.pin.recommend.model.viewmodel.DateMonthConverter"/>
+        <variable name="owner" type="com.pin.recommend.main.PaymentDetailsFragment" />
+        <variable name="vm" type="com.pin.recommend.model.viewmodel.PaymentDetailsViewModel"/>
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:background="#88ffffff"
+        tools:context=".main.PaymentDetailsFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:paddingLeft="4dp"
+                android:paddingTop="4dp"
+                android:paddingRight="4dp"
+                android:paddingBottom="8dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageButton
+                    android:id="@+id/prev_month"
+                    android:onClick="@{() -> owner.onPrevMonth()}"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_baseline_chevron_left_32"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/current_month"
+                    android:gravity="center"
+                    android:textSize="18dp"
+                    android:layout_weight="1"
+                    android:text="@{DateMonthConverter.toString(vm.currentDate)}"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"/>
+                <ImageButton
+                    android:id="@+id/next_month"
+                    android:onClick="@{() -> owner.onNextMonth()}"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_baseline_chevron_right_32"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/amount_month_payment"
+                    android:layout_gravity="center"
+                    android:text='@{"今月のPayは"+IntConverter.toString(vm.monthlyPaymentAmount)+"円です"}'
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:textColor="@color/colorPrimary"
+                    android:layout_gravity="center"
+                    android:text="全期間のPayを見る"
+                    android:onClick="@{() -> owner.toWholePeriodPaymentAmountView()}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/amount_month_savings"
+                    android:layout_gravity="center"
+                    android:text='@{"今月の貯金は"+IntConverter.toString(vm.monthlySavingsAmount)+"円です"}'
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:textColor="@color/colorPrimary"
+                    android:layout_gravity="center"
+                    android:text="全期間の貯金を見る"
+                    android:onClick="@{() -> owner.toWholePeriodSavingsAmountView()}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginBottom="70dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/payment_recycle_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="70dp"
+            android:tint="#ffffff"
+            app:srcCompat="@drawable/ic_add_24dp" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>
+

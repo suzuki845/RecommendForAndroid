@@ -115,6 +115,7 @@ class StoryListFragment : Fragment() {
         recyclerView.layoutManager = layoutManager
         recyclerView.setHasFixedSize(false)
         recyclerView.adapter = verticalRecyclerViewAdapter
+
         editListViewModel.editMode.observe(viewLifecycleOwner, Observer { aBoolean -> verticalRecyclerViewAdapter.setEditMode(aBoolean!!) })
         val fab: FloatingActionButton = root.findViewById(R.id.fab)
         fab.setOnClickListener {

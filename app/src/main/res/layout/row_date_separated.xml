@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.pin.recommend.model.viewmodel.DateConverter"/>
+        <import type="com.pin.recommend.model.viewmodel.DoubleConverter"/>
+        <import type="com.pin.recommend.model.viewmodel.IntConverter"/>
+        <variable
+            name="is_edit_mode"
+            type="java.lang.Boolean"/>
+        <variable
+            name="payment_and_tag"
+            type="com.pin.recommend.model.entity.PaymentAndTag" />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/date"
+            android:paddingLeft="4dp"
+            android:background="@color/grey_400"
+            android:gravity="left|center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/payment_recycle_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+</layout>

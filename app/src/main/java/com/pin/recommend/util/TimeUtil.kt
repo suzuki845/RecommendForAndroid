@@ -1,6 +1,5 @@
 package com.pin.recommend.util
 
-import androidx.room.Ignore
 import java.util.*
 
 class TimeUtil {
@@ -20,5 +19,50 @@ class TimeUtil {
             // 時の部分をクリアするには、setで入れないといけない。
             calendar[Calendar.HOUR_OF_DAY] = 0
         }
+
+        @JvmStatic
+        fun resetDate(date: Date): Date {
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            calendar.clear(Calendar.MINUTE)
+            calendar.clear(Calendar.SECOND)
+            calendar.clear(Calendar.MILLISECOND)
+            // 時の部分をクリアするには、setで入れないといけない。
+            calendar[Calendar.HOUR_OF_DAY] = 0
+            return calendar.time
+        }
+
+        @JvmStatic
+        fun monthlyStartDate(currentDate: Date): Date {
+            val cal = Calendar.getInstance()
+
+            //年月をセットする
+            cal.time = currentDate
+            val year = cal[Calendar.YEAR]
+            val month = cal[Calendar.MONTH]
+            var day = 0
+            cal[year, month, day, 0, 0] = 0
+
+            return cal.time
+        }
+
+        @JvmStatic
+        fun monthlyEndDate(currentDate: Date): Date {
+            val cal = Calendar.getInstance()
+
+            //年月をセットする
+            cal.time = currentDate
+            val year = cal[Calendar.YEAR]
+            val month = cal[Calendar.MONTH]
+            var day = 1
+            cal[year, month, day, 0, 0] = 0
+
+                //月末日を取得する
+            day = cal.getActualMaximum(Calendar.DATE)
+            cal[year, month, day, 0, 0] = 0
+            return cal.time
+        }
+
+
     }
 }

@@ -18,7 +18,7 @@ import com.pin.recommend.R;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2, R.string.tab_text_3};
 
     private final Context mContext;
 
@@ -36,6 +36,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return HomeFragment.newInstance(position + 1);
             case 1:
                 return new StoryListFragment().newInstance(position);
+            case 2:
+                return new PaymentDetailsFragment().newInstance(position);
         }
         return null;
     }
@@ -49,6 +51,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // Show 2 total pages.
-        return 2;
+        return 3;
     }
 }
