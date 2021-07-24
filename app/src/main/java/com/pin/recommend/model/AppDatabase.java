@@ -2,7 +2,6 @@ package com.pin.recommend.model;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -118,21 +117,6 @@ public abstract class AppDatabase extends RoomDatabase {
                             " type INTEGER DEFAULT 0 NOT NULL," +
                             " createdAt INTEGER NOT NULL," +
                             " updatedAt INTEGER NOT NULL" +
-                            ");");
-        }
-    };
-
-    static final Migration MIGRATION_5_6 = new Migration(5, 6) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL(
-                    "CREATE TABLE Event (" +
-                            " id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                            " characterId INTEGER NOT NULL,"+
-                            " title TEXT," +
-                            " memo TEXT," +
-                            " date INTEGER NOT NULL," +
-                            " FOREIGN KEY(`characterId`) REFERENCES `RecommendCharacter`(`id`) ON UPDATE CASCADE ON DELETE CASCADE" +
                             ");");
         }
     };
