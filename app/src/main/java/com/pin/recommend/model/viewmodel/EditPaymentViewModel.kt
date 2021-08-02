@@ -65,9 +65,9 @@ class EditPaymentViewModel(application: Application) : AndroidViewModel(applicat
 
     fun updatePayment(): Boolean{
 
-        Log.d("UPDATE!! amount", paymentAndTag.value?.payment?.amount.toString())
-        Log.d("UPDATE!! updatedAt", paymentAndTag.value?.payment?.updatedAt.toString())
-        Log.d("UPDATE!! memo", paymentAndTag.value?.payment?.memo.toString())
+        //Log.d("UPDATE!! amount", paymentAndTag.value?.payment?.amount.toString())
+        //Log.d("UPDATE!! updatedAt", paymentAndTag.value?.payment?.updatedAt.toString())
+        //Log.d("UPDATE!! memo", paymentAndTag.value?.payment?.memo.toString())
 
         val paymentAndTag = paymentAndTag.value
         val payment = paymentAndTag?.payment

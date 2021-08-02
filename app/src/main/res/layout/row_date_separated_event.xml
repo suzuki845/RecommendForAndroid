@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.pin.recommend.model.viewmodel.DateConverter"/>
+        <import type="com.pin.recommend.model.viewmodel.DoubleConverter"/>
+        <import type="com.pin.recommend.model.viewmodel.IntConverter"/>
+        <variable
+            name="is_edit_mode"
+            type="java.lang.Boolean"/>
+        <variable
+            name="payment_and_tag"
+            type="com.pin.recommend.model.entity.Event" />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:background="@color/grey_400"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/date"
+                android:paddingLeft="4dp"
+                android:gravity="left|center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <View
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="1dp" />
+            <ImageButton
+                android:id="@+id/add_event"
+                android:paddingRight="4dp"
+                android:background="@drawable/ic_add_24dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/event_recycle_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+</layout>

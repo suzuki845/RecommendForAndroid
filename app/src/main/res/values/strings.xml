@@ -18,6 +18,7 @@
     <string name="tab_text_1">ホーム</string>
     <string name="tab_text_2">ストーリー</string>
     <string name="tab_text_3">Pay ＆ 貯金</string>
+    <string name="tab_text_4">カレンダー</string>
 
     <!-- use pass code lock -->
     <string name="image_error">image</string>

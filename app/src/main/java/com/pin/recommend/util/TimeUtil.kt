@@ -40,7 +40,7 @@ class TimeUtil {
             cal.time = currentDate
             val year = cal[Calendar.YEAR]
             val month = cal[Calendar.MONTH]
-            var day = 0
+            var day = 1
             cal[year, month, day, 0, 0] = 0
 
             return cal.time
@@ -54,11 +54,8 @@ class TimeUtil {
             cal.time = currentDate
             val year = cal[Calendar.YEAR]
             val month = cal[Calendar.MONTH]
-            var day = 1
-            cal[year, month, day, 0, 0] = 0
-
                 //月末日を取得する
-            day = cal.getActualMaximum(Calendar.DATE)
+            val day = cal.getActualMaximum(Calendar.DATE)
             cal[year, month, day, 0, 0] = 0
             return cal.time
         }

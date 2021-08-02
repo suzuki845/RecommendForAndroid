@@ -19,8 +19,8 @@ android {
         applicationId "com.pin.recommend"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 14
-        versionName "1.6.0"
+        versionCode 15
+        versionName "1.7.0"
         //vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -83,6 +83,7 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.3.2'
     implementation 'com.nineoldandroids:library:2.4.0'
     implementation 'com.daimajia.slider:library:1.1.5@aar'
+    implementation 'com.github.prolificinteractive:material-calendarview:2.0.0'
 
     def room_version = "2.2.5"
     implementation "androidx.room:room-runtime:$room_version"
