@@ -30,8 +30,14 @@ public interface StoryPictureDao {
     @Delete
     public void deleteStoryPicture(StoryPicture storyPicture);
 
+    @Query("DELETE FROM StoryPicture")
+    public void deleteAll();
+
     @Delete
     public void deleteAll(List<StoryPicture> storyPictures);
+
+    @Query("SELECT * FROM StoryPicture")
+    public List<StoryPicture> findByAll();
 
     @Query("SELECT * FROM StoryPicture WHERE id = :id")
     public StoryPicture findById(long id);

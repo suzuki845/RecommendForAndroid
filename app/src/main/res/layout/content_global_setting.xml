@@ -64,6 +64,42 @@
                     android:layout_height="10dp" />
 
                 <LinearLayout
+                    android:id="@+id/export_backup"
+                    android:onClick="onExportBackup"
+                    android:background="#ffffff"
+                    android:padding="6dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="バックアップの作成"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
+
+                <LinearLayout
+                    android:id="@+id/import_backup"
+                    android:onClick="onImportBackup"
+                    android:background="#ffffff"
+                    android:padding="6dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="バックアップの復元"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
+
+                <LinearLayout
                     android:id="@+id/link_to_privacy_policy"
                     android:onClick="onClickPrivacyPolicy"
                     android:background="#ffffff"

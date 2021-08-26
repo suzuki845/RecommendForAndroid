@@ -2,7 +2,6 @@ package com.pin.recommend.model.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.pin.recommend.model.entity.Payment
 import com.pin.recommend.model.entity.PaymentTag
 
 @Dao
@@ -15,6 +14,12 @@ interface PaymentTagDao {
 
     @Delete
     fun deletePaymentTag(tag: PaymentTag?)
+
+    @Query("DELETE FROM PaymentTag")
+    fun deleteAll()
+
+    @Query("SELECT * FROM PaymentTag")
+    fun findAll(): List<PaymentTag>
 
     @Query("SELECT * FROM PaymentTag WHERE id = :id")
     fun findById(id: Long): PaymentTag?

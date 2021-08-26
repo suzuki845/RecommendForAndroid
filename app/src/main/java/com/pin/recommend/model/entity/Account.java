@@ -11,10 +11,19 @@ import androidx.room.PrimaryKey;
 
 import com.pin.recommend.model.AppDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Account implements Parcelable {
+
+    //json化するためのフィールド
+    @Ignore
+    public List<RecommendCharacter> characters;
+
+    @Ignore
+    public List<PaymentTag> paymentTags;
+
 
     @Ignore
     public static final int ACCOUNT_ID = 1;

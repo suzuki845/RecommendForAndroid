@@ -24,6 +24,12 @@ public interface StoryDao {
     @Delete
     public void deleteStory(Story story);
 
+    @Query("DELETE FROM Story")
+    public void deleteAll();
+
+    @Query("SELECT * FROM Story")
+    public List<Story> findByAll();
+
     @Query("SELECT * FROM Story WHERE id = :id")
     public Story findById(long id);
 

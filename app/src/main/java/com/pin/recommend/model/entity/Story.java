@@ -35,6 +35,10 @@ import static androidx.room.ForeignKey.CASCADE;
 )
 public class Story implements Parcelable {
 
+    //json化するためのフィールド
+    @Ignore
+    public List<StoryPicture> pictures;
+
     @PrimaryKey(autoGenerate = true)
     public long id;
 

@@ -25,6 +25,12 @@ public interface RecommendCharacterDao {
     @Delete
     public void deleteCharacter(RecommendCharacter character);
 
+    @Query("DELETE FROM RecommendCharacter")
+    public void deleteAll();
+
+    @Query("SELECT * FROM RecommendCharacter")
+    List<RecommendCharacter> findAll();
+
     @Query("SELECT * FROM RecommendCharacter WHERE id = :id")
     public RecommendCharacter findById(long id);
 

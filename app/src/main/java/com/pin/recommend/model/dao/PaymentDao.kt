@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.pin.recommend.model.entity.Payment
 import com.pin.recommend.model.entity.PaymentAndTag
-import com.pin.recommend.model.entity.PaymentTag
 import java.util.*
 
 @Dao
@@ -17,6 +16,12 @@ interface PaymentDao {
 
     @Delete
     fun deletePayment(payment: Payment?)
+
+    @Query("DELETE FROM Payment")
+    fun deleteAll()
+
+    @Query("SELECT * FROM Payment")
+    fun findAll(): List<Payment>
 
     @Query("SELECT * FROM Payment WHERE id = :id")
     fun findById(id: Long): Payment?

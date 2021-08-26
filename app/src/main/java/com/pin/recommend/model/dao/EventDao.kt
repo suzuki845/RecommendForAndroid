@@ -3,8 +3,6 @@ package com.pin.recommend.model.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.pin.recommend.model.entity.Event
-import com.pin.recommend.model.entity.Payment
-import com.pin.recommend.model.entity.PaymentAndTag
 import java.util.*
 
 @Dao
@@ -17,6 +15,12 @@ interface EventDao {
 
     @Delete
     fun deleteEvent(event: Event?)
+
+    @Query("DELETE FROM Event")
+    fun deleteAll()
+
+    @Query("SELECT * FROM Event")
+    fun findAll(): List<Event>
 
     @Query("SELECT * FROM Event WHERE id = :id")
     fun findById(id: Long): Event?

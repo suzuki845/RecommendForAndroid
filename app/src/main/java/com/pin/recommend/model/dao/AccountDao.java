@@ -23,6 +23,9 @@ public interface AccountDao {
     @Update
     public int updateAccount(Account account);
 
+    @Query("DELETE FROM Account")
+    public void deleteAll();
+
     @Query("SELECT * FROM Account WHERE id = :id")
     public LiveData<Account> findTrackedById(long id);
 
@@ -31,5 +34,6 @@ public interface AccountDao {
 
     @Query("SELECT * FROM Account")
     public List<Account> test();
+
 
 }

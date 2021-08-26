@@ -26,6 +26,11 @@ class Payment(
         var createdAt: Date,
         var updatedAt: Date
 ){
+
+        @Ignore
+        var paymentTag: PaymentTag? = null
+
+
         fun getShortComment(length: Int): String? {
                 var t = memo ?: ""
                 t = t.replace("\n", " ")

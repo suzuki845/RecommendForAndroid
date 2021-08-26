@@ -3,19 +3,27 @@ package com.pin.recommend
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.dialog.ToolbarSettingDialogFragment
+import com.pin.recommend.model.AppDatabase
+import com.pin.recommend.model.BackupExportModel
+import com.pin.recommend.model.BackupImportModel
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.util.PrefUtil
 import com.pin.recommend.util.ShowToast
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+
 
 class GlobalSettingActivity : AppCompatActivity() {
 
@@ -24,6 +32,18 @@ class GlobalSettingActivity : AppCompatActivity() {
     private lateinit var accountViewModel: AccountViewModel
 
     private lateinit var passCodeRock: Switch
+
+    private val backupExporter by lazy {
+        BackupExportModel(
+                AppDatabase.getDatabase(this)
+        )
+    }
+
+    private val backupImporter by lazy {
+        BackupImportModel(
+                AppDatabase.getDatabase(this)
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,9 +63,9 @@ class GlobalSettingActivity : AppCompatActivity() {
         super.onResume()
         passCodeRock.isChecked = PrefUtil.getBoolean(Constants.PREF_KEY_IS_LOCKED)
         passCodeRock.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            if(isChecked){
+            if (isChecked) {
                 startActivity(PassCodeSetActivity.createIntent(this))
-            }else{
+            } else {
                 PrefUtil.putBoolean(Constants.PREF_KEY_IS_LOCKED, false);
                 PrefUtil.putInt(Constants.PREF_KEY_PASSWORD, 0);
                 ShowToast.show("ロックを解除しました。", this);
@@ -53,14 +73,53 @@ class GlobalSettingActivity : AppCompatActivity() {
         })
     }
 
-    fun onClickSettingToolbar (v: View){
+    fun onExportBackup(v: View){
+
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        startActivityForResult(intent, EXPORT_BACKUP_REQUEST_CODE)
+    }
+
+    fun onImportBackup(v: View){
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        startActivityForResult(intent, IMPORT_BACKUP_REQUEST_CODE)
+    }
+
+
+    private val EXPORT_BACKUP_REQUEST_CODE = 21389
+    private val IMPORT_BACKUP_REQUEST_CODE = 21726
+    override fun onActivityResult(requestCode: Int, resultCode: Int, result: Intent?) {
+        super.onActivityResult(requestCode, resultCode, result)
+        if (resultCode == RESULT_OK) {
+            if (requestCode == EXPORT_BACKUP_REQUEST_CODE) {
+                if (result?.data != null) {
+                    val pickedDir = DocumentFile.fromTreeUri(this, result.data!!)
+                    GlobalScope.launch {
+                        backupExporter.export(this@GlobalSettingActivity, pickedDir!!)
+                    }
+                }
+            }
+
+            if (requestCode == IMPORT_BACKUP_REQUEST_CODE) {
+                if (result?.data != null) {
+                    val pickedDir = DocumentFile.fromTreeUri(this, result.data!!)
+                    GlobalScope.launch {
+                        backupImporter.import(this@GlobalSettingActivity, pickedDir!!)
+                    }
+                }
+            }
+
+        }
+    }
+
+    fun onClickSettingToolbar(v: View){
         val account = accountViewModel.accountLiveData.value
-        val toolbarSettingDialogFragment = ToolbarSettingDialogFragment(object: DialogActionListener<ToolbarSettingDialogFragment>{
+        val toolbarSettingDialogFragment = ToolbarSettingDialogFragment(object : DialogActionListener<ToolbarSettingDialogFragment> {
             override fun onDecision(dialog: ToolbarSettingDialogFragment?) {
                 account?.toolbarBackgroundColor = dialog?.backgroundColor;
                 account?.toolbarTextColor = dialog?.textColor;
                 accountViewModel.saveAccount(account);
             }
+
             override fun onCancel() {
             }
         });

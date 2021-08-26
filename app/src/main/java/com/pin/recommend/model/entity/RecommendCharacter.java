@@ -23,7 +23,9 @@ import com.pin.recommend.R;
 import com.pin.recommend.model.AppDatabase;
 import com.pin.recommend.util.TimeUtil;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +34,16 @@ import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(foreignKeys = @ForeignKey(entity = Account.class, parentColumns = "id", childColumns = "accountId", onDelete = CASCADE, onUpdate = CASCADE))
 public class RecommendCharacter implements Parcelable {
+
+    //json化するためのフィールド
+    @Ignore
+    public List<Payment> payments;
+
+    @Ignore
+    public List<Event> events;
+
+    @Ignore
+    public List<Story> stories;
 
     @PrimaryKey(autoGenerate = true)
     public long id;
