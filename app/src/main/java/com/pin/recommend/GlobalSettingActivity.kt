@@ -1,17 +1,21 @@
 package com.pin.recommend
 
+import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Switch
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.documentfile.provider.DocumentFile
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
+import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.dialog.ToolbarSettingDialogFragment
 import com.pin.recommend.model.AppDatabase
@@ -74,14 +78,21 @@ class GlobalSettingActivity : AppCompatActivity() {
     }
 
     fun onExportBackup(v: View){
-
+        Toast.makeText(this, "バックアップの作成先を選択して下さい。", Toast.LENGTH_LONG).show()
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         startActivityForResult(intent, EXPORT_BACKUP_REQUEST_CODE)
     }
 
     fun onImportBackup(v: View){
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-        startActivityForResult(intent, IMPORT_BACKUP_REQUEST_CODE)
+        val dialog = BackupImportDialogFragment(object : DialogActionListener<BackupImportDialogFragment> {
+            override fun onDecision(dialog: BackupImportDialogFragment) {
+                Toast.makeText(this@GlobalSettingActivity, "バックアップフォルダを選択して下さい。", Toast.LENGTH_LONG).show()
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                startActivityForResult(intent, IMPORT_BACKUP_REQUEST_CODE)
+            }
+            override fun onCancel() {}
+        })
+        dialog.show(supportFragmentManager, "GlobalSettingActivity")
     }
 
 
@@ -91,19 +102,39 @@ class GlobalSettingActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, result)
         if (resultCode == RESULT_OK) {
             if (requestCode == EXPORT_BACKUP_REQUEST_CODE) {
-                if (result?.data != null) {
-                    val pickedDir = DocumentFile.fromTreeUri(this, result.data!!)
+                result?.data?.let {data ->
+                    val pickedDir = DocumentFile.fromTreeUri(this, data) ?:
+                    return Toast.makeText(this@GlobalSettingActivity, "バックアップの作成に失敗しました。", Toast.LENGTH_LONG).show()
                     GlobalScope.launch {
-                        backupExporter.export(this@GlobalSettingActivity, pickedDir!!)
+                        try{
+                            backupExporter.export(this@GlobalSettingActivity, pickedDir)
+                            this@GlobalSettingActivity.runOnUiThread{
+                                Toast.makeText(this@GlobalSettingActivity, "バックアップを作成しました。", Toast.LENGTH_LONG).show()
+                            }
+                        }catch (e: Exception){
+                            this@GlobalSettingActivity.runOnUiThread{
+                                Toast.makeText(this@GlobalSettingActivity, "バックアップの作成に失敗しました。\n\n${e.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
                     }
                 }
             }
 
             if (requestCode == IMPORT_BACKUP_REQUEST_CODE) {
-                if (result?.data != null) {
-                    val pickedDir = DocumentFile.fromTreeUri(this, result.data!!)
+                result?.data?.let {data ->
+                    val pickedDir = DocumentFile.fromTreeUri(this, data)
+                            ?: return  Toast.makeText(this@GlobalSettingActivity, "バックアップの復元に失敗しました。", Toast.LENGTH_LONG).show()
                     GlobalScope.launch {
-                        backupImporter.import(this@GlobalSettingActivity, pickedDir!!)
+                        try {
+                            backupImporter.import(this@GlobalSettingActivity, pickedDir)
+                            this@GlobalSettingActivity.runOnUiThread{
+                                Toast.makeText(this@GlobalSettingActivity, "バックアップを復元しました。", Toast.LENGTH_LONG).show()
+                            }
+                        }catch (e: Exception){
+                            this@GlobalSettingActivity.runOnUiThread{
+                                Toast.makeText(this@GlobalSettingActivity, "バックアップの復元に失敗しました。\n\n${e.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
                     }
                 }
             }
@@ -150,4 +181,26 @@ class GlobalSettingActivity : AppCompatActivity() {
         }
     }
 
+}
+
+
+class BackupImportDialogFragment(private val actionListener: DialogActionListener<BackupImportDialogFragment>) : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireActivity())
+                .setMessage("oshi_backup(日付)のフォルダを選択し、アクセスの許可をタップすると復元が行われます。\n\n警告：バックアップを復元すると現在のデータが全て消去され、バックアップの内容で上書きされます。")
+                .setTitle("バックアップの復元")
+                .setPositiveButton("決定") { dialog, id -> actionListener.onDecision(this) }
+                .setNegativeButton("キャンセル") { dialog, id -> actionListener.onCancel() }
+                .create()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // onPause でダイアログを閉じる場合
+        dismiss()
+    }
+
+    companion object {
+        const val Tag = "com.pin.reccomend.DeleteDialogFragment"
+    }
 }

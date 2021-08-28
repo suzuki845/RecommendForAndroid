@@ -44,6 +44,10 @@ public class RecommendCharacter implements Parcelable {
 
     @Ignore
     public List<Story> stories;
+    //ここまで
+
+
+
 
     @PrimaryKey(autoGenerate = true)
     public long id;
@@ -267,53 +271,6 @@ public class RecommendCharacter implements Parcelable {
     }
 
 
-    /*/ v1
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.id);
-        dest.writeLong(this.accountId);
-        dest.writeString(this.name);
-        dest.writeLong(this.created != null ? this.created.getTime() : -1);
-        dest.writeString(this.iconImageUri);
-        dest.writeString(this.backgroundImageUri);
-        dest.writeValue(this.backgroundColor);
-        dest.writeValue(this.toolbarBackgroundColor);
-        dest.writeValue(this.toolbarTextColor);
-        dest.writeValue(this.homeTextColor);
-    }
-
-    protected RecommendCharacter(Parcel in) {
-        this.id = in.readLong();
-        this.accountId = in.readLong();
-        this.name = in.readString();
-        long tmpCreated = in.readLong();
-        this.created = tmpCreated == -1 ? null : new Date(tmpCreated);
-        this.iconImageUri = in.readString();
-        this.backgroundImageUri = in.readString();
-        this.backgroundColor = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.toolbarBackgroundColor = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.toolbarTextColor = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.homeTextColor = (Integer) in.readValue(Integer.class.getClassLoader());
-    }
-
-    public static final Creator<RecommendCharacter> CREATOR = new Creator<RecommendCharacter>() {
-        @Override
-        public RecommendCharacter createFromParcel(Parcel source) {
-            return new RecommendCharacter(source);
-        }
-
-        @Override
-        public RecommendCharacter[] newArray(int size) {
-            return new RecommendCharacter[size];
-        }
-    };
-*/
-
 
     //v2
     @Override
@@ -369,3 +326,55 @@ public class RecommendCharacter implements Parcelable {
         }
     };
 }
+
+
+
+
+/* v1 parcel
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
+        dest.writeLong(this.accountId);
+        dest.writeString(this.name);
+        dest.writeLong(this.created != null ? this.created.getTime() : -1);
+        dest.writeString(this.iconImageUri);
+        dest.writeString(this.backgroundImageUri);
+        dest.writeValue(this.backgroundColor);
+        dest.writeValue(this.toolbarBackgroundColor);
+        dest.writeValue(this.toolbarTextColor);
+        dest.writeValue(this.homeTextColor);
+    }
+
+    protected RecommendCharacter(Parcel in) {
+        this.id = in.readLong();
+        this.accountId = in.readLong();
+        this.name = in.readString();
+        long tmpCreated = in.readLong();
+        this.created = tmpCreated == -1 ? null : new Date(tmpCreated);
+        this.iconImageUri = in.readString();
+        this.backgroundImageUri = in.readString();
+        this.backgroundColor = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.toolbarBackgroundColor = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.toolbarTextColor = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.homeTextColor = (Integer) in.readValue(Integer.class.getClassLoader());
+    }
+
+    public static final Creator<RecommendCharacter> CREATOR = new Creator<RecommendCharacter>() {
+        @Override
+        public RecommendCharacter createFromParcel(Parcel source) {
+            return new RecommendCharacter(source);
+        }
+
+        @Override
+        public RecommendCharacter[] newArray(int size) {
+            return new RecommendCharacter[size];
+        }
+    };
+*/
+

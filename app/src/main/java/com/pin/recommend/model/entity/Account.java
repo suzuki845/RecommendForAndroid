@@ -24,6 +24,8 @@ public class Account implements Parcelable {
     @Ignore
     public List<PaymentTag> paymentTags;
 
+    //ここまで
+
 
     @Ignore
     public static final int ACCOUNT_ID = 1;
