@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStore;
 import androidx.lifecycle.ViewModelStoreOwner;
-import androidx.multidex.MultiDex;
+//import androidx.multidex.MultiDex;
 
 import com.pin.recommend.model.viewmodel.AccountViewModel;
 import com.pin.recommend.util.PrefUtil;
@@ -31,7 +31,7 @@ public class MyApplication extends android.app.Application implements ViewModelS
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        MultiDex.install(this);
+        //MultiDex.install(this);
     }
 
     public static void setupStatusBarColor(Activity activity, int foregroundColor, int backgroundColor) {

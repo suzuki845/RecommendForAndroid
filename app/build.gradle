@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     signingConfigs {
@@ -12,23 +12,25 @@ android {
             keyPassword 'pinkichi7183'
         }
     }
-    compileSdkVersion 29
+    compileSdkVersion 31
 
     defaultConfig {
-        multiDexEnabled true
+        //multiDexEnabled false
         applicationId "com.pin.recommend"
-        minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 16
-        versionName "1.8.0"
+        minSdkVersion 26
+        targetSdkVersion 31
+        versionCode 17
+        versionName "1.9.0"
         //vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
+
             annotationProcessorOptions {
                 arguments += ["room.schemaLocation":
                                       "$projectDir/schemas".toString()]
             }
+
         }
         dataBinding {
             enabled = true
@@ -48,8 +50,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility "1.8"
+        targetCompatibility "1.8"
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -62,15 +64,16 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation project(':imageutil')
     implementation project(':util')
 
-    implementation 'com.android.support:multidex:2.0.1'
-    implementation 'com.google.android.gms:play-services-ads:19.1.0'
-    implementation 'com.google.firebase:firebase-core:17.4.0'
+    //implementation 'com.android.support:multidex:2.0.1'
+    //implementation 'com.google.android.gms:play-services-ads:19.1.0'
+    //implementation 'com.google.firebase:firebase-core:17.4.0'
 
     implementation 'com.squareup.okhttp3:okhttp:3.1.2'
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'

@@ -53,7 +53,7 @@ class StoryListFragment : Fragment() {
         storyViewModel = ViewModelProvider(requireActivity()).get(StoryViewModel::class.java)
         characterViewModel = ViewModelProvider(requireActivity()).get(RecommendCharacterViewModel::class.java)
         editListViewModel = ViewModelProvider(this).get(EditStateViewModel::class.java)
-        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)
+        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
 
         setHasOptionsMenu(true)
     }

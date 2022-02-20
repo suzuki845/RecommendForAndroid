@@ -15,9 +15,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ScreenShotActivity"
+            android:label="スクリーンショット"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
+        <activity
             android:name=".GlobalSettingActivity"
             android:label="@string/title_activity_global_setting"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".EditCharacterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -45,9 +50,9 @@
         <activity
             android:name=".EditEventActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".MainActivity"
+            android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -79,10 +84,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PassCodeSetActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PassCodeConfirmationActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

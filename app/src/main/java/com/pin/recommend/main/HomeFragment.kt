@@ -8,10 +8,7 @@ import com.pin.recommend.model.entity.AnniversaryManager
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProviders
 import com.pin.recommend.main.HomeFragment
-import com.pin.recommend.CharacterDetailActivity
-import com.pin.recommend.R
 import android.graphics.Typeface
-import com.pin.recommend.MyApplication
 import androidx.appcompat.app.AppCompatActivity
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -21,7 +18,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.pin.recommend.EditCharacterActivity
+import com.pin.recommend.*
 import com.pin.recommend.model.entity.Account
 import de.hdodenhof.circleimageview.CircleImageView
 import java.lang.RuntimeException
@@ -33,6 +30,7 @@ import java.util.*
  */
 class HomeFragment : Fragment() {
     private lateinit var pageViewModel: PageViewModel
+    private lateinit var contentWrapperView: View;
     private lateinit var iconImageView: CircleImageView
     private lateinit var characterNameView: TextView
     private lateinit var firstText: TextView
@@ -53,7 +51,7 @@ class HomeFragment : Fragment() {
         }
         pageViewModel.setIndex(index)
         characterViewModel = ViewModelProvider(requireActivity()).get(RecommendCharacterViewModel::class.java)
-        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)
+        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
         anniversaryManager = AnniversaryManager(character)
         setHasOptionsMenu(true)
     }
@@ -67,6 +65,18 @@ class HomeFragment : Fragment() {
         elapsedView = root.findViewById(R.id.elapsedTime)
         characterNameView = root.findViewById(R.id.character_name)
         anniversaryView = root.findViewById(R.id.anniversary)
+        iconImageView.setOnClickListener{
+            val intent = Intent(requireActivity(), ScreenShotActivity::class.java);
+            intent.putExtra(ScreenShotActivity.INTENT_SCREEN_SHOT, character.id)
+            startActivity(intent)
+        }
+        contentWrapperView = root.findViewById(R.id.content_wrapper)
+        contentWrapperView.setOnClickListener{
+            val intent = Intent(requireActivity(), ScreenShotActivity::class.java);
+            intent.putExtra(ScreenShotActivity.INTENT_SCREEN_SHOT, character.id)
+            startActivity(intent)
+        }
+
         initializeText(character)
         val characterLiveData = characterViewModel.getCharacter(character.id)
         characterLiveData.observe(viewLifecycleOwner, Observer { character ->

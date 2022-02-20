@@ -15,7 +15,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
-import com.pin.recommend.CharacterDetailActivity
 import com.pin.recommend.dialog.BackgroundSettingDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.dialog.TextSettingDialogFragment
@@ -26,6 +25,7 @@ import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
+import com.pin.util.FixedInterstitial
 
 class CharacterDetailActivity : AppCompatActivity() {
     private lateinit var background: View
@@ -47,6 +47,9 @@ class CharacterDetailActivity : AppCompatActivity() {
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
 
+        FixedInterstitial.setUnitId(resources.getString(R.string.ad_unit_id_for_interstitial))
+        FixedInterstitial.load(this)
+
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
         val viewPager = findViewById<ViewPager>(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
@@ -59,8 +62,8 @@ class CharacterDetailActivity : AppCompatActivity() {
         accountViewModel = MyApplication.getAccountViewModel(this)
         characterViewModel = ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
 
-        character = intent.getParcelableExtra(INTENT_CHARACTER)
-        val characterLiveData = characterViewModel!!.getCharacter(character.id)
+        character = intent.getParcelableExtra(INTENT_CHARACTER)!!
+        val characterLiveData = characterViewModel.getCharacter(character.id)
         characterLiveData.observe(this, Observer { character ->
             if (character == null) return@Observer
             this@CharacterDetailActivity.character = character

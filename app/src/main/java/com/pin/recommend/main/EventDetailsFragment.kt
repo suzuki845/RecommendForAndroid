@@ -55,7 +55,7 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
-        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)
+        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
         if(character != null){
             eventViewModel.setCharacter(character)
         }

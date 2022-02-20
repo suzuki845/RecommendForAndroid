@@ -82,7 +82,7 @@ class EditCharacterActivity : AppCompatActivity() {
         accountViewModel = MyApplication.getAccountViewModel(this)
         characterViewModel = ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
 
-        character = intent.getParcelableExtra(INTENT_EDIT_CHARACTER)
+        character = intent.getParcelableExtra(INTENT_EDIT_CHARACTER)!!
         val characterLiveData = characterViewModel.getCharacter(character.id)
 
         iconImageView = findViewById(R.id.character_icon)

@@ -14,7 +14,7 @@ import java.util.*
         ]
 )
 class Payment(
-        @PrimaryKey(autoGenerate = true)
+        @PrimaryKey(autoGenerate = true,)
         var id: Long,
         var characterId: Long,
         var paymentTagId: Long?,

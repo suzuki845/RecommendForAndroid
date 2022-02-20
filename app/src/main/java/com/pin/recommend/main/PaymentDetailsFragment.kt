@@ -55,7 +55,7 @@ class PaymentDetailsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
-        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)
+        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
         if(character != null){
             //paymentViewModel.characterId.value = character.id
             paymentViewModel.setCharacterId(character.id)

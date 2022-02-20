@@ -54,10 +54,10 @@
 
             <ImageView
                 android:id="@+id/pickImage"
-                android:tint="#666666"
                 android:src="@drawable/ic_image_24dp"
                 android:layout_width="50dp"
-                android:layout_height="50dp"/>
+                android:layout_height="50dp"
+                app:tint="#666666" />
         </LinearLayout>
 
         <LinearLayout
