@@ -40,7 +40,7 @@ class TimeUtil {
             cal.time = currentDate
             val year = cal[Calendar.YEAR]
             val month = cal[Calendar.MONTH]
-            var day = 1
+            var day = 0
             cal[year, month, day, 0, 0] = 0
 
             return cal.time

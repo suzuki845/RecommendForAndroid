@@ -76,6 +76,7 @@ class CreatePaymentViewModel(application: Application) : AndroidViewModel(applic
     fun createPayment(): Boolean{
         val characterId = characterId.value ?: return false
         val date = TimeUtil.resetDate(date.value ?: Date())
+        //print("test!! $date")
         val amount = (amount.value ?: 0).toDouble()
         val memo  = memo.value
         val selectedTag = selectedTag.value
@@ -90,8 +91,8 @@ class CreatePaymentViewModel(application: Application) : AndroidViewModel(applic
                 createdAt = date,
                 updatedAt = date
         )
-Log.d("DateIn create", date.toString())
-        return paymentDao.insertPayment(newPayment) != 0L
+        val r = paymentDao.insertPayment(newPayment) != 0L
+        return r;
     }
 
 

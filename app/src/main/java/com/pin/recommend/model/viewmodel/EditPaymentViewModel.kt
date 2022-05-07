@@ -71,6 +71,8 @@ class EditPaymentViewModel(application: Application) : AndroidViewModel(applicat
 
         val paymentAndTag = paymentAndTag.value
         val payment = paymentAndTag?.payment
+        //val date = TimeUtil.resetDate( Date())
+        //payment?.updatedAt = date
         payment?.paymentTagId = selectedTag.value?.id
         return paymentDao.updatePayment(payment) != 0
     }

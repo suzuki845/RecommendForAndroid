@@ -37,7 +37,7 @@ interface PaymentDao {
     fun findByTrackedCharacterIdPaymentAndTag(characterId: Long): LiveData<List<PaymentAndTag>>
 
     @Transaction
-    @Query("SELECT * FROM Payment WHERE characterId = :characterId AND (updatedAt >= :start AND updatedAt <= :end) ORDER BY updatedAt ASC")
+    @Query("SELECT * FROM Payment WHERE characterId = :characterId AND (createdAt >= :start AND createdAt <= :end) ORDER BY updatedAt ASC")
     fun findByTrackedCharacterIdPaymentAndTagInDate(characterId: Long, start: Date, end: Date): LiveData<List<PaymentAndTag>>
 
     @Transaction
