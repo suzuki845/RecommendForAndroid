@@ -181,6 +181,24 @@ class GlobalSettingActivity : AppCompatActivity() {
         }
     }
 
+    fun onClickEmotionDiary(v: View){
+        val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.emotiondiary");
+        intent = Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
+
+    fun onClickDietSupport(v: View){
+        val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.diet_support");
+        intent = Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
+
+    fun onClickWordBook(v: View){
+        val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.wordbook");
+        intent = Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
+
 }
 
 
@@ -190,7 +208,7 @@ class BackupImportDialogFragment(private val actionListener: DialogActionListene
                 .setMessage("oshi_backup(日付)のフォルダを選択し、アクセスの許可をタップすると復元が行われます。\n\n警告：バックアップを復元すると現在のデータが全て消去され、バックアップの内容で上書きされます。")
                 .setTitle("バックアップの復元")
                 .setPositiveButton("決定") { dialog, id -> actionListener.onDecision(this) }
-                .setNegativeButton("キャンセル") { dialog, id -> actionListener.onCancel() }
+                .setNegativeButton("閉じる") { dialog, id -> actionListener.onCancel() }
                 .create()
     }
 

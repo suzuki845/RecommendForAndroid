@@ -1,12 +1,14 @@
 package com.pin.recommend;
 
+import static com.pin.recommend.Constants.APP_START_COUNT;
+import static com.pin.recommend.Constants.PREF_KEY_IS_LOCKED;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -16,13 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStore;
 import androidx.lifecycle.ViewModelStoreOwner;
-//import androidx.multidex.MultiDex;
 
 import com.pin.recommend.model.viewmodel.AccountViewModel;
 import com.pin.recommend.util.PrefUtil;
-import com.soundcloud.android.crop.CropImageActivity;
-
-import static com.pin.recommend.Constants.PREF_KEY_IS_LOCKED;
 
 public class MyApplication extends android.app.Application implements ViewModelStoreOwner,  Application.ActivityLifecycleCallbacks{
 
@@ -95,6 +93,9 @@ public class MyApplication extends android.app.Application implements ViewModelS
         super.onCreate();
         PrefUtil.setSharedPreferences(getApplicationContext());
         registerActivityLifecycleCallbacks((ActivityLifecycleCallbacks) this);
+
+        int appStartCount = PrefUtil.getInt(APP_START_COUNT);
+        PrefUtil.putInt(APP_START_COUNT, ++appStartCount);
     }
 
     @Override public void onTrimMemory(int level) {

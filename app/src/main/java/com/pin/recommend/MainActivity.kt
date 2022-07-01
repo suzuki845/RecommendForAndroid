@@ -1,15 +1,20 @@
 package com.pin.recommend
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import com.pin.imageutil.CaptureConfig
 import com.pin.recommend.Constants.PREF_KEY_IS_LOCKED
 import com.pin.recommend.model.AppDatabase
-import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.util.PrefUtil
+import java.net.URI
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -34,18 +39,9 @@ class MainActivity : AppCompatActivity() {
             }
             characterDao.findTrackedById(fixedCharacterId)
         }
-        /*
+
         fixedCharacter.observe(this, Observer { character ->
-            if (character != null) {
-                val characterDetailIntent = Intent(this@MainActivity, CharacterDetailActivity::class.java)
-                characterDetailIntent.putExtra(CharacterDetailActivity.INTENT_CHARACTER, character)
-                intents.add(characterDetailIntent)
-            }
-            startActivities(intents.toArray(arrayOf()))
-            finish()
-        })
-         */
-        fixedCharacter.observe(this, Observer { character ->
+
             if (character != null) {
                 val characterDetailIntent = Intent(this@MainActivity, CharacterDetailActivity::class.java)
                 characterDetailIntent.putExtra(CharacterDetailActivity.INTENT_CHARACTER, character)
@@ -55,6 +51,17 @@ class MainActivity : AppCompatActivity() {
                 intents.add(PassCodeConfirmationActivity.createIntent(applicationContext));
             }
             isNeedPassCodeConfirmation = false;
+
+            val notification = NotificationChecker(applicationContext);
+            val data = NotificationData(
+                R.drawable.emotion_diary,
+                "新アプリリリースのお知らせ",
+                "独り言をつぶやくように、簡単にその時の感情を記録できる、誰にも見られないチャット風の気分日記アプリです。" +
+                        "\n\n推して何日？のユーザーさんならこんなアプリがあったら楽しんでくれるんじゃないかなぁと思って作ってみました。" +
+                        "\n\n気分アイコン、背景を自由に設定できるので推し仕様にカスタマイズできたりします！" +
+                        "\n\n唐突な宣伝で申し訳ないのですが、是非インストールしてみてください！",
+                "https://play.google.com/store/apps/details?id=com.suzuki.emotiondiary")
+            notification.check(0, intents, data)
 
             startActivities(intents.toArray(arrayOf()))
             finish()
@@ -75,3 +82,4 @@ class MainActivity : AppCompatActivity() {
         const val INTENT_ACCOUNT = "com.pin.recommend.MainActivity.INTENT_ACCOUNT"
     }
 }
+

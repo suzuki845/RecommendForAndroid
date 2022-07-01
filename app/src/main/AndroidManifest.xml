@@ -88,7 +88,11 @@
         <activity
             android:name=".PassCodeConfirmationActivity"
             android:screenOrientation="portrait" />
-
+        <activity
+            android:name=".NotificationDialogActivity"
+            android:theme="@style/Translucent"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-6083382584515170~2198377338" />
