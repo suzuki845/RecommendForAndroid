@@ -13,6 +13,13 @@
     <string name="ad_unit_id_for_interstitial">ca-app-pub-3940256099942544/1033173712</string>
 -->
 
+    <!-- admob -->
+    <string name="ad_unit_id_for_reward">ca-app-pub-6083382584515170/2706336964</string>
+
+    <!-- admob test
+    <string name="ad_unit_id_for_reward">ca-app-pub-3940256099942544/5224354917</string>
+-->
+
     <string name="admob_app_id">ca-app-pub-6083382584515170~8391014938</string>
 
 

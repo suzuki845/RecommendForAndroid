@@ -93,6 +93,12 @@
             android:theme="@style/Translucent"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.pin.util.reward.RewardDialogFragmentActivity"
+            android:theme="@style/Translucent"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" />
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-6083382584515170~2198377338" />

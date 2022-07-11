@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.pin.recommend.model.viewmodel.AccountViewModel;
 import com.pin.recommend.util.PrefUtil;
+import com.pin.util.Reward;
 
 public class MyApplication extends android.app.Application implements ViewModelStoreOwner,  Application.ActivityLifecycleCallbacks{
 
@@ -94,6 +95,9 @@ public class MyApplication extends android.app.Application implements ViewModelS
         PrefUtil.setSharedPreferences(getApplicationContext());
         registerActivityLifecycleCallbacks((ActivityLifecycleCallbacks) this);
 
+        Reward reward = Reward.Companion.getInstance(this);
+        reward.setAdUnitId(getResources().getString(R.string.ad_unit_id_for_reward));
+
         int appStartCount = PrefUtil.getInt(APP_START_COUNT);
         PrefUtil.putInt(APP_START_COUNT, ++appStartCount);
     }
@@ -122,6 +126,8 @@ public class MyApplication extends android.app.Application implements ViewModelS
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
+        Reward reward = Reward.Companion.getInstance(this);
+        reward.checkRewardTime();
     }
 
     @Override

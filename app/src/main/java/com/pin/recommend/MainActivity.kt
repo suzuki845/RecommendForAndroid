@@ -14,6 +14,9 @@ import com.pin.recommend.Constants.PREF_KEY_IS_LOCKED
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.util.PrefUtil
+import com.pin.util.FixedInterstitial
+import com.pin.util.Reward
+import com.pin.util.reward.RewardDialogFragmentActivity
 import java.net.URI
 import java.util.*
 
@@ -67,6 +70,19 @@ class MainActivity : AppCompatActivity() {
             finish()
         })
 
+        val reward = Reward.getInstance(this)
+        reward.checkRewardTime()
+        reward.initialize()
+
+        reward.isNotify.observeForever( {
+            if (it) {
+                val isPassCodeLocked = PrefUtil.getBoolean(PREF_KEY_IS_LOCKED)
+                if (!isPassCodeLocked) {
+                    val intent = RewardDialogFragmentActivity.createIntent(this)
+                    startActivity(intent)
+                }
+            }
+        })
 
     }
 

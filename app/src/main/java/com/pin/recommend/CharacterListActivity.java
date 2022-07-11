@@ -15,6 +15,7 @@ import com.pin.recommend.model.viewmodel.AccountViewModel;
 import com.pin.recommend.model.viewmodel.EditStateViewModel;
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel;
 import com.pin.util.AdMobAdaptiveBannerManager;
+import com.pin.util.Reward;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -55,10 +56,17 @@ public class CharacterListActivity extends AppCompatActivity {
 
         adViewContainer = this.findViewById(R.id.ad_container);
         adMobManager = new AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id));
-        adMobManager.testMode(false);
         adMobManager.setAllowAdClickLimit(6);
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3);
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14);
+        Reward reward = Reward.Companion.getInstance(this);
+        reward.isBetweenRewardTime().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isBetweenRewardTime) {
+                adMobManager.setEnable(!isBetweenRewardTime);
+                adMobManager.checkFirst();
+            }
+        });
 
         accountViewModel = MyApplication.getAccountViewModel(this);
         characterViewModel = new ViewModelProvider(this).get(RecommendCharacterViewModel.class);
@@ -167,46 +175,6 @@ public class CharacterListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        /*
-        switch (item.getItemId()) {
-            case R.id.passcode_lock:
-                startActivity(PassCodeSetActivity.createIntent(getApplicationContext()));
-                return true;
-            case R.id.setting_toolbar:
-                ToolbarSettingDialogFragment toolbarSettingDialogFragment = new ToolbarSettingDialogFragment(new DialogActionListener<ToolbarSettingDialogFragment>() {
-                    @Override
-                    public void onDecision(final ToolbarSettingDialogFragment dialog) {
-                        Account account = accountViewModel.getAccountLiveData().getValue();
-                        account.toolbarBackgroundColor = dialog.getBackgroundColor();
-                        account.toolbarTextColor = dialog.getTextColor();
-                        accountViewModel.saveAccount(account);
-                    }
-                    @Override
-                    public void onCancel() {
-
-                    }
-                });
-                toolbarSettingDialogFragment.setDefaultBackgroundColor(accountViewModel.getAccountLiveData().getValue().getToolbarBackgroundColor());
-                toolbarSettingDialogFragment.setDefaultTextColor(accountViewModel.getAccountLiveData().getValue().getToolbarTextColor());
-                toolbarSettingDialogFragment.show(getSupportFragmentManager(), ToolbarSettingDialogFragment.TAG);
-                return true;
-            case R.id.edit_mode:
-                if(editListViewModel.getEditMode().getValue()) {
-                    editListViewModel.setEditMode(false);
-                }else{
-                    editListViewModel.setEditMode(true);
-                }
-                return true;
-            case R.id.link_to_privacy_policy:
-                Uri uri = Uri.parse("http://turuwo-apps.net/privacy-policy.html");
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-
-                        }
-         */
         switch (item.getItemId()) {
             case R.id.edit_mode:
                 if(editListViewModel.getEditMode().getValue()) {

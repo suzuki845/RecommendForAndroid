@@ -46,6 +46,24 @@
                     android:layout_height="1dp" />
 
                 <LinearLayout
+                    android:id="@+id/show_reward"
+                    android:onClick="onShowRewardDialog"
+                    android:background="#ffffff"
+                    android:padding="6dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="動画を見て広告を削除"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp" />
+
+                <LinearLayout
                     android:id="@+id/setting_toolbar"
                     android:onClick="onClickSettingToolbar"
                     android:background="#ffffff"

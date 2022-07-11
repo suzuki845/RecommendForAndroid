@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Switch
 import android.widget.Toast
@@ -15,7 +16,6 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.dialog.ToolbarSettingDialogFragment
 import com.pin.recommend.model.AppDatabase
@@ -25,6 +25,8 @@ import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.util.PrefUtil
 import com.pin.recommend.util.ShowToast
+import com.pin.util.Reward
+import com.pin.util.reward.RewardDialogFragment
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -55,6 +57,16 @@ class GlobalSettingActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         toolbar = findViewById(R.id.toolbar)
+
+        val showReward = findViewById<ViewGroup>(R.id.show_reward)
+        val reward = Reward.getInstance(this)
+        reward.isBetweenRewardTime.observe(this) {
+            if(!it){
+                showReward.visibility = View.VISIBLE
+            }else{
+                showReward.visibility = View.GONE
+            }
+        }
 
         accountViewModel = MyApplication.getAccountViewModel(this)
         val accountLiveData = accountViewModel.accountLiveData
@@ -181,6 +193,10 @@ class GlobalSettingActivity : AppCompatActivity() {
         }
     }
 
+    fun onShowRewardDialog(v: View){
+        RewardDialogFragment(onOk = {it.dismiss()}, onCancel = {it.dismiss()}, onStop = {}).show(supportFragmentManager, RewardDialogFragment.TAG)
+    }
+
     fun onClickEmotionDiary(v: View){
         val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.emotiondiary");
         intent = Intent(Intent.ACTION_VIEW, uri);
@@ -198,6 +214,7 @@ class GlobalSettingActivity : AppCompatActivity() {
         intent = Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
     }
+
 
 }
 

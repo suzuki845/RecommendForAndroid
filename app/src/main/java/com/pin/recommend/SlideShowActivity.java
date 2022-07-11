@@ -18,6 +18,7 @@ import com.pin.recommend.model.viewmodel.AccountViewModel;
 import com.pin.recommend.model.viewmodel.StoryPictureViewModel;
 import com.pin.recommend.view.SlideShowItemView;
 import com.pin.util.AdMobAdaptiveBannerManager;
+import com.pin.util.Reward;
 
 import java.util.List;
 
@@ -43,10 +44,17 @@ public class SlideShowActivity extends AppCompatActivity {
 
         adViewContainer = this.findViewById(R.id.ad_container);
         adMobManager = new AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id));
-        adMobManager.testMode(false);
         adMobManager.setAllowAdClickLimit(6);
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3);
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14);
+        Reward reward = Reward.Companion.getInstance(this);
+        reward.isBetweenRewardTime().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isBetweenRewardTime) {
+                adMobManager.setEnable(!isBetweenRewardTime);
+                adMobManager.checkFirst();
+            }
+        });
 
         accountViewModel = MyApplication.getAccountViewModel(this);
         storyPictureViewModel = new ViewModelProvider(this).get(StoryPictureViewModel.class);

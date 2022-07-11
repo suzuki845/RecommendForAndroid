@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.27239583333333334" />
+        <entry key="../AndroidUtils/util/src/main/res/layout/activity_reward_dialog_fragment.xml" value="0.11955420466058764" />
+        <entry key="../AndroidUtils/util/src/main/res/layout/dialog_reward.xml" value="0.11955420466058764" />
         <entry key="app/src/main/res/layout/activity_notification_dialog.xml" value="0.11904761904761904" />
         <entry key="app/src/main/res/layout/activity_screen_shot.xml" value="0.1157548125633232" />
         <entry key="app/src/main/res/layout/content_global_setting.xml" value="0.1" />

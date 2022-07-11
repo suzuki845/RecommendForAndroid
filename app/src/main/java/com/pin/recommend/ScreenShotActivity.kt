@@ -27,6 +27,7 @@ import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.util.FixedInterstitial
+import com.pin.util.Reward
 import de.hdodenhof.circleimageview.CircleImageView
 import java.io.IOException
 import java.util.*
@@ -167,7 +168,10 @@ class ScreenShotActivity : AppCompatActivity() {
                         val image = getViewBitmap()
                         save(this, image!!, Bitmap.CompressFormat.PNG, "image/png", "anniversary-${Date()}");
                         finish()
-                        FixedInterstitial.show()
+                        val reward = Reward.getInstance(this)
+                        if(reward.isBetweenRewardTime.value == false){
+                            FixedInterstitial.show()
+                        }
                         Toast.makeText(
                             this, """
      スクリーンショットを保存しました。ファイルをご確認ください。

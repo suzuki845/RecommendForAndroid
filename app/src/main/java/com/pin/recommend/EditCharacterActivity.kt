@@ -27,6 +27,7 @@ import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
+import com.pin.util.Reward.Companion.getInstance
 import com.pin.util.RuntimePermissionUtils
 import com.soundcloud.android.crop.Crop
 import de.hdodenhof.circleimageview.CircleImageView
@@ -74,10 +75,16 @@ class EditCharacterActivity : AppCompatActivity() {
         adViewContainer = findViewById(R.id.ad_container)
 
         adMobManager = AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id))
-        adMobManager.testMode(false)
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
+        val reward = getInstance(this)
+        reward.isBetweenRewardTime.observe(
+            this
+        ) { isBetweenRewardTime ->
+            adMobManager.setEnable(!isBetweenRewardTime!!)
+            adMobManager.checkFirst()
+        }
 
         accountViewModel = MyApplication.getAccountViewModel(this)
         characterViewModel = ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
