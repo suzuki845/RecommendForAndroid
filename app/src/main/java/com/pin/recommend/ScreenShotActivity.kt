@@ -1,14 +1,11 @@
 package com.pin.recommend
 
-import android.content.ContentResolver
-import android.content.ContentValues
+import android.Manifest
 import android.content.Context
 import android.graphics.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
@@ -20,7 +17,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.drawToBitmap
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.pin.imageutil.ImageSaver
+import com.pin.imageutil.insertImage
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.AnniversaryManager
 import com.pin.recommend.model.entity.RecommendCharacter
@@ -28,8 +25,8 @@ import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.util.FixedInterstitial
 import com.pin.util.Reward
+import com.pin.util.RuntimePermissionUtils
 import de.hdodenhof.circleimageview.CircleImageView
-import java.io.IOException
 import java.util.*
 
 
@@ -164,9 +161,36 @@ class ScreenShotActivity : AppCompatActivity() {
         item.setOnMenuItemClickListener { item ->
             when(item.itemId){
                 R.id.save -> {
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (!RuntimePermissionUtils.hasSelfPermissions(
+                                this,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            )
+                        ) {
+                            if (RuntimePermissionUtils.shouldShowRequestPermissionRationale(
+                                    this,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                )
+                            ) {
+                                RuntimePermissionUtils.showAlertDialog(
+                                    fragmentManager,
+                                    "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください"
+                                )
+                                return@setOnMenuItemClickListener false
+                            } else {
+                                requestPermissions(
+                                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                                    REQUEST_PERMISSION_CODE
+                                )
+                                return@setOnMenuItemClickListener false
+                            }
+                        }
+                    }
+
                     try {
                         val image = getViewBitmap()
-                        save(this, image!!, Bitmap.CompressFormat.PNG, "image/png", "anniversary-${Date()}");
+                        save(this, image!!, Bitmap.CompressFormat.PNG, "image/png", "anniversary-${System.currentTimeMillis()}")
                         finish()
                         val reward = Reward.getInstance(this)
                         if(reward.isBetweenRewardTime.value == false){
@@ -178,7 +202,8 @@ class ScreenShotActivity : AppCompatActivity() {
      """.trimIndent(), Toast.LENGTH_LONG
                         ).show()
                     } catch (e: Exception){
-                        Toast.makeText(this, "保存に失敗しました。", Toast.LENGTH_LONG).show()
+                        println(e)
+                        Toast.makeText(this, "保存に失敗しました。 \n\n ${e.message}", Toast.LENGTH_LONG).show()
                     }
                 }
             }
@@ -204,12 +229,14 @@ class ScreenShotActivity : AppCompatActivity() {
         return bitmap
     }
 
-    @Throws(IOException::class)
+    private val REQUEST_PERMISSION_CODE = 1234
+
     fun save(
         context: Context, bitmap: Bitmap, format: Bitmap.CompressFormat,
         mimeType: String, displayName: String
     ): Uri {
-
+        return insertImage(bitmap, format, mimeType, displayName)
+/*
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
             put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
@@ -235,6 +262,8 @@ class ScreenShotActivity : AppCompatActivity() {
             }
             throw it
         }
+
+ */
     }
 
 }

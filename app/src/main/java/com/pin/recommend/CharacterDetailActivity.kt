@@ -155,8 +155,10 @@ class CharacterDetailActivity : AppCompatActivity() {
 
     private fun setMenuItemIconTint(account: Account, item: MenuItem) {
         var drawable = item.icon
-        drawable = DrawableCompat.wrap(drawable)
-        DrawableCompat.setTint(drawable, character.getToolbarTextColor(this, account.getToolbarTextColor()))
+        drawable = drawable?.let { DrawableCompat.wrap(it) }
+        if (drawable != null) {
+            DrawableCompat.setTint(drawable, character.getToolbarTextColor(this, account.getToolbarTextColor()))
+        }
     }
 
     private fun setAllMenuItemIconTint(account: Account, menu: Menu) {
