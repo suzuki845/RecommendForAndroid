@@ -64,24 +64,6 @@
                     android:layout_height="1dp" />
 
                 <LinearLayout
-                    android:id="@+id/setting_toolbar"
-                    android:onClick="onClickSettingToolbar"
-                    android:background="#ffffff"
-                    android:padding="6dp"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:text="ツールバーの設定"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp" />
-
-                <LinearLayout
                     android:id="@+id/export_backup"
                     android:onClick="onExportBackup"
                     android:background="#ffffff"
@@ -131,6 +113,23 @@
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp" />
+
+                <LinearLayout
+                    android:id="@+id/link_to_homepage"
+                    android:onClick="onClickHomePage"
+                    android:background="#ffffff"
+                    android:padding="6dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="お問い合わせ"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:onClick="onClickPrivacyPolicy"

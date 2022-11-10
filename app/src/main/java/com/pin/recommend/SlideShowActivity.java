@@ -27,6 +27,7 @@ import static com.pin.recommend.StoryDetailActivity.INTENT_SLIDE_SHOW_CURRENT_PO
 
 public class SlideShowActivity extends AppCompatActivity {
 
+    private  Toolbar toolbar;
     private SliderLayout sliderView;
     private Story story;
     private int initPosition = 0;
@@ -55,6 +56,8 @@ public class SlideShowActivity extends AppCompatActivity {
                 adMobManager.checkFirst();
             }
         });
+
+        toolbar = findViewById(R.id.toolbar);
 
         accountViewModel = MyApplication.getAccountViewModel(this);
         storyPictureViewModel = new ViewModelProvider(this).get(StoryPictureViewModel.class);
@@ -86,12 +89,6 @@ public class SlideShowActivity extends AppCompatActivity {
     }
 
     private void initializeToolbar(Account account){
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(account.getToolbarBackgroundColor());
-        toolbar.setTitleTextColor(account.getToolbarTextColor());
-        Drawable drawable = DrawableCompat.wrap(toolbar.getOverflowIcon());
-        DrawableCompat.setTint(drawable, account.getToolbarTextColor());
-        MyApplication.setupStatusBarColor(this , account.getToolbarTextColor(), account.getToolbarBackgroundColor());
         toolbar.setTitle("スライドショー");
         setSupportActionBar(toolbar);
     }

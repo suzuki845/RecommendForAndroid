@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.pin.recommend.util.PrefUtil;
 
@@ -28,6 +29,8 @@ public class PassCodeConfirmationActivity extends AppCompatActivity implements V
     private Bitmap bitmapBlack = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888);
     private Bitmap bitmapGrey = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888);
 
+    private Toolbar toolbar;
+
     public static Intent createIntent(Context context) {
         return new Intent(context, PassCodeConfirmationActivity.class);
     }
@@ -36,6 +39,9 @@ public class PassCodeConfirmationActivity extends AppCompatActivity implements V
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirm_pass_code);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         initViews();
         initCircleCanvas();
     }

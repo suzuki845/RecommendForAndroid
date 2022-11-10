@@ -1,6 +1,5 @@
 package com.pin.recommend
 
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
@@ -14,7 +13,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
-import com.google.android.material.tabs.TabLayout
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.pin.recommend.dialog.BackgroundSettingDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.dialog.TextSettingDialogFragment
@@ -27,10 +26,13 @@ import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.FixedInterstitial
 import com.pin.util.Reward.Companion.getInstance
+import kotlinx.android.synthetic.main.activity_character_detail.view.*
 
-class CharacterDetailActivity : AppCompatActivity() {
-    private lateinit var background: View
-    private lateinit var tabs: TabLayout
+class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener {
+    private lateinit var backgroundImage: View
+    private lateinit var backgroundColor: View
+    private lateinit var navigation: BottomNavigationView
+    private lateinit var viewPager: ViewPager
     private lateinit var accountViewModel: AccountViewModel
     private lateinit var characterViewModel: RecommendCharacterViewModel
     private lateinit var character: RecommendCharacter
@@ -60,13 +62,16 @@ class CharacterDetailActivity : AppCompatActivity() {
 
 
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
-        val viewPager = findViewById<ViewPager>(R.id.view_pager)
+        viewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
+        viewPager.addOnPageChangeListener(this)
+        navigation = findViewById(R.id.navigation)
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
-        tabs = findViewById(R.id.tabs)
-        tabs.setupWithViewPager(viewPager)
-        background = findViewById(R.id.background)
+        backgroundImage = findViewById(R.id.backgroundImage)
+        backgroundColor = findViewById(R.id.backgroundColor)
         toolbar = findViewById(R.id.toolbar)
+
 
         accountViewModel = MyApplication.getAccountViewModel(this)
         characterViewModel = ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
@@ -77,10 +82,46 @@ class CharacterDetailActivity : AppCompatActivity() {
             if (character == null) return@Observer
             this@CharacterDetailActivity.character = character
             initializeBackground(character)
-            initializeTab(character)
             initializeToolbar(character)
         })
     }
+
+    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        when (item.itemId) {
+            R.id.home -> {
+                viewPager.currentItem = 0
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.story -> {
+                viewPager.currentItem = 1
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.pay_save -> {
+                viewPager.currentItem = 2
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.event -> {
+                viewPager.currentItem = 3
+                return@OnNavigationItemSelectedListener true
+            }
+        }
+        false
+    }
+
+    override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
+
+    override fun onPageSelected(p0: Int) {
+
+        when(p0) {
+            0 -> navigation.menu.getItem(0).isChecked = true
+            1 -> navigation.menu.getItem(1).isChecked = true
+            2 -> navigation.menu.getItem(2).isChecked = true
+            3 -> navigation.menu.getItem(3).isChecked = true
+        }
+
+    }
+
+    override fun onPageScrollStateChanged(p0: Int) {}
 
     override fun onResume() {
         super.onResume()
@@ -88,33 +129,16 @@ class CharacterDetailActivity : AppCompatActivity() {
     }
 
     private fun initializeBackground(character: RecommendCharacter) {
-        background.background = character.getBackgroundDrawable(this@CharacterDetailActivity, 1000, 1000)
-        background.alpha = character.backgroundImageOpacity
-    }
+        backgroundImage.background = character.getBackgroundImageDrawable(this@CharacterDetailActivity, 1000, 1000)
+        backgroundImage.alpha = character.backgroundImageOpacity
 
-    private fun initializeTab(character: RecommendCharacter) {
-        tabs.tabTextColors = ColorStateList.valueOf(character.getHomeTextColor())
-    }
-
-    private fun accountToolbarBackgroundColor(account: Account?): Int {
-        return account?.getToolbarBackgroundColor() ?: Color.parseColor("#eb34ab")
-    }
-
-    private fun accountToolbarTextColor(account: Account?): Int {
-        return account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
+        character.backgroundColor
+            .let {
+                backgroundColor.setBackgroundColor(it)
+            }
     }
 
     private fun initializeToolbar(character: RecommendCharacter) {
-        val account = accountViewModel.accountLiveData.value
-        toolbar.setBackgroundColor(character.getToolbarBackgroundColor(this, accountToolbarBackgroundColor(account)))
-        toolbar.setTitleTextColor(character.getToolbarTextColor(this, accountToolbarTextColor(account)))
-        val drawable = toolbar.overflowIcon?.let { DrawableCompat.wrap(it) }
-        if (drawable != null) {
-            DrawableCompat.setTint(drawable, character.getToolbarTextColor(this, accountToolbarTextColor(account)))
-        }
-        MyApplication.setupStatusBarColor(this,
-                character.getToolbarTextColor(this, accountToolbarTextColor(account)),
-                character.getToolbarBackgroundColor(this, accountToolbarBackgroundColor(account)))
         toolbar.title = character.name
         setSupportActionBar(toolbar)
     }
@@ -132,13 +156,13 @@ class CharacterDetailActivity : AppCompatActivity() {
                     item.setIcon(R.drawable.pin_outline)
                     it.removeFixedCharacter()
                     accountViewModel.saveAccount(it)
+                    finish()
                 } else {
                     item.setIcon(R.drawable.pin_fill)
                     it.setFixedCharacter(character.id)
                     accountViewModel.saveAccount(it)
                     Toast.makeText(this@CharacterDetailActivity, "トップページ に固定しました", Toast.LENGTH_SHORT).show()
                 }
-                setMenuItemIconTint(account, item)
             }
             false
         }
@@ -148,28 +172,8 @@ class CharacterDetailActivity : AppCompatActivity() {
             } else {
                 item.setIcon(R.drawable.pin_fill)
             }
-            setAllMenuItemIconTint(it, menu)
         }
         return true
-    }
-
-    private fun setMenuItemIconTint(account: Account, item: MenuItem) {
-        var drawable = item.icon
-        drawable = drawable?.let { DrawableCompat.wrap(it) }
-        if (drawable != null) {
-            DrawableCompat.setTint(drawable, character.getToolbarTextColor(this, account.getToolbarTextColor()))
-        }
-    }
-
-    private fun setAllMenuItemIconTint(account: Account, menu: Menu) {
-        for (i in 0 until menu.size()) {
-            val item = menu.getItem(i)
-            var drawable = item.icon
-            if (drawable != null) {
-                drawable = DrawableCompat.wrap(drawable)
-                DrawableCompat.setTint(drawable, character.getToolbarTextColor(this, account.getToolbarTextColor()))
-            }
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -206,22 +210,6 @@ class CharacterDetailActivity : AppCompatActivity() {
                 backgroundSettingDialogFragment.setDefaultBackgroundColor(character.getBackgroundColor())
                 backgroundSettingDialogFragment.setDefaultImageOpacity(character.backgroundImageOpacity)
                 backgroundSettingDialogFragment.show(supportFragmentManager, BackgroundSettingDialogFragment.TAG)
-                true
-            }
-            R.id.setting_toolbar -> {
-                val toolbarSettingDialogFragment = ToolbarSettingDialogFragment(object : DialogActionListener<ToolbarSettingDialogFragment> {
-                    override fun onDecision(dialog: ToolbarSettingDialogFragment) {
-                        character.toolbarBackgroundColor = dialog.backgroundColor
-                        character.toolbarTextColor = dialog.textColor
-                        characterViewModel.update(character)
-                    }
-
-                    override fun onCancel() {}
-                })
-                val account = accountViewModel.accountLiveData.value
-                toolbarSettingDialogFragment.setDefaultBackgroundColor(character.getToolbarBackgroundColor(this, accountToolbarBackgroundColor(account)))
-                toolbarSettingDialogFragment.setDefaultTextColor(character.getToolbarTextColor(this, accountToolbarTextColor(account)))
-                toolbarSettingDialogFragment.show(supportFragmentManager, ToolbarSettingDialogFragment.TAG)
                 true
             }
             R.id.delete_background_image -> {

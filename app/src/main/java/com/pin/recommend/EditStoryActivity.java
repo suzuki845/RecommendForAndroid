@@ -158,13 +158,6 @@ public class EditStoryActivity extends AppCompatActivity {
     }
 
     private void initializeToolbar(Account account){
-        toolbar.setBackgroundColor(account.getToolbarBackgroundColor());
-        toolbar.setTitleTextColor(account.getToolbarTextColor());
-        Drawable drawable = DrawableCompat.wrap(toolbar.getOverflowIcon());
-        DrawableCompat.setTint(drawable, account.getToolbarTextColor());
-        MyApplication.setupStatusBarColor(this ,
-                account.getToolbarTextColor(),
-                account.getToolbarBackgroundColor());
         toolbar.setTitle("ストーリー編集");
         setSupportActionBar(toolbar);
     }

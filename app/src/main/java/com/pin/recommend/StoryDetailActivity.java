@@ -55,6 +55,7 @@ public class StoryDetailActivity extends AppCompatActivity {
 
     private AdMobAdaptiveBannerManager adMobManager;
     private ViewGroup adViewContainer;
+    private Toolbar toolbar;
 
 
     @Override
@@ -75,6 +76,8 @@ public class StoryDetailActivity extends AppCompatActivity {
                 adMobManager.checkFirst();
             }
         });
+
+        toolbar = findViewById(R.id.toolbar);
 
         accountViewModel = MyApplication.getAccountViewModel(this);
         storyPictureViewModel = new ViewModelProvider(this).get(StoryPictureViewModel.class);
@@ -158,12 +161,6 @@ public class StoryDetailActivity extends AppCompatActivity {
 
 
     private void initializeToolbar(Account account){
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(account.getToolbarBackgroundColor());
-        toolbar.setTitleTextColor(account.getToolbarTextColor());
-        Drawable drawable = DrawableCompat.wrap(toolbar.getOverflowIcon());
-        DrawableCompat.setTint(drawable, account.getToolbarTextColor());
-        MyApplication.setupStatusBarColor(this , account.getToolbarTextColor(), account.getToolbarBackgroundColor());
         toolbar.setTitle("ストーリー");
         setSupportActionBar(toolbar);
     }

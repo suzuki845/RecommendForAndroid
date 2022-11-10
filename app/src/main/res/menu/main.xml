@@ -18,11 +18,6 @@
         android:title="背景画像を削除"
         app:showAsAction="never" />
     <item
-        android:id="@+id/setting_toolbar"
-        android:orderInCategory="4"
-        android:title="ツールバーの設定"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/change_body_text_color"
         android:orderInCategory="5"
         android:title="ホームの文字色の設定"

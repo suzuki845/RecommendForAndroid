@@ -13,10 +13,10 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.pin.recommend.util.PrefUtil;
 import com.pin.recommend.util.ShowToast;
@@ -37,6 +37,8 @@ public class PassCodeSetActivity extends AppCompatActivity implements View.OnCli
     private int password;
     private boolean isDoubleCheck = false;
 
+    private Toolbar toolbar;
+
     public static Intent createIntent(Context context) {
         return new Intent(context, PassCodeSetActivity.class);
     }
@@ -44,6 +46,9 @@ public class PassCodeSetActivity extends AppCompatActivity implements View.OnCli
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_input_pass_code);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         initViews();
         initCircleCanvas();
 

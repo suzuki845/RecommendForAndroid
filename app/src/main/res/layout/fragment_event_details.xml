@@ -34,7 +34,6 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/event_recycle_view"
-                android:layout_marginBottom="60dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </LinearLayout>

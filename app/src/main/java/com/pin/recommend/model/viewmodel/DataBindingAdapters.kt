@@ -51,19 +51,6 @@ object DataBindingAdapters {
     @JvmStatic
     @BindingAdapter("android:accountToolbar", "android:characterToolbar", "android:activity")
     fun setToolbar(toolbar: Toolbar, account: Account?, character: RecommendCharacter?, activity: Activity){
-        if(character != null){
-            val accountToolbarTextColor = account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
-            val accountToolbarBackgroundColor =  account?.getToolbarBackgroundColor() ?: Color.parseColor("#eb34ab")
-            toolbar.setBackgroundColor(character.getToolbarBackgroundColor(toolbar.context, accountToolbarBackgroundColor))
-            toolbar.setTitleTextColor(character.getToolbarTextColor(toolbar.context, accountToolbarTextColor))
-            val drawable = toolbar.overflowIcon?.let { DrawableCompat.wrap(it) }
-            if (drawable != null) {
-                DrawableCompat.setTint(drawable, character.getToolbarTextColor(toolbar.context, accountToolbarTextColor))
-            }
-            MyApplication.setupStatusBarColor(activity,
-                    character.getToolbarTextColor(toolbar.context, accountToolbarTextColor),
-                    character.getToolbarBackgroundColor(toolbar.context, accountToolbarBackgroundColor))
-        }
     }
 
     @JvmStatic
@@ -95,7 +82,7 @@ object DataBindingAdapters {
     @JvmStatic
     @BindingAdapter("android:characterBackground")
     fun setCharacterBackground(imageView: ImageView, character: RecommendCharacter?) {
-        character?.getBackgroundDrawable(imageView.context, 1000, 1000)?.let {
+        character?.getBackgroundImageDrawable(imageView.context, 1000, 1000)?.let {
             imageView.setImageDrawable(it)
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
         }

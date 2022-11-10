@@ -140,15 +140,15 @@ class StoryListFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
-        val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
+        //val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
+        //val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
         editListViewModel.editMode.observe(this, Observer { mode ->
             val s: SpannableString = if (mode) {
                 SpannableString("完了")
             } else {
                 SpannableString("編集")
             }
-            s.setSpan(textColor?.let { ForegroundColorSpan(it) }, 0, s.length, 0)
+            //s.setSpan(textColor?.let { ForegroundColorSpan(it) }, 0, s.length, 0)
             editMode.title = s
         })
     }

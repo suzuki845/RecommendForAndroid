@@ -136,11 +136,12 @@ class HomeFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
+        /*
         val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
         val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
-
+        */
         val s = SpannableString("編集")
-        s.setSpan(ForegroundColorSpan(textColor), 0, s.length, 0)
+        //s.setSpan(ForegroundColorSpan(textColor), 0, s.length, 0)
         editMode.title = s
     }
 

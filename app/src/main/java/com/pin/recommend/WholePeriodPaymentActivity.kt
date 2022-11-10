@@ -31,10 +31,12 @@ class WholePeriodPaymentActivity : AppCompatActivity() {
         MyApplication.getAccountViewModel(this)
     }
 
+
     private lateinit var binding: ActivityWholePeriodPaymentBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         viewModel.setCharacterId(intent.getLongExtra(INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER, -1))
 
@@ -44,22 +46,18 @@ class WholePeriodPaymentActivity : AppCompatActivity() {
         binding.vm = viewModel
         binding.avm = accountViewModel
         binding.content.vm = viewModel
+
+        initializeToolbar()
     }
+
+    private fun initializeToolbar() {
+        binding.toolbar.title = "Payの合計"
+        setSupportActionBar(binding.toolbar)
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        setAllMenuItemIconTint(menu)
         return true
-    }
-
-    private fun setAllMenuItemIconTint(menu: Menu) {
-        for (i in 0 until menu.size()) {
-            val item = menu.getItem(i)
-            var drawable = item.icon
-            if (drawable != null) {
-                drawable = DrawableCompat.wrap(drawable)
-                DrawableCompat.setTint(drawable, accountViewModel.accountLiveData.value!!.getToolbarTextColor())
-            }
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

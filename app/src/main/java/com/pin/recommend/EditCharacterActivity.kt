@@ -216,13 +216,6 @@ class EditCharacterActivity : AppCompatActivity() {
 
 
     private fun initializeToolbar(account: Account) {
-        toolbar.setBackgroundColor(account.getToolbarBackgroundColor())
-        toolbar.setTitleTextColor(account.getToolbarTextColor())
-        val drawable = DrawableCompat.wrap(toolbar.overflowIcon!!)
-        DrawableCompat.setTint(drawable, account.getToolbarTextColor())
-        MyApplication.setupStatusBarColor(this,
-                account.getToolbarTextColor(),
-                account.getToolbarBackgroundColor())
         toolbar.title = "編集"
         setSupportActionBar(toolbar)
     }
@@ -285,20 +278,9 @@ class EditCharacterActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_edit_character, menu)
-        setAllMenuItemIconTint(menu)
         return true
     }
 
-    private fun setAllMenuItemIconTint(menu: Menu) {
-        for (i in 0 until menu.size()) {
-            val item = menu.getItem(i)
-            var drawable = item.icon
-            if (drawable != null) {
-                drawable = DrawableCompat.wrap(drawable)
-                accountViewModel.accountLiveData.value?.getToolbarTextColor()?.let { DrawableCompat.setTint(drawable, it) }
-            }
-        }
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {

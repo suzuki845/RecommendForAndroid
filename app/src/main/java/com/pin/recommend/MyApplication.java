@@ -128,6 +128,8 @@ public class MyApplication extends android.app.Application implements ViewModelS
     public void onActivityResumed(@NonNull Activity activity) {
         Reward reward = Reward.Companion.getInstance(this);
         reward.checkRewardTime();
+
+        setupStatusBarColor(activity, Color.parseColor("#000000"), Color.parseColor("#FAFAFA"));
     }
 
     @Override

@@ -127,11 +127,6 @@ public class CharacterListActivity extends AppCompatActivity {
     }
 
     private void initializeToolbar(Account account){
-        toolbar.setBackgroundColor(account.getToolbarBackgroundColor());
-        toolbar.setTitleTextColor(account.getToolbarTextColor());
-        Drawable drawable = DrawableCompat.wrap(toolbar.getOverflowIcon());
-        DrawableCompat.setTint(drawable, account.getToolbarTextColor());
-        MyApplication.setupStatusBarColor(this , account.getToolbarTextColor(), account.getToolbarBackgroundColor());
         toolbar.setTitle("推しリスト");
         setSupportActionBar(toolbar);
     }
@@ -152,25 +147,7 @@ public class CharacterListActivity extends AppCompatActivity {
             }
         });
 
-        setAllMenuItemIconTint(menu);
         return true;
-    }
-
-    private void setMenuItemIconTint(MenuItem item){
-        Drawable drawable = item.getIcon();
-        drawable = DrawableCompat.wrap(drawable);
-        DrawableCompat.setTint(drawable, accountViewModel.getAccountLiveData().getValue().getToolbarTextColor());
-    }
-
-    private void setAllMenuItemIconTint(Menu menu){
-        for (int i = 0;i < menu.size();i++) {
-            MenuItem item = menu.getItem(i);
-            Drawable drawable = item.getIcon();
-            if (drawable != null) {
-                drawable = DrawableCompat.wrap(drawable);
-                DrawableCompat.setTint(drawable, accountViewModel.getAccountLiveData().getValue().getToolbarTextColor());
-            }
-        }
     }
 
     @Override

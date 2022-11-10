@@ -84,9 +84,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PassCodeSetActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="behind" />
         <activity
             android:name=".PassCodeConfirmationActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="behind" />
         <activity
             android:name=".NotificationDialogActivity"

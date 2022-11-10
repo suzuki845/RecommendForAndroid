@@ -181,13 +181,10 @@ public class RecommendCharacter implements Parcelable {
         return backgroundImageUri != null;
     }
 
-    public Drawable getBackgroundDrawable(Context context, int w, int h){
+    public Drawable getBackgroundImageDrawable(Context context, int w, int h){
         if(hasBackgroundImage()) {
             Bitmap bitmap = getBackgroundBitmap(context, w, h);
             return new BitmapDrawable(context.getResources(), bitmap);
-        }
-        if(backgroundColor != null) {
-            return new ColorDrawable(backgroundColor);
         }
         return null;
     }

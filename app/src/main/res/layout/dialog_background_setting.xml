@@ -49,7 +49,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="背景色"
+            android:text="フィルターカラー"
             android:labelFor="@id/preview_background_color" />
 
         <ImageView
@@ -59,12 +59,6 @@
             android:background="@drawable/border"
             android:layout_width="50dp"
             android:layout_height="50dp" />
-
-        <TextView
-            android:padding="4dp"
-            android:text="※背景画像を選択した場合、背景色より背景画像が優先されます"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

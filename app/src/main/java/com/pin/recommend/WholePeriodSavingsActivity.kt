@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -38,22 +39,17 @@ class WholePeriodSavingsActivity : AppCompatActivity() {
         binding.vm = viewModel
         binding.avm = accountViewModel
         binding.content.vm = viewModel
+
+        initializeToolbar()
+    }
+
+    private fun initializeToolbar() {
+        binding.toolbar.title = "貯金の合計"
+        setSupportActionBar(binding.toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        setAllMenuItemIconTint(menu)
         return true
-    }
-
-    private fun setAllMenuItemIconTint(menu: Menu) {
-        for (i in 0 until menu.size()) {
-            val item = menu.getItem(i)
-            var drawable = item.icon
-            if (drawable != null) {
-                drawable = DrawableCompat.wrap(drawable)
-                DrawableCompat.setTint(drawable, accountViewModel.accountLiveData.value!!.getToolbarTextColor())
-            }
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

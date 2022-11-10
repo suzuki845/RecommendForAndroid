@@ -8,17 +8,14 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.drawToBitmap
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.imageutil.insertImage
-import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.AnniversaryManager
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.AccountViewModel
@@ -47,7 +44,8 @@ class ScreenShotActivity : AppCompatActivity() {
     private lateinit var character: RecommendCharacter
     private lateinit var toolbar: Toolbar
     private lateinit var containerView: View
-    private lateinit var background: ImageView
+    private lateinit var backgroundImage: View
+    private lateinit var backgroundColor: View
     private lateinit var iconImageView: CircleImageView
     private lateinit var characterNameView: TextView
     private lateinit var firstText: TextView
@@ -64,7 +62,8 @@ class ScreenShotActivity : AppCompatActivity() {
         setContentView(R.layout.activity_screen_shot)
 
         toolbar = findViewById(R.id.toolbar)
-        background = findViewById(R.id.background)
+        backgroundImage = findViewById(R.id.backgroundImage)
+        backgroundColor = findViewById(R.id.backgroundColor)
         containerView = findViewById(R.id.content)
         iconImageView = findViewById(R.id.character_icon)
         dateView = findViewById(R.id.created)
@@ -127,29 +126,15 @@ class ScreenShotActivity : AppCompatActivity() {
     }
 
     private fun initializeBackground(character: RecommendCharacter) {
-        background.background = character.getBackgroundDrawable(this, 1000, 1000)
-        background.alpha = character.backgroundImageOpacity
-    }
+        backgroundImage.background = character.getBackgroundImageDrawable(this, 1000, 1000)
+        backgroundImage.alpha = character.backgroundImageOpacity
 
-    private fun accountToolbarBackgroundColor(account: Account?): Int {
-        return account?.getToolbarBackgroundColor() ?: Color.parseColor("#eb34ab")
-    }
-
-    private fun accountToolbarTextColor(account: Account?): Int {
-        return account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
+        character.backgroundColor?.let {
+            backgroundColor.setBackgroundColor(it)
+        }
     }
 
     private fun initializeToolbar(character: RecommendCharacter) {
-        val account = accountViewModel.accountLiveData.value
-        toolbar.setBackgroundColor(character.getToolbarBackgroundColor(this, accountToolbarBackgroundColor(account)))
-        toolbar.setTitleTextColor(character.getToolbarTextColor(this, accountToolbarTextColor(account)))
-        val drawable = toolbar.overflowIcon?.let { DrawableCompat.wrap(it) }
-        if (drawable != null) {
-            DrawableCompat.setTint(drawable, character.getToolbarTextColor(this, accountToolbarTextColor(account)))
-        }
-        MyApplication.setupStatusBarColor(this,
-            character.getToolbarTextColor(this, accountToolbarTextColor(account)),
-            character.getToolbarBackgroundColor(this, accountToolbarBackgroundColor(account)))
         toolbar.title = character.name
         setSupportActionBar(toolbar)
     }
@@ -214,16 +199,24 @@ class ScreenShotActivity : AppCompatActivity() {
 
     private fun getViewBitmap(): Bitmap? {
         val bitmap = Bitmap.createBitmap(
-            background.width, background.height,
+            backgroundImage.width, backgroundImage.height,
             Bitmap.Config.ARGB_8888
         )
         val canvas = Canvas(bitmap)
-        canvas.drawARGB(255, 255, 255, 255)
-        val b = background.drawToBitmap(Bitmap.Config.ARGB_8888)
-        val paint = Paint().apply {
-            alpha = (background.alpha * 255).toInt()
+
+        val image = backgroundImage.drawToBitmap(Bitmap.Config.ARGB_8888)
+        val imagePaint = Paint().apply {
+            alpha = (backgroundImage.alpha * 255).toInt()
         }
-        canvas.drawBitmap(b, 0F,0F, paint)
+        canvas.drawBitmap(image, 0F,0F, imagePaint)
+
+        val color = backgroundColor.drawToBitmap(Bitmap.Config.ARGB_8888)
+        val colorPaint = Paint().apply {
+            alpha = (backgroundColor.alpha * 255).toInt()
+        }
+
+        canvas.drawBitmap(color, 0F, 0F, colorPaint)
+
         containerView.draw(canvas)
 
         return bitmap

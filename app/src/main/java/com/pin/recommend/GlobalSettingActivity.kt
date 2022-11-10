@@ -154,43 +154,21 @@ class GlobalSettingActivity : AppCompatActivity() {
         }
     }
 
-    fun onClickSettingToolbar(v: View){
-        val account = accountViewModel.accountLiveData.value
-        val toolbarSettingDialogFragment = ToolbarSettingDialogFragment(object : DialogActionListener<ToolbarSettingDialogFragment> {
-            override fun onDecision(dialog: ToolbarSettingDialogFragment?) {
-                account?.toolbarBackgroundColor = dialog?.backgroundColor;
-                account?.toolbarTextColor = dialog?.textColor;
-                accountViewModel.saveAccount(account);
-            }
-
-            override fun onCancel() {
-            }
-        });
-        if (account != null) {
-            toolbarSettingDialogFragment.setDefaultBackgroundColor(account.toolbarBackgroundColor)
-        }
-        if (account != null) {
-            toolbarSettingDialogFragment.setDefaultTextColor(account.getToolbarTextColor())
-        }
-        toolbarSettingDialogFragment.show(supportFragmentManager, ToolbarSettingDialogFragment.TAG);
+    fun onClickHomePage(v: View){
+        val uri = Uri.parse("https://developer-d5452.web.app/");
+        intent = Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
     }
 
     fun onClickPrivacyPolicy(v: View){
-        val uri = Uri.parse("http://turuwo-apps.net/privacy-policy.html");
+        val uri = Uri.parse("https://developer-d5452.web.app/privacy-policy.html");
         intent = Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
     }
 
     private fun initializeToolbar(account: Account?) {
-        if (account != null) {
-            toolbar.setBackgroundColor(account.getToolbarBackgroundColor())
-            toolbar.setTitleTextColor(account.getToolbarTextColor())
-            val drawable = toolbar.overflowIcon?.let { DrawableCompat.wrap(it) }
-            drawable?.let { DrawableCompat.setTint(it, account.getToolbarTextColor()) }
-            MyApplication.setupStatusBarColor(this, account.getToolbarTextColor(), account.getToolbarBackgroundColor())
-            toolbar.title = "設定"
-            setSupportActionBar(toolbar)
-        }
+        toolbar.title = "設定"
+        setSupportActionBar(toolbar)
     }
 
     fun onShowRewardDialog(v: View){

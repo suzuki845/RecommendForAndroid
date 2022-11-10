@@ -121,20 +121,12 @@ class CreatePaymentActivity : AppCompatActivity() {
             viewModel.date.value = date
 
         }, year, month, dayOfMonth)
-        //datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
 
     private fun initializeToolbar(account: Account?) {
-        if (account != null) {
-            toolbar.setBackgroundColor(account.getToolbarBackgroundColor())
-            toolbar.setTitleTextColor(account.getToolbarTextColor())
-            val drawable = toolbar.overflowIcon?.let { DrawableCompat.wrap(it) }
-            drawable?.let { DrawableCompat.setTint(it, account.getToolbarTextColor()) }
-            MyApplication.setupStatusBarColor(this, account.getToolbarTextColor(), account.getToolbarBackgroundColor())
-            toolbar.title = "Pay & 貯金の追加"
-            setSupportActionBar(toolbar)
-        }
+        toolbar.title = "Pay & 貯金の追加"
+        setSupportActionBar(toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

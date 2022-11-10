@@ -103,14 +103,7 @@ class PaymentTagListActivity: AppCompatActivity() {
 
 
     private fun initializeToolbar(account: Account?) {
-        if (account != null) {
-            toolbar.setBackgroundColor(account.getToolbarBackgroundColor())
-            toolbar.setTitleTextColor(account.getToolbarTextColor())
-            val drawable = toolbar.overflowIcon?.let { DrawableCompat.wrap(it) }
-            drawable?.let { DrawableCompat.setTint(it, account.getToolbarTextColor()) }
-            MyApplication.setupStatusBarColor(this, account.getToolbarTextColor(), account.getToolbarBackgroundColor())
-            setSupportActionBar(toolbar)
-        }
+         setSupportActionBar(toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -123,19 +116,7 @@ class PaymentTagListActivity: AppCompatActivity() {
                 editMode.title = "編集"
             }
         })
-        setAllMenuItemIconTint(menu)
         return true
-    }
-
-    private fun setAllMenuItemIconTint(menu: Menu) {
-        for (i in 0 until menu.size()) {
-            val item = menu.getItem(i)
-            var drawable = item.icon
-            if (drawable != null) {
-                drawable = DrawableCompat.wrap(drawable)
-                DrawableCompat.setTint(drawable, accountViewModel.accountLiveData.value!!.getToolbarTextColor())
-            }
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

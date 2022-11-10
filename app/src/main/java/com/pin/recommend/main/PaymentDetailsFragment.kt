@@ -141,7 +141,7 @@ class PaymentDetailsFragment : Fragment() {
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
         val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
-        val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
+        //val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
         paymentViewModel.isEditMode.observe(this, Observer<Boolean> { mode ->
             if (mode) {
                 editMode.title = "完了"
