@@ -2,6 +2,7 @@ package com.pin.recommend.main;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
@@ -35,11 +36,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return HomeFragment.newInstance(position + 1);
             case 1:
-                return new StoryListFragment().newInstance(position);
+                return StoryListFragment.newInstance(position);
             case 2:
-                return new PaymentDetailsFragment().newInstance(position);
+                return PaymentDetailsFragment.newInstance(position);
             case 3:
-                return new EventDetailsFragment().newInstance(position);
+                return EventDetailsFragment.newInstance(position);
         }
         return null;
     }

@@ -24,7 +24,7 @@ import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
-import com.pin.util.FixedInterstitial
+import com.pin.util.Interstitial
 import com.pin.util.Reward.Companion.getInstance
 import kotlinx.android.synthetic.main.activity_character_detail.view.*
 
@@ -55,10 +55,6 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
             adMobManager.setEnable(!isBetweenRewardTime!!)
             adMobManager.checkFirst()
         }
-
-
-        FixedInterstitial.setUnitId(resources.getString(R.string.ad_unit_id_for_interstitial))
-        FixedInterstitial.load(this)
 
 
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)

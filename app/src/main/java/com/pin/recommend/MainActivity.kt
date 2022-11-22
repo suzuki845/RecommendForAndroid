@@ -14,9 +14,10 @@ import com.pin.recommend.Constants.PREF_KEY_IS_LOCKED
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.util.PrefUtil
-import com.pin.util.FixedInterstitial
+import com.pin.util.Interstitial
 import com.pin.util.Reward
 import com.pin.util.reward.RewardDialogFragmentActivity
+import kotlinx.coroutines.delay
 import java.net.URI
 import java.util.*
 
@@ -70,19 +71,12 @@ class MainActivity : AppCompatActivity() {
             finish()
         })
 
+        Interstitial.setUnitId(resources.getString(R.string.ad_unit_id_for_interstitial))
         val reward = Reward.getInstance(this)
+        reward.setAdUnitId(resources.getString(R.string.ad_unit_id_for_reward))
+        //reward.reset()
         reward.checkRewardTime()
-        reward.initialize()
-
-        reward.isNotify.observeForever( {
-            if (it) {
-                val isPassCodeLocked = PrefUtil.getBoolean(PREF_KEY_IS_LOCKED)
-                if (!isPassCodeLocked) {
-                    val intent = RewardDialogFragmentActivity.createIntent(this)
-                    startActivity(intent)
-                }
-            }
-        })
+        reward.checkNotify()
 
     }
 

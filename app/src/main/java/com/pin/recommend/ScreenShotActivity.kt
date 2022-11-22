@@ -1,6 +1,7 @@
 package com.pin.recommend
 
 import android.Manifest
+import android.app.ProgressDialog
 import android.content.Context
 import android.graphics.*
 import android.net.Uri
@@ -20,7 +21,7 @@ import com.pin.recommend.model.entity.AnniversaryManager
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
-import com.pin.util.FixedInterstitial
+import com.pin.util.Interstitial
 import com.pin.util.Reward
 import com.pin.util.RuntimePermissionUtils
 import de.hdodenhof.circleimageview.CircleImageView
@@ -174,18 +175,41 @@ class ScreenShotActivity : AppCompatActivity() {
                     }
 
                     try {
+                        val dialog = ProgressDialog(this)
+                        dialog.show()
+
                         val image = getViewBitmap()
-                        save(this, image!!, Bitmap.CompressFormat.PNG, "image/png", "anniversary-${System.currentTimeMillis()}")
-                        finish()
                         val reward = Reward.getInstance(this)
                         if(reward.isBetweenRewardTime.value == false){
-                            FixedInterstitial.show()
-                        }
-                        Toast.makeText(
-                            this, """
+                            Interstitial.loadAndShow(this, {
+                                save(this, image!!, Bitmap.CompressFormat.PNG, "image/png", "anniversary-${System.currentTimeMillis()}")
+                                dialog.dismiss()
+                                finish()
+                                Toast.makeText(
+                                    this, """
      スクリーンショットを保存しました。ファイルをご確認ください。
      """.trimIndent(), Toast.LENGTH_LONG
-                        ).show()
+                                ).show()
+                            }, {
+                                save(this, image!!, Bitmap.CompressFormat.PNG, "image/png", "anniversary-${System.currentTimeMillis()}")
+                                dialog.dismiss()
+                                finish()
+                                Toast.makeText(
+                                    this, """
+     スクリーンショットを保存しました。ファイルをご確認ください。
+     """.trimIndent(), Toast.LENGTH_LONG
+                                ).show()
+                            })
+                        }else{
+                            save(this, image!!, Bitmap.CompressFormat.PNG, "image/png", "anniversary-${System.currentTimeMillis()}")
+                            dialog.dismiss()
+                            finish()
+                            Toast.makeText(
+                                this, """
+     スクリーンショットを保存しました。ファイルをご確認ください。
+     """.trimIndent(), Toast.LENGTH_LONG
+                            ).show()
+                        }
                     } catch (e: Exception){
                         println(e)
                         Toast.makeText(this, "保存に失敗しました。 \n\n ${e.message}", Toast.LENGTH_LONG).show()
@@ -229,34 +253,6 @@ class ScreenShotActivity : AppCompatActivity() {
         mimeType: String, displayName: String
     ): Uri {
         return insertImage(bitmap, format, mimeType, displayName)
-/*
-        val values = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
-            put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
-            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM)
-        }
-
-        var uri: Uri? = null
-        return runCatching {
-            with(context.contentResolver) {
-                insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)?.also {
-                    uri = it // Keep uri reference so it can be removed on failure
-                    openOutputStream(it)?.use { stream ->
-                        if (!bitmap.compress(format, 95, stream))
-                            throw IOException("Failed to save bitmap.")
-                    } ?: throw IOException("Failed to open output stream.")
-
-                } ?: throw IOException("Failed to create new MediaStore record.")
-            }
-        }.getOrElse {
-            uri?.let { orphanUri ->
-                // Don't leave an orphan entry in the MediaStore
-                context.contentResolver.delete(orphanUri, null, null)
-            }
-            throw it
-        }
-
- */
     }
 
 }
