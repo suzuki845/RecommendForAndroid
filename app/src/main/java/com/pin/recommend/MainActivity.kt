@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
             isNeedPassCodeConfirmation = false;
 
             val notification = NotificationChecker(applicationContext);
+            /*
             val data = NotificationData(
                 R.drawable.emotion_diary,
                 "新アプリリリースのお知らせ",
@@ -65,7 +66,16 @@ class MainActivity : AppCompatActivity() {
                         "\n\n気分アイコン、背景を自由に設定できるので推し仕様にカスタマイズできたりします！" +
                         "\n\n唐突な宣伝で申し訳ないのですが、是非インストールしてみてください！",
                 "https://play.google.com/store/apps/details?id=com.suzuki.emotiondiary")
-            notification.check(0, intents, data)
+             */
+            val data = NotificationData(
+                R.drawable.oshitimer,
+                "新アプリリリースのお知らせ",
+                "推しが応援してくれるタイマーアプリを作ってみました！勉強やトレーニングでご利用ください！" +
+                        "\n\n推して何日？のユーザーさんならこんなアプリがあったら楽しんでくれるんじゃないかなぁと思って作ってみました。" +
+                        "\n\nアイコン、背景を自由に設定できるので推し仕様にカスタマイズできます！" +
+                        "\n\n唐突な宣伝で申し訳ないのですが、是非インストールしてみてください！",
+                "https://play.google.com/store/apps/details?id=com.suzuki.oshitimer")
+            notification.check(1, intents, data)
 
             startActivities(intents.toArray(arrayOf()))
             finish()
