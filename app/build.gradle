@@ -12,7 +12,7 @@ android {
             keyPassword 'pinkichi7183'
         }
     }
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         //multiDexEnabled false
