@@ -2,6 +2,7 @@ package com.pin.recommend.model;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -10,6 +11,7 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.pin.recommend.model.dao.AccountDao;
+import com.pin.recommend.model.dao.CustomAnniversaryDao;
 import com.pin.recommend.model.dao.EventDao;
 import com.pin.recommend.model.dao.PaymentDao;
 import com.pin.recommend.model.dao.PaymentTagDao;
@@ -17,6 +19,7 @@ import com.pin.recommend.model.dao.RecommendCharacterDao;
 import com.pin.recommend.model.dao.StoryDao;
 import com.pin.recommend.model.dao.StoryPictureDao;
 import com.pin.recommend.model.entity.Account;
+import com.pin.recommend.model.entity.CustomAnniversary;
 import com.pin.recommend.model.entity.Event;
 import com.pin.recommend.model.entity.Payment;
 import com.pin.recommend.model.entity.PaymentTag;
@@ -27,7 +30,7 @@ import com.pin.recommend.model.entity.StoryPicture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Account.class, RecommendCharacter.class, Story.class, StoryPicture.class, Payment.class, PaymentTag.class, Event.class }, version = 6, exportSchema = true)
+@Database(entities = {Account.class, RecommendCharacter.class, Story.class, StoryPicture.class, Payment.class, PaymentTag.class, Event.class , CustomAnniversary.class}, version = 8, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -44,6 +47,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract PaymentTagDao paymentTagDao();
 
     public abstract EventDao eventDao();
+
+    public abstract CustomAnniversaryDao customAnniversaryDao();
 
     private static final int NUMBER_OF_THREADS = 4;
 
@@ -66,6 +71,8 @@ public abstract class AppDatabase extends RoomDatabase {
                             .addMigrations(MIGRATION_3_4)
                             .addMigrations(MIGRATION_4_5)
                             .addMigrations(MIGRATION_5_6)
+                            .addMigrations(MIGRATION_6_7)
+                            .addMigrations(MIGRATION_7_8)
                             .build();
                 }
             }
@@ -140,6 +147,45 @@ public abstract class AppDatabase extends RoomDatabase {
                             ");");
         }
     };
+
+    static final Migration MIGRATION_6_7 = new Migration(6,7) {
+
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL(
+                    "CREATE INDEX paymentCharacterId ON Payment(characterId)"
+            );
+            database.execSQL(
+                    "CREATE INDEX eventCharacterId ON Event(characterId)"
+            );
+        }
+    };
+
+
+
+
+    static final Migration MIGRATION_7_8 = new Migration(7,8) {
+
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL(
+                    "CREATE TABLE CustomAnniversary (" +
+                            " id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                            " characterId INTEGER NOT NULL," +
+                            " uuid TEXT NOT NULL," +
+                            " name TEXT NOT NULL," +
+                            " date INTEGER NOT NULL," +
+                            " topText TEXT," +
+                            " bottomText TEXT," +
+                            " FOREIGN KEY(`characterId`) REFERENCES `RecommendCharacter`(`id`) ON UPDATE CASCADE ON DELETE CASCADE" +
+                            ")"
+            );
+            database.execSQL(
+                    "CREATE INDEX customAnniversaryCharacterId ON Event(characterId)"
+            );
+        }
+    };
+
 
 
 }

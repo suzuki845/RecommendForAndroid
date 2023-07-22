@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 6,
-    "identityHash": "775d3969201df510964a0a44fcf7e9df",
+    "version": 7,
+    "identityHash": "ea36c06b79cf1c92aa0dc008f4587968",
     "entities": [
       {
         "tableName": "Account",
@@ -362,12 +362,12 @@
         },
         "indices": [
           {
-            "name": "index_Payment_characterId",
+            "name": "paymentCharacterId",
             "unique": false,
             "columnNames": [
               "characterId"
             ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_Payment_characterId` ON `${TABLE_NAME}` (`characterId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `paymentCharacterId` ON `${TABLE_NAME}` (`characterId`)"
           }
         ],
         "foreignKeys": [
@@ -472,12 +472,12 @@
         },
         "indices": [
           {
-            "name": "index_Event_characterId",
+            "name": "eventCharacterId",
             "unique": false,
             "columnNames": [
               "characterId"
             ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_Event_characterId` ON `${TABLE_NAME}` (`characterId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `eventCharacterId` ON `${TABLE_NAME}` (`characterId`)"
           }
         ],
         "foreignKeys": [
@@ -498,7 +498,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '775d3969201df510964a0a44fcf7e9df')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ea36c06b79cf1c92aa0dc008f4587968')"
     ]
   }
 }

@@ -4,7 +4,8 @@ import androidx.room.*
 import java.util.*
 
 @Entity(
-        foreignKeys = [
+    indices = [Index(name = "eventCharacterId", value = ["characterId"])],
+    foreignKeys = [
             ForeignKey(
                     entity = RecommendCharacter::class,
                     parentColumns = ["id"],
