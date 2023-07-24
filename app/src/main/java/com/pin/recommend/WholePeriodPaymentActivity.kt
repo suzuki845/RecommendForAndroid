@@ -45,7 +45,7 @@ class WholePeriodPaymentActivity : AppCompatActivity() {
         binding.activity = this
         binding.vm = viewModel
         binding.avm = accountViewModel
-        binding.content.vm = viewModel
+        binding.vm = viewModel
 
         initializeToolbar()
     }

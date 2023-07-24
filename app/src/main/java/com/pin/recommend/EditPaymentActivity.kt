@@ -50,7 +50,7 @@ class EditPaymentActivity : AppCompatActivity() {
         viewModel.load(id)
 
         binding  = DataBindingUtil.setContentView(this, R.layout.activity_edit_payment)
-        binding.content.vm = viewModel
+        binding.vm = viewModel
         binding.lifecycleOwner = this
 
         toolbar = findViewById(R.id.toolbar)

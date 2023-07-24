@@ -58,7 +58,7 @@ class PaymentTagListActivity: AppCompatActivity() {
         })
 
         with(binding) {
-            content.listview.adapter = PaymentTagAdapter(applicationContext, onDelete = {
+            listview.adapter = PaymentTagAdapter(applicationContext, onDelete = {
                 val dialog = DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
                     override fun onDecision(dialog: DeleteDialogFragment) {
                         viewModel.deleteTag(it)
@@ -70,11 +70,11 @@ class PaymentTagListActivity: AppCompatActivity() {
             })
             lifecycleOwner = this@PaymentTagListActivity
             viewModel.currentTags.observe(this@PaymentTagListActivity, Observer {
-                val adapter = content.listview.adapter as PaymentTagAdapter
+                val adapter = listview.adapter as PaymentTagAdapter
                 adapter.setList(it)
             })
             viewModel.isEditMode.observe(this@PaymentTagListActivity, Observer {
-                val adapter = content.listview.adapter as PaymentTagAdapter
+                val adapter = listview.adapter as PaymentTagAdapter
                 adapter.isEditMode = it
             })
 

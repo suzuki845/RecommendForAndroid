@@ -54,7 +54,7 @@ class CreatePaymentActivity : AppCompatActivity() {
         }
 
         binding  = DataBindingUtil.setContentView(this, R.layout.activity_create_payment)
-        binding.content.vm = viewModel
+        binding.vm = viewModel
         binding.lifecycleOwner = this
 
         toolbar = findViewById(R.id.toolbar)

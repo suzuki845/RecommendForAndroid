@@ -18,7 +18,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.adapter.PaymentTagAdapter
 import com.pin.recommend.databinding.ActivityCreateEventBinding
-import com.pin.recommend.databinding.ActivityCreatePaymentBinding
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.CreateEventViewModel
@@ -57,7 +56,7 @@ class CreateEventActivity : AppCompatActivity() {
         }
 
         binding  = DataBindingUtil.setContentView(this, R.layout.activity_create_event)
-        binding.content.vm = viewModel
+        binding.vm = viewModel
         binding.lifecycleOwner = this
 
         toolbar = findViewById(R.id.toolbar)
