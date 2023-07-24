@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
@@ -51,16 +52,19 @@ class StoryListFragment : Fragment() {
         }
         pageViewModel!!.setIndex(index)
         storyViewModel = ViewModelProvider(requireActivity()).get(StoryViewModel::class.java)
-        characterViewModel = ViewModelProvider(requireActivity()).get(RecommendCharacterViewModel::class.java)
+        characterViewModel =
+            ViewModelProvider(requireActivity()).get(RecommendCharacterViewModel::class.java)
         editListViewModel = ViewModelProvider(this).get(EditStateViewModel::class.java)
-        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
+        character =
+            requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
 
         setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val root = inflater.inflate(R.layout.fragment_story_list, container, false)
 
         sortView = root.findViewById(R.id.sort)
@@ -88,35 +92,41 @@ class StoryListFragment : Fragment() {
         verticalRecyclerViewAdapter = VerticalRecyclerViewAdapter(this, character)
         val characterLiveData = characterViewModel.getCharacter(character.id)
 
-         Transformations.switchMap(characterLiveData){
-             this.character = it
-             sortView.setTextColor(it.getHomeTextColor())
-             val isAsc = it.storySortOrder == 1
-             if (isAsc) {
-                 sortView.text = "並び順 : 登録日 古い順"
-             } else {
-                 sortView.text = "並び順 : 登録日 新しい順"
-             }
+        Transformations.switchMap(characterLiveData) {
+            if(it == null) return@switchMap MutableLiveData()
+            this.character = it
+            sortView.setTextColor(it.getHomeTextColor())
+            val isAsc = it.storySortOrder == 1
+            if (isAsc) {
+                sortView.text = "並び順 : 登録日 古い順"
+            } else {
+                sortView.text = "並び順 : 登録日 新しい順"
+            }
 
-             initializeText(it)
+            initializeText(it)
 
-             storyViewModel.findByTrackedCharacterIdOrderByCreated(it.id, isAsc)
+            storyViewModel.findByTrackedCharacterIdOrderByCreated(it.id, isAsc)
         }.observe(viewLifecycleOwner, Observer { stories ->
-             if (stories == null) return@Observer
-             verticalRecyclerViewAdapter.setList(stories)
-             verticalRecyclerViewAdapter.updateCharacter(character)
-         })
+            if (stories == null) return@Observer
+            verticalRecyclerViewAdapter.setList(stories)
+            verticalRecyclerViewAdapter.updateCharacter(character)
+        })
 
 
         recyclerView = root.findViewById(R.id.story_recycle_view)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
-        val dividerItemDecoration = DividerItemDecoration(requireContext(), LinearLayoutManager(requireContext()).orientation)
+        val dividerItemDecoration = DividerItemDecoration(
+            requireContext(),
+            LinearLayoutManager(requireContext()).orientation
+        )
         recyclerView.addItemDecoration(dividerItemDecoration)
         recyclerView.layoutManager = layoutManager
         recyclerView.setHasFixedSize(false)
         recyclerView.adapter = verticalRecyclerViewAdapter
 
-        editListViewModel.editMode.observe(viewLifecycleOwner, Observer { aBoolean -> verticalRecyclerViewAdapter.setEditMode(aBoolean!!) })
+        editListViewModel.editMode.observe(
+            viewLifecycleOwner,
+            Observer { aBoolean -> verticalRecyclerViewAdapter.setEditMode(aBoolean!!) })
         val fab: FloatingActionButton = root.findViewById(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(activity, CreateStoryActivity::class.java)
@@ -126,7 +136,7 @@ class StoryListFragment : Fragment() {
         return root
     }
 
-    private fun initializeText(character: RecommendCharacter){
+    private fun initializeText(character: RecommendCharacter) {
         sortView.setTextColor(character.getHomeTextColor())
         sortView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
         verticalRecyclerViewAdapter.updateCharacter(character)
@@ -156,7 +166,8 @@ class StoryListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.change_body_text_color -> {
-                val bodyTextPickerDialogFragment = ColorPickerDialogFragment(object : DialogActionListener<ColorPickerDialogFragment?> {
+                val bodyTextPickerDialogFragment = ColorPickerDialogFragment(object :
+                    DialogActionListener<ColorPickerDialogFragment?> {
                     override fun onDecision(dialog: ColorPickerDialogFragment?) {
                         character.homeTextColor = dialog?.color
                         characterViewModel.update(character)
@@ -165,7 +176,10 @@ class StoryListFragment : Fragment() {
                     override fun onCancel() {}
                 })
                 bodyTextPickerDialogFragment.setDefaultColor(character.getHomeTextColor())
-                bodyTextPickerDialogFragment.show(requireActivity().supportFragmentManager, ToolbarSettingDialogFragment.TAG)
+                bodyTextPickerDialogFragment.show(
+                    requireActivity().supportFragmentManager,
+                    ToolbarSettingDialogFragment.TAG
+                )
                 return true
             }
             R.id.edit_mode -> {
@@ -184,6 +198,7 @@ class StoryListFragment : Fragment() {
         private const val ARG_SECTION_NUMBER = "section_number"
         const val INTENT_STORY = "com.pin.recommend.StoryFragment.INTENT_STORY"
         const val INTENT_CREATE_STORY = "com.pin.recommend.StoryFragment.INTENT_CREATE_STORY"
+
         @JvmStatic
         fun newInstance(index: Int): StoryListFragment {
             val fragment = StoryListFragment()

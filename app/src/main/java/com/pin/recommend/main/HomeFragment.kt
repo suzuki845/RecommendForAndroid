@@ -4,7 +4,6 @@ import android.widget.TextView
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.recommend.model.viewmodel.EditStateViewModel
 import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.entity.AnniversaryManager
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProviders
 import com.pin.recommend.main.HomeFragment
@@ -19,7 +18,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.*
+import com.pin.recommend.model.CharacterDetailsState
 import com.pin.recommend.model.entity.Account
+import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import de.hdodenhof.circleimageview.CircleImageView
 import java.lang.RuntimeException
 import java.text.SimpleDateFormat
@@ -37,10 +38,7 @@ class HomeFragment : Fragment() {
     private lateinit var dateView: TextView
     private lateinit var elapsedView: TextView
     private lateinit var anniversaryView: TextView
-    private val now = Calendar.getInstance()
-    private lateinit var characterViewModel: RecommendCharacterViewModel
-    private lateinit var character: RecommendCharacter
-    private lateinit var anniversaryManager: AnniversaryManager
+    private lateinit var characterDetailsVM: CharacterDetailsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,9 +48,9 @@ class HomeFragment : Fragment() {
             index = requireArguments().getInt(ARG_SECTION_NUMBER)
         }
         pageViewModel.setIndex(index)
-        characterViewModel = ViewModelProvider(requireActivity()).get(RecommendCharacterViewModel::class.java)
-        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
-        anniversaryManager = AnniversaryManager(character)
+        characterDetailsVM = ViewModelProvider(requireActivity()).get(CharacterDetailsViewModel::class.java)
+        val character: RecommendCharacter? = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)
+        characterDetailsVM.setId(character?.id)
         setHasOptionsMenu(true)
     }
 
@@ -67,50 +65,49 @@ class HomeFragment : Fragment() {
         anniversaryView = root.findViewById(R.id.anniversary)
         iconImageView.setOnClickListener{
             val intent = Intent(requireActivity(), ScreenShotActivity::class.java);
-            intent.putExtra(ScreenShotActivity.INTENT_SCREEN_SHOT, character.id)
+            intent.putExtra(ScreenShotActivity.INTENT_SCREEN_SHOT, characterDetailsVM.state.value?.characterId)
             startActivity(intent)
         }
         contentWrapperView = root.findViewById(R.id.content_wrapper)
         contentWrapperView.setOnClickListener{
             val intent = Intent(requireActivity(), ScreenShotActivity::class.java);
-            intent.putExtra(ScreenShotActivity.INTENT_SCREEN_SHOT, character.id)
+            intent.putExtra(ScreenShotActivity.INTENT_SCREEN_SHOT, characterDetailsVM.state.value?.characterId)
             startActivity(intent)
         }
 
-        initializeText(character)
-        val characterLiveData = characterViewModel.getCharacter(character.id)
-        characterLiveData.observe(viewLifecycleOwner, Observer { character ->
-            if (character == null) return@Observer
-            this@HomeFragment.character = character
-            val image = character.getIconImage(context, 500, 500)
-            if (image != null) {
-                iconImageView.setImageBitmap(image)
+        characterDetailsVM.state.observe(viewLifecycleOwner, Observer {
+            val icon = it.iconImage
+            if (icon != null) {
+                iconImageView.setImageBitmap(icon)
             }
-            initializeText(character)
+
+            initializeText(it)
         })
+
         return root
     }
 
-    private fun initializeText(character: RecommendCharacter) {
-        firstText.text = character.getAboveText()
-        firstText.setTextColor(character.getHomeTextColor())
-        firstText.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
-        dateView.text = character.getBelowText()
-        dateView.setTextColor(character.getHomeTextColor())
-        dateView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
-        elapsedView.setTextColor(character.getHomeTextColor())
-        elapsedView.text = character.getDiffDays(now)
-        elapsedView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
-        characterNameView.text = character.name
-        characterNameView.setTextColor(character.getHomeTextColor())
-        characterNameView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
-        anniversaryManager.initialize(character)
-        anniversaryView.text = anniversaryManager.nextOrIsAnniversary(now.time)
-        anniversaryView.setTextColor(character.getHomeTextColor())
-        anniversaryView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
+    private fun initializeText(state: CharacterDetailsState) {
+        firstText.text = state.topText
+        firstText.setTextColor(state.textColor)
+        firstText.setShadowLayer(4f, 0f, 0f, state.textShadowColor)
+        dateView.text = state.bottomText
+        dateView.setTextColor(state.textColor)
+        dateView.setShadowLayer(4f, 0f, 0f, state.textShadowColor)
+        elapsedView.setTextColor(state.textColor)
+        //elapsedView.text = character.getDiffDays(now)
+        elapsedView.text = state.elapsedDays.toString()
+        elapsedView.setShadowLayer(4f, 0f, 0f, state.textShadowColor)
+        characterNameView.text = state.characterName
+        characterNameView.setTextColor(state.textColor)
+        characterNameView.setShadowLayer(4f, 0f, 0f, state.textShadowColor)
+
+        anniversaryView.text = state.anniversaryMessage
+        anniversaryView.setTextColor(state.textColor)
+        anniversaryView.setShadowLayer(4f, 0f, 0f, state.textShadowColor)
         try {
-            if (character.fontFamily != null && character.fontFamily != "default") {
-                val font = Typeface.createFromAsset(requireActivity().assets, "fonts/" + character.fontFamily + ".ttf")
+            if (state.fontFamily != null && state.fontFamily != "default") {
+                val font = Typeface.createFromAsset(requireActivity().assets, "fonts/" + state.fontFamily + ".ttf")
                 firstText.typeface = font
                 dateView.typeface = font
                 elapsedView.typeface = font
@@ -124,25 +121,20 @@ class HomeFragment : Fragment() {
                 anniversaryView.typeface = null
             }
         } catch (e: RuntimeException) {
-            println("font missing " + character.fontFamily)
+            println("font missing " + state.fontFamily)
         }
-    }
-
-    private fun accountToolbarTextColor(account: Account?): Int {
-        return account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.change_anniversary, menu)
+
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        /*
-        val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
-        val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
-        */
         val s = SpannableString("編集")
-        //s.setSpan(ForegroundColorSpan(textColor), 0, s.length, 0)
         editMode.title = s
+
     }
 
 
@@ -150,8 +142,11 @@ class HomeFragment : Fragment() {
         when (item.itemId) {
             R.id.edit_mode -> {
                 val intent = Intent(context, EditCharacterActivity::class.java)
-                intent.putExtra(EditCharacterActivity.INTENT_EDIT_CHARACTER, character)
+                intent.putExtra(EditCharacterActivity.INTENT_EDIT_CHARACTER, characterDetailsVM.state.value?.characterId)
                 startActivity(intent)
+                return true
+            }
+            R.id.change_anniversary -> {
                 return true
             }
         }

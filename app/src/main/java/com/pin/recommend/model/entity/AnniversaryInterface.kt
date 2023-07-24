@@ -3,6 +3,7 @@ package com.pin.recommend.model.entity
 import java.util.Date
 
 interface AnniversaryInterface {
+
     fun getName(): String
     fun getTopText(): String
     fun getBottomText(): String

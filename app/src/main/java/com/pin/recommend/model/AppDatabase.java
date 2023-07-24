@@ -181,7 +181,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             ")"
             );
             database.execSQL(
-                    "CREATE INDEX customAnniversaryCharacterId ON Event(characterId)"
+                    "CREATE INDEX customAnniversaryCharacterId ON CustomAnniversary(characterId)"
             );
         }
     };

@@ -17,7 +17,6 @@ import androidx.core.view.drawToBitmap
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.imageutil.insertImage
-import com.pin.recommend.model.entity.AnniversaryManager
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
@@ -54,7 +53,7 @@ class ScreenShotActivity : AppCompatActivity() {
     private lateinit var elapsedView: TextView
     private lateinit var anniversaryView: TextView
     private val now = Calendar.getInstance()
-    private lateinit var anniversaryManager: AnniversaryManager
+//    private lateinit var anniversaryManager: AnniversaryManager
 
 
 
@@ -101,9 +100,9 @@ class ScreenShotActivity : AppCompatActivity() {
         characterNameView.text = character.name
         characterNameView.setTextColor(character.getHomeTextColor())
         characterNameView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
-        anniversaryManager = AnniversaryManager(character)
-        anniversaryManager.initialize(character)
-        anniversaryView.text = anniversaryManager.nextOrIsAnniversary(now.time)
+      //  anniversaryManager = AnniversaryManager(character)
+        //anniversaryManager.initialize(character)
+        //anniversaryView.text = anniversaryManager.nextOrIsAnniversary(now.time)
         anniversaryView.setTextColor(character.getHomeTextColor())
         anniversaryView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
         try {

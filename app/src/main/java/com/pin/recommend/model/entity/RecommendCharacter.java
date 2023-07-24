@@ -240,6 +240,26 @@ public class RecommendCharacter implements Parcelable {
         return diffDays + "日";
     }
 
+    public long getElapsedDays(Date now) {
+        Calendar current = Calendar.getInstance();
+        current.setTime(now);
+        TimeUtil.resetTime(current);
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(created);
+        TimeUtil.resetTime(calendar2);
+
+        //modify
+        if(!isZeroDayStart){
+            calendar2.add(Calendar.DAY_OF_MONTH, -1);
+        }
+
+        long diffTime = current.getTimeInMillis() - calendar2.getTimeInMillis();
+        long diffDays = diffTime / MILLIS_OF_DAY;
+        return diffDays;
+    }
+
+
     public String getDiffDaysYMD(Calendar now){
         TimeUtil.resetTime(now);
 

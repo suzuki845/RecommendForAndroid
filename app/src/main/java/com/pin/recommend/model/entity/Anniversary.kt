@@ -59,7 +59,11 @@ class UserDefinedAnniversary: AnniversaryInterface {
     }
 
     override fun isAnniversary(current: Date): Boolean {
-        return TimeUtil.resetDate(current).compareTo(TimeUtil.resetDate(getDate())) == 0
+        val cc = Calendar.getInstance().apply { time = current }
+        val ac = Calendar.getInstance().apply { time = date }
+
+        return cc.get(Calendar.MONTH) == ac.get(Calendar.MONTH)
+                && cc.get(Calendar.DAY_OF_MONTH) == ac.get(Calendar.DAY_OF_MONTH)
     }
 
     override fun getMessage(current: Date) : String{
@@ -178,7 +182,7 @@ class SystemDefinedAnniversaries: AnniversaryInterface {
         anniversaries.clear()
         for (i in 1..18){
             val unit = i * 100
-            anniversaries.add(SystemDefinedAnniversary("${unit}日", startDate = created.time, periodType = PeriodType.Days, farInAdvance = unit, isZeroDayStart = character.isZeroDayStart))
+            anniversaries.add(SystemDefinedAnniversary("${unit}日", startDate = created.time, periodType = PeriodType.Days, farInAdvance = unit, isZeroDayStart = character.isZeroDayStart, topText = character.aboveText, bottomText = character.belowText))
         }
         for (i in 1..100){
             val unit = i
@@ -227,7 +231,7 @@ class SystemDefinedAnniversaries: AnniversaryInterface {
     }
 
     override fun getElapsedDays(current: Date): Long {
-        return getCurrentAnniversary(current)?.let { it.getElapsedDays(current) } ?: 0
+        return character.getElapsedDays(current)
     }
 
     override fun getMessage(current: Date) : String{

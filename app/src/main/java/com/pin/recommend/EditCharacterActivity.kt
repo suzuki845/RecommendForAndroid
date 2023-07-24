@@ -50,6 +50,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
     private lateinit var character: RecommendCharacter
 
+    private var id: Long = 0
     private var draftIcon: Bitmap? = null
     private var draftCreated: Date = Date()
     private var draftElapsedDateFormat = 0
@@ -89,8 +90,9 @@ class EditCharacterActivity : AppCompatActivity() {
         accountViewModel = MyApplication.getAccountViewModel(this)
         characterViewModel = ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
 
-        character = intent.getParcelableExtra(INTENT_EDIT_CHARACTER)!!
-        val characterLiveData = characterViewModel.getCharacter(character.id)
+        //character = intent.getParcelableExtra(INTENT_EDIT_CHARACTER)!!
+        id = intent.getLongExtra(INTENT_EDIT_CHARACTER, -1)
+        val characterLiveData = characterViewModel.getCharacter(id)
 
         iconImageView = findViewById(R.id.character_icon)
         characterNameView = findViewById(R.id.character_name)
@@ -100,11 +102,6 @@ class EditCharacterActivity : AppCompatActivity() {
         aboveText = findViewById(R.id.above_text)
         belowText = findViewById(R.id.below_text)
         fontPickerView = findViewById(R.id.font_picker)
-        if (character.fontFamily != null) {
-            fontPickerView.text = character.fontFamily
-        }else{
-            fontPickerView.text = "default"
-        }
         createdView.setOnClickListener(View.OnClickListener {
             onShowDatePickerDialog(null)
         })
@@ -112,6 +109,11 @@ class EditCharacterActivity : AppCompatActivity() {
         characterLiveData.observe(this, Observer { character ->
             if (character == null) return@Observer
             this.character = character
+            if (character.fontFamily != null) {
+                fontPickerView.text = character.fontFamily
+            }else{
+                fontPickerView.text = "default"
+            }
 
             character.getIconImage(this, 500, 500)?.let {
                 draftIcon = it
