@@ -15,10 +15,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".CreateAnniversaryActivity"
+            android:exported="false"
+            android:label="記念日の作成"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".EditAnniversaryActivity"
+            android:exported="false"
+            android:label="記念日の編集"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".ScreenShotActivity"
             android:label="スクリーンショット"
-            android:theme="@style/AppTheme.NoActionBar"
-            />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".GlobalSettingActivity"
             android:label="@string/title_activity_global_setting"
@@ -84,22 +93,22 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PassCodeSetActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="behind" />
+            android:screenOrientation="behind"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PassCodeConfirmationActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="behind" />
+            android:screenOrientation="behind"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".NotificationDialogActivity"
-            android:theme="@style/Translucent"
             android:launchMode="singleInstance"
-            android:screenOrientation="behind" />
+            android:screenOrientation="behind"
+            android:theme="@style/Translucent" />
         <activity
             android:name="com.pin.util.reward.RewardDialogFragmentActivity"
-            android:theme="@style/Translucent"
             android:launchMode="singleInstance"
-            android:screenOrientation="behind" />
+            android:screenOrientation="behind"
+            android:theme="@style/Translucent" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

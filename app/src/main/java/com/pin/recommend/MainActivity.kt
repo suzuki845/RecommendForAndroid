@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             if (fixedCharacterId == null) {
                 fixedCharacterId = -1L
             }
-            characterDao.findTrackedById(fixedCharacterId)
+            characterDao.watchById(fixedCharacterId)
         }
 
         fixedCharacter.observe(this, Observer { character ->

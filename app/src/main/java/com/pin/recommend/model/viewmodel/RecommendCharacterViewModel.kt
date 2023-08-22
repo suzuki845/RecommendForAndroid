@@ -32,14 +32,14 @@ class RecommendCharacterViewModel(application: Application) : AndroidViewModel(a
             object : Function<Account?, LiveData<List<RecommendCharacter>>> {
                 override fun apply(input: Account?): LiveData<List<RecommendCharacter>> {
                     if(input == null) return MutableLiveData(listOf())
-                    return characterDao.findByAccountId(input.id)
+                    return characterDao.watchByAccountId(input.id)
                 }
             })
     }
 
     fun getCharacter(characterId: Long?): LiveData<RecommendCharacter?> {
         if (character == null) {
-            character = characterDao.findTrackedById(characterId!!)
+            character = characterDao.watchById(characterId!!)
         }
         return character!!
     }

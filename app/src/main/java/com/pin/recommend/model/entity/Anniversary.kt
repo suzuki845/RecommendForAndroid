@@ -90,7 +90,7 @@ class SystemDefinedAnniversary: AnniversaryInterface {
     private val topText: String
     private val bottomText: String
 
-    constructor(name: String, startDate: Date, periodType: PeriodType, farInAdvance: Int, isZeroDayStart: Boolean, topText: String = "", bottomText: String = ""){
+    constructor(name: String, startDate: Date, periodType: PeriodType, farInAdvance: Int, isZeroDayStart: Boolean, topText: String, bottomText: String){
         this.name = name
         this.startDate.time = startDate
         this.periodType = periodType
@@ -171,22 +171,20 @@ class SystemDefinedAnniversaries: AnniversaryInterface {
 
     constructor(character: RecommendCharacter){
         this.character = character
-        initialize(character)
     }
 
-    private fun initialize(character: RecommendCharacter){
-        this.character = character
+    fun initialize(){
         val created = Calendar.getInstance()
         created.time = character.created
         TimeUtil.resetTime(created)
         anniversaries.clear()
         for (i in 1..18){
             val unit = i * 100
-            anniversaries.add(SystemDefinedAnniversary("${unit}日", startDate = created.time, periodType = PeriodType.Days, farInAdvance = unit, isZeroDayStart = character.isZeroDayStart, topText = character.aboveText, bottomText = character.belowText))
+            anniversaries.add(SystemDefinedAnniversary("${unit}日", startDate = created.time, periodType = PeriodType.Days, farInAdvance = unit, isZeroDayStart = character.isZeroDayStart, topText = character.aboveText ?: "", bottomText = character.belowText ?: ""))
         }
         for (i in 1..100){
             val unit = i
-            anniversaries.add(SystemDefinedAnniversary("${unit}周年", startDate = created.time, periodType = PeriodType.Year, farInAdvance = unit, isZeroDayStart = character.isZeroDayStart))
+            anniversaries.add(SystemDefinedAnniversary("${unit}周年", startDate = created.time, periodType = PeriodType.Year, farInAdvance = unit, isZeroDayStart = character.isZeroDayStart, topText = character.aboveText ?: "", bottomText = character.belowText ?: ""))
         }
     }
 

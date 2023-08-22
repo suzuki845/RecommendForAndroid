@@ -21,9 +21,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -39,7 +37,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_margin="6dp"
-                android:onClick="onShowDatePickerDialog"
                 android:text="YYYY年M月d日"
                 android:textColor="@color/colorPrimary" />
 

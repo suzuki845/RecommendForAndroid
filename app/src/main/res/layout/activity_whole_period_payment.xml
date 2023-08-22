@@ -4,21 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <import type="com.pin.recommend.model.viewmodel.DoubleConverter" />
-
         <import type="com.pin.recommend.model.viewmodel.IntConverter" />
-
         <import type="com.pin.recommend.model.viewmodel.DateConverter" />
-
         <variable
             name="activity"
             type="android.app.Activity" />
-
         <variable
             name="vm"
             type="com.pin.recommend.model.viewmodel.WholePeriodPaymentViewModel" />
-
         <variable
             name="avm"
             type="com.pin.recommend.model.viewmodel.AccountViewModel" />

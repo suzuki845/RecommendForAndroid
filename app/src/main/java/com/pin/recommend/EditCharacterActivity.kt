@@ -5,8 +5,6 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,20 +15,19 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.lifecycle.Observer
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.imageutil.BitmapUtility
+import com.pin.recommend.adapter.AnniversariesDraftAdapter
 import com.pin.recommend.adapter.FontAdapter
-import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.viewmodel.AccountViewModel
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
+import com.pin.recommend.databinding.ActivityCreateEventBinding
+import com.pin.recommend.databinding.ActivityEditCharacterBinding
+import com.pin.recommend.model.viewmodel.AnniversaryEditViewModel
+import com.pin.recommend.model.viewmodel.CharacterEditViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.Reward.Companion.getInstance
 import com.pin.util.RuntimePermissionUtils
 import com.soundcloud.android.crop.Crop
-import de.hdodenhof.circleimageview.CircleImageView
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,32 +39,20 @@ class EditCharacterActivity : AppCompatActivity() {
         val INTENT_EDIT_CHARACTER = "com.pin.recommend.EditCharacterActivity.INTENT_EDIT_CHARACTER"
     }
 
-    private val NOW = Calendar.getInstance()
     private val FORMAT = SimpleDateFormat("yyyy年MM月dd日")
 
-    private lateinit var accountViewModel: AccountViewModel
-    private lateinit var characterViewModel: RecommendCharacterViewModel
+    private val characterVM: CharacterEditViewModel by lazy{
+        ViewModelProvider(this).get(CharacterEditViewModel::class.java)
+    }
 
-    private lateinit var character: RecommendCharacter
+    private val anniversaryVM: AnniversaryEditViewModel by lazy {
+        ViewModelProvider(this).get(AnniversaryEditViewModel::class.java)
+    }
 
-    private var id: Long = 0
-    private var draftIcon: Bitmap? = null
-    private var draftCreated: Date = Date()
-    private var draftElapsedDateFormat = 0
-    private var draftFont: String? = null
-
-    private lateinit var iconImageView: CircleImageView
-    private lateinit var characterNameView: EditText
-    private lateinit var isZeroDayStartView: Switch
-    private lateinit var aboveText: EditText
-    private lateinit var belowText: EditText
-    private lateinit var createdView: TextView
-    private lateinit var fontPickerView: TextView
+    private lateinit var binding: ActivityEditCharacterBinding
 
     private lateinit var adMobManager: AdMobAdaptiveBannerManager
     private lateinit var adViewContainer: ViewGroup
-
-    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,62 +72,22 @@ class EditCharacterActivity : AppCompatActivity() {
             adMobManager.checkFirst()
         }
 
-        accountViewModel = MyApplication.getAccountViewModel(this)
-        characterViewModel = ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
+        val id = intent.getLongExtra(INTENT_EDIT_CHARACTER, -1)
+        characterVM.initialize(id)
 
-        //character = intent.getParcelableExtra(INTENT_EDIT_CHARACTER)!!
-        id = intent.getLongExtra(INTENT_EDIT_CHARACTER, -1)
-        val characterLiveData = characterViewModel.getCharacter(id)
+        binding  = DataBindingUtil.setContentView(this, R.layout.activity_edit_character)
+        binding.vm = characterVM
+        binding.lifecycleOwner = this
 
-        iconImageView = findViewById(R.id.character_icon)
-        characterNameView = findViewById(R.id.character_name)
-        isZeroDayStartView = findViewById(R.id.is_zero_day_start)
-        createdView = findViewById(R.id.created)
+        val listView = binding.anniversaries
+        val adapter = AnniversariesDraftAdapter(this)
+        listView.adapter = adapter
+        characterVM.anniversaries.observe(this){
+            adapter.setItems(it)
+        }
 
-        aboveText = findViewById(R.id.above_text)
-        belowText = findViewById(R.id.below_text)
-        fontPickerView = findViewById(R.id.font_picker)
-        createdView.setOnClickListener(View.OnClickListener {
-            onShowDatePickerDialog(null)
-        })
-
-        characterLiveData.observe(this, Observer { character ->
-            if (character == null) return@Observer
-            this.character = character
-            if (character.fontFamily != null) {
-                fontPickerView.text = character.fontFamily
-            }else{
-                fontPickerView.text = "default"
-            }
-
-            character.getIconImage(this, 500, 500)?.let {
-                draftIcon = it
-                iconImageView.setImageBitmap(it)
-            }
-            characterNameView.setText(character.name)
-            draftCreated = character.created
-            isZeroDayStartView.isChecked = character.isZeroDayStart
-            createdView.text = FORMAT.format(character.created)
-            aboveText.setText(character.getAboveText())
-            belowText.setText(character.getBelowText())
-            draftFont = character.getFontFamily()
-            fontPickerView.text = draftFont
-            try {
-                if (draftFont != null && !draftFont.equals("default")) {
-                    val type = Typeface.createFromAsset(assets, "fonts/" + character.fontFamily + ".ttf")
-                    fontPickerView.typeface = type
-                }
-            } catch (e: RuntimeException) {
-            }
-        })
-
-        toolbar = findViewById<Toolbar>(R.id.toolbar)
-
-        accountViewModel.accountLiveData.observe(this, Observer { account ->
-            account?.let {
-                initializeToolbar(it)
-            }
-        })
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        initializeToolbar(toolbar)
     }
 
     override fun onResume() {
@@ -151,17 +96,11 @@ class EditCharacterActivity : AppCompatActivity() {
     }
 
     fun save(){
-        character.name = characterNameView.text.toString()
-        character.created = draftCreated
-        character.isZeroDayStart = isZeroDayStartView.isChecked
-        character.belowText = belowText.text.toString()
-        character.aboveText = aboveText.text.toString()
-        character.elapsedDateFormat = draftElapsedDateFormat
-        character.fontFamily = draftFont
-        if(draftIcon != null){
-            character.saveIconImage(this, draftIcon)
-        }
-        characterViewModel.update(character)
+    }
+
+    fun onAddAnniversary(v: View){
+        val intent = Intent(this, CreateAnniversaryActivity::class.java)
+        startActivity(intent)
     }
 
     fun onShowFontDialog(view: View?){
@@ -177,17 +116,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
         val dialog = builder.create()
         listView.setOnItemClickListener{ parent, view, pos, id ->
-            draftFont = adapter.getItem(pos)
-            fontPickerView.text = draftFont
-            try {
-                if (draftFont != null && !draftFont.equals("default")) {
-                    val type = Typeface.createFromAsset(assets, "fonts/" + draftFont + ".ttf")
-                    fontPickerView.typeface = type
-                }else{
-                    fontPickerView.typeface = null
-                }
-            } catch (e: RuntimeException) {
-            }
+            characterVM.fontFamily.value = adapter.getItem(pos)
             dialog.cancel()
         }
 
@@ -196,7 +125,6 @@ class EditCharacterActivity : AppCompatActivity() {
 
     fun onShowDatePickerDialog(view: View?) {
         val calendar = Calendar.getInstance()
-        calendar.time = draftCreated
         val year = calendar[Calendar.YEAR]
         val month = calendar[Calendar.MONTH]
         val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
@@ -209,15 +137,14 @@ class EditCharacterActivity : AppCompatActivity() {
             val newCalender = Calendar.getInstance()
             newCalender[year, month] = dayOfMonth
             val date = newCalender.time
-            draftCreated = date
-            createdView.setText(FORMAT.format(draftCreated))
+            characterVM.created.value = date
         }, year, month, dayOfMonth)
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
 
 
-    private fun initializeToolbar(account: Account) {
+    private fun initializeToolbar(toolbar: Toolbar) {
         toolbar.title = "編集"
         setSupportActionBar(toolbar)
     }
@@ -271,8 +198,13 @@ class EditCharacterActivity : AppCompatActivity() {
     private fun handleCropIcon(resultCode: Int, result: Intent) {
         if (resultCode == RESULT_OK) {
             val uri = Crop.getOutput(result)
-            draftIcon = BitmapUtility.decodeUri(this, uri, 500, 500)
-            iconImageView.setImageBitmap(draftIcon)
+            val bitmap = BitmapUtility.decodeUri(
+                this,
+                uri,
+                500,
+                500
+            )
+            characterVM.iconImage.value = bitmap
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT).show()
         }
@@ -282,7 +214,6 @@ class EditCharacterActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.activity_edit_character, menu)
         return true
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {

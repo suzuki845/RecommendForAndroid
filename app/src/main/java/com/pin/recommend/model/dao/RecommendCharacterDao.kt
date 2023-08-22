@@ -2,6 +2,7 @@ package com.pin.recommend.model.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.RecommendCharacter
 
 @Dao
@@ -25,8 +26,29 @@ interface RecommendCharacterDao {
     fun findById(id: Long): RecommendCharacter?
 
     @Query("SELECT * FROM RecommendCharacter WHERE id = :id")
-    fun findTrackedById(id: Long): LiveData<RecommendCharacter?>
+    fun watchById(id: Long): LiveData<RecommendCharacter?>
 
     @Query("SELECT * FROM RecommendCharacter WHERE accountId = :accountId")
-    fun findByAccountId(accountId: Long): LiveData<List<RecommendCharacter>>
+    fun watchByAccountId(accountId: Long): LiveData<List<RecommendCharacter>>
+
+    @Transaction
+    @Query(
+        "SELECT * FROM RecommendCharacter"
+    )
+    fun watchCharacterWithAnniversaries(): LiveData<List<CharacterWithAnniversaries>>
+
+    @Transaction
+    @Query(
+        "SELECT * FROM RecommendCharacter " +
+                "WHERE id = :id"
+    )
+    fun watchByIdCharacterWithAnniversaries(id: Long): LiveData<CharacterWithAnniversaries?>
+
+    @Transaction
+    @Query(
+        "SELECT * FROM RecommendCharacter " +
+                "WHERE id = :id"
+    )
+    fun findByIdCharacterWithAnniversaries(id: Long): CharacterWithAnniversaries?
+
 }

@@ -15,7 +15,7 @@ import java.util.*
         onUpdate = ForeignKey.CASCADE
     )]
 )
-class CustomAnniversary (
+class CustomAnniversary(
     @PrimaryKey(autoGenerate = true)
     var id: Long,
     var characterId: Long,
@@ -24,5 +24,20 @@ class CustomAnniversary (
     var name: String,
     var topText: String?,
     var bottomText: String?,
-    ){
+) {
+
+    fun toDraft(): Draft {
+        return Draft(characterId, date, uuid, name, topText, bottomText)
+    }
+
+    class Draft
+        (
+        var characterId: Long,
+        var date: Date,
+        var uuid: String,
+        var name: String,
+        var topText: String?,
+        var bottomText: String?,
+    )
+
 }

@@ -47,8 +47,6 @@ public class RecommendCharacter implements Parcelable {
     //ここまで
 
 
-
-
     @PrimaryKey(autoGenerate = true)
     public long id;
 
@@ -91,38 +89,46 @@ public class RecommendCharacter implements Parcelable {
     //v3
     public int storySortOrder;
 
-    @Ignore public static final int CREATED_AT_DESC = 0;
-    @Ignore public static final int CREATED_AT_ASC = 1;
-    @Ignore public static final int UPDATED_AT_DESC = 2;
-    @Ignore public static final int UPDATED_AT_ASC = 3;
+    @Ignore
+    public static final int CREATED_AT_DESC = 0;
+    @Ignore
+    public static final int CREATED_AT_ASC = 1;
+    @Ignore
+    public static final int UPDATED_AT_DESC = 2;
+    @Ignore
+    public static final int UPDATED_AT_ASC = 3;
     //end v3
 
     //v4
     public float backgroundImageOpacity = 1;
     public Integer homeTextShadowColor;
-    public Integer getHomeTextShadowColor(){ return homeTextShadowColor != null ? homeTextShadowColor : Color.parseColor("#ffffffff"); }
+
+    public Integer getHomeTextShadowColor() {
+        return homeTextShadowColor != null ? homeTextShadowColor : Color.parseColor("#ffffffff");
+    }
     //end v4
 
 
     @Ignore
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy年MM月dd日");
 
-    public RecommendCharacter(){}
+    public RecommendCharacter() {
+    }
 
-    public String getFontFamily(){
+    public String getFontFamily() {
         return fontFamily != null ? fontFamily : "default";
     }
 
-    public String getAboveText(){
-        return aboveText != null ?  aboveText : "を推してから";
+    public String getAboveText() {
+        return aboveText != null ? aboveText : "を推してから";
     }
 
-    public String getBelowText(){
+    public String getBelowText() {
         return belowText != null ? belowText : "になりました";
     }
 
-    public boolean saveIconImage(Context context, Bitmap bitmap){
-        if(BitmapUtility.fileExistsByPrivate(context,iconImageUri )){
+    public boolean saveIconImage(Context context, Bitmap bitmap) {
+        if (BitmapUtility.fileExistsByPrivate(context, iconImageUri)) {
             BitmapUtility.deletePrivateImage(context, iconImageUri);
         }
 
@@ -134,8 +140,8 @@ public class RecommendCharacter implements Parcelable {
         return success;
     }
 
-    public boolean saveBackgroundImage(Context context, Bitmap bitmap){
-        if(backgroundImageUri != null && BitmapUtility.fileExistsByPrivate(context, backgroundImageUri)){
+    public boolean saveBackgroundImage(Context context, Bitmap bitmap) {
+        if (backgroundImageUri != null && BitmapUtility.fileExistsByPrivate(context, backgroundImageUri)) {
             BitmapUtility.deletePrivateImage(context, backgroundImageUri);
         }
 
@@ -147,9 +153,9 @@ public class RecommendCharacter implements Parcelable {
         return success;
     }
 
-    public Bitmap getIconImage(Context context, int width, int height){
+    public Bitmap getIconImage(Context context, int width, int height) {
         Bitmap bitmap;
-        if(iconImageUri == null) {
+        if (iconImageUri == null) {
             return null;
         }
 
@@ -157,15 +163,15 @@ public class RecommendCharacter implements Parcelable {
         return bitmap;
     }
 
-    public boolean hasIconImage(){
-        if(iconImageUri != null){
+    public boolean hasIconImage() {
+        if (iconImageUri != null) {
             return true;
         }
         return false;
     }
 
-    public boolean deleteIconImage(Context context){
-        if(iconImageUri != null){
+    public boolean deleteIconImage(Context context) {
+        if (iconImageUri != null) {
             BitmapUtility.deletePrivateImage(context, iconImageUri);
             this.iconImageUri = null;
             return true;
@@ -173,56 +179,61 @@ public class RecommendCharacter implements Parcelable {
         return false;
     }
 
-    public Bitmap getBackgroundBitmap(Context context, int width, int height){
+    public Bitmap getBackgroundBitmap(Context context, int width, int height) {
         return BitmapUtility.readPrivateImage(context, backgroundImageUri, width, height);
     }
 
-    public boolean hasBackgroundImage(){
+    public boolean hasBackgroundImage() {
         return backgroundImageUri != null;
     }
 
-    public Drawable getBackgroundImageDrawable(Context context, int w, int h){
-        if(hasBackgroundImage()) {
+    public Drawable getBackgroundImageDrawable(Context context, int w, int h) {
+        if (hasBackgroundImage()) {
             Bitmap bitmap = getBackgroundBitmap(context, w, h);
             return new BitmapDrawable(context.getResources(), bitmap);
         }
         return null;
     }
 
-    public boolean deleteBackgroundImage(Context context){
-        if(backgroundImageUri != null){
-             BitmapUtility.deletePrivateImage(context, backgroundImageUri);
-             this.backgroundImageUri = null;
-             return true;
+    public boolean deleteBackgroundImage(Context context) {
+        if (backgroundImageUri != null) {
+            BitmapUtility.deletePrivateImage(context, backgroundImageUri);
+            this.backgroundImageUri = null;
+            return true;
         }
         return false;
     }
 
 
-    public Integer getBackgroundColor(){return backgroundColor;}
+    public Integer getBackgroundColor() {
+        return backgroundColor;
+    }
 
-    public Integer getToolbarBackgroundColor(Context context, int defaultColor){
-        if(toolbarBackgroundColor != null) {
+    public Integer getToolbarBackgroundColor(Context context, int defaultColor) {
+        if (toolbarBackgroundColor != null) {
             return toolbarBackgroundColor;
         }
         return defaultColor;
     }
 
-    public Integer getToolbarTextColor(Context context, int defaultColor){
-        if(toolbarTextColor != null) {
+    public Integer getToolbarTextColor(Context context, int defaultColor) {
+        if (toolbarTextColor != null) {
             return toolbarTextColor;
         }
         return defaultColor;
     }
 
-    public Integer getHomeTextColor(){ return homeTextColor != null ? homeTextColor : Color.parseColor("#444444"); }
+    public Integer getHomeTextColor() {
+        return homeTextColor != null ? homeTextColor : Color.parseColor("#444444");
+    }
 
-    public String getFormattedDate(){
+    public String getFormattedDate() {
         return FORMAT.format(created);
     }
 
     @Ignore
     static final int MILLIS_OF_DAY = 1000 * 60 * 60 * 24;
+
     public String getDiffDaysSingle(Calendar now) {
         TimeUtil.resetTime(now);
 
@@ -231,7 +242,7 @@ public class RecommendCharacter implements Parcelable {
         TimeUtil.resetTime(calendar2);
 
         //modify
-        if(!isZeroDayStart){
+        if (!isZeroDayStart) {
             calendar2.add(Calendar.DAY_OF_MONTH, -1);
         }
 
@@ -250,7 +261,7 @@ public class RecommendCharacter implements Parcelable {
         TimeUtil.resetTime(calendar2);
 
         //modify
-        if(!isZeroDayStart){
+        if (!isZeroDayStart) {
             calendar2.add(Calendar.DAY_OF_MONTH, -1);
         }
 
@@ -260,14 +271,14 @@ public class RecommendCharacter implements Parcelable {
     }
 
 
-    public String getDiffDaysYMD(Calendar now){
+    public String getDiffDaysYMD(Calendar now) {
         TimeUtil.resetTime(now);
 
         Calendar calendar2 = Calendar.getInstance();
         calendar2.setTime(created);
         TimeUtil.resetTime(calendar2);
 
-        if(!isZeroDayStart){
+        if (!isZeroDayStart) {
             calendar2.add(Calendar.DAY_OF_MONTH, -1);
         }
 
@@ -280,13 +291,12 @@ public class RecommendCharacter implements Parcelable {
                 + diffCalendar.get(Calendar.DAY_OF_MONTH) + "日";
     }
 
-    public String getDiffDays(Calendar now){
-        if(elapsedDateFormat == 1){
+    public String getDiffDays(Calendar now) {
+        if (elapsedDateFormat == 1) {
             return getDiffDaysYMD(now);
         }
         return getDiffDaysSingle(now);
     }
-
 
 
     //v2

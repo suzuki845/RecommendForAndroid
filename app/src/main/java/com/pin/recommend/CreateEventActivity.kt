@@ -38,13 +38,8 @@ class CreateEventActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateEventBinding
 
-    private lateinit var toolbar: Toolbar
-
-    private lateinit var accountViewModel: AccountViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setSupportActionBar(findViewById(R.id.toolbar))
 
         var characterId = intent.getLongExtra(INTENT_CREATE_EVENT_CHARACTER, -1);
         if(characterId != -1L){
@@ -58,12 +53,8 @@ class CreateEventActivity : AppCompatActivity() {
         binding  = DataBindingUtil.setContentView(this, R.layout.activity_create_event)
         binding.vm = viewModel
         binding.lifecycleOwner = this
-
-        toolbar = findViewById(R.id.toolbar)
-
-        accountViewModel = MyApplication.getAccountViewModel(this)
-        val accountLiveData = accountViewModel.accountLiveData
-        accountLiveData.observe(this, Observer { account -> initializeToolbar(account) })
+        binding.toolbar.title = "イベントの追加"
+        setSupportActionBar(binding.toolbar)
     }
 
     fun onShowDatePickerDialog(view: View?) {
@@ -88,16 +79,10 @@ class CreateEventActivity : AppCompatActivity() {
         datePickerDialog.show()
     }
 
-    private fun initializeToolbar(account: Account?) {
-        toolbar.title = "イベントの追加"
-        setSupportActionBar(toolbar)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_create_event, menu)
         return true
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {

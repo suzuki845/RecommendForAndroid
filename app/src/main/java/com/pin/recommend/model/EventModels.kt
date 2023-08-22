@@ -20,7 +20,7 @@ class EventBetweenDatesModel(private val eventDao: EventDao, private val charact
     val characterId = MutableLiveData<Long?>()
 
     val character = characterId.switchMap {
-        characterDao.findTrackedById(it ?: -1)
+        characterDao.watchById(it ?: -1)
     }
 
     val section = MutableLiveData<Section<Date>>(Section(Date(), Date()))

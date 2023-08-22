@@ -43,12 +43,12 @@ class CharacterDetails(
     private val _displayOnHomeAnniversaries = MutableLiveData<List<AnniversaryInterface>>(listOf())
 
     val character = _id.switchMap {
-        return@switchMap characterDao.findTrackedById(it ?: -1)
+        return@switchMap characterDao.watchById(it ?: -1)
     }
 
-    private val systemDefinedAnniversaries: LiveData<AnniversaryInterface?> = character.map {
-        if(it == null) return@map null
-        return@map SystemDefinedAnniversaries(it)
+    private val systemDefinedAnniversaries: LiveData<AnniversaryInterface?> = character.map {character ->
+        if(character == null) return@map null
+        return@map SystemDefinedAnniversaries(character).apply { initialize() }
     }
 
     private val userDefinedAnniversaries: LiveData<List<AnniversaryInterface>> =
