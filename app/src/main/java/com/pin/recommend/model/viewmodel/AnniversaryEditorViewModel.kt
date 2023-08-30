@@ -15,8 +15,8 @@ class AnniversaryEditorViewModel(application: Application) : AndroidViewModel(ap
     val topText = model.topText
     val bottomText = model.bottomText
 
-    fun save(onComplete: (CustomAnniversary.Draft) -> Unit){
-        model.save(onComplete)
+    fun save(onComplete: (CustomAnniversary.Draft) -> Unit, onError: (Exception) -> Unit){
+        model.save(onComplete, onError)
     }
 
     fun initialize(e: CustomAnniversary? = null){

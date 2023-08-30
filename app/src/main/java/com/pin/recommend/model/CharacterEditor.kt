@@ -164,15 +164,17 @@ class CharacterEditor(val context: Context) {
                     entity.iconImageUri = filename + ext
                 }
 
+                var characterId = entity.id
                 if (entity.id != 0L) {
                     db.recommendCharacterDao().updateCharacter(entity)
                 } else {
-                    db.recommendCharacterDao().insertCharacter(entity)
+                    characterId = db.recommendCharacterDao().insertCharacter(entity)
                 }
 
                 db.customAnniversaryDao().deleteByCharacterId(entity.id)
 
                 anniversaries.value?.forEach {
+                    it.characterId = characterId
                     db.customAnniversaryDao().insertAnniversary(it.toFinal())
                 }
 
@@ -180,7 +182,7 @@ class CharacterEditor(val context: Context) {
             }
 
             p.onComplete()
-        } catch (e: java.lang.Exception) {
+        } catch (e: Exception) {
             p.onError(e)
         }
     }

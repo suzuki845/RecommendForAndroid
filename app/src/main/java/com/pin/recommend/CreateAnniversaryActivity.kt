@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -18,8 +19,10 @@ import java.util.*
 class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
 
     companion object {
-        const val INTENT_CHARACTER_ID = "com.suzuki.Recommend.CreateAnniversaryActivity.CHARACTER_ID"
-        const val INTENT_CREATE_ANNIVERSARY = "com.suzuki.Recommend.CreateAnniversaryActivity.INTENT_CREATE_ANNIVERSARY"
+        const val INTENT_CHARACTER_ID =
+            "com.suzuki.Recommend.CreateAnniversaryActivity.CHARACTER_ID"
+        const val INTENT_CREATE_ANNIVERSARY =
+            "com.suzuki.Recommend.CreateAnniversaryActivity.INTENT_CREATE_ANNIVERSARY"
     }
 
     private lateinit var binding: ActivityCreateAnniversaryBinding
@@ -42,12 +45,15 @@ class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
         setSupportActionBar(binding.toolbar)
     }
 
-    private fun save(){
-        anniversaryVm.save {
+    private fun save() {
+        anniversaryVm.save({
             val resultIntent = Intent()
             resultIntent.putExtra(INTENT_CREATE_ANNIVERSARY, it.toJson())
             setResult(RESULT_OK, resultIntent)
-        }
+            finish()
+        }, {
+            Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_LONG).show()
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -59,7 +65,6 @@ class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
         return when (item.itemId) {
             R.id.action_save -> {
                 save()
-                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -83,7 +88,8 @@ class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
                 newCalender[year, month] = dayOfMonth
                 val date = newCalender.time
                 anniversaryVm.date.value = date
-            }, year, month, dayOfMonth)
+            }, year, month, dayOfMonth
+        )
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
     }

@@ -32,33 +32,38 @@ class AnniversaryEditor {
         bottomText.value = e?.bottomText
     }
 
-    fun save(onComplete: (CustomAnniversary.Draft) -> Unit) {
-        val id = id.value ?: 0
-        val characterId = characterId.value ?: throw Exception("foreign key is null")
-        val uuid = uuid.value ?: UUID.randomUUID().toString()
-        val date = date.value ?: throw Exception("date is null")
-        val name = name.value ?: throw Exception("name is null")
-        val topText = topText.value
-        val bottomText = bottomText.value
+    fun save(onComplete: (CustomAnniversary.Draft) -> Unit, onError: (e: Exception) -> Unit) {
+        try{
+            val id = id.value ?: 0
+            val characterId = characterId.value ?: throw Exception("foreign key is null")
+            val uuid = uuid.value ?: UUID.randomUUID().toString()
+            val date = date.value ?: throw Exception("date is null")
+            val name = name.value ?: throw Exception("記念日名がありません. name is null")
+            val topText = topText.value
+            val bottomText = bottomText.value
 
-        val drift = CustomAnniversary.Draft(
-            id,
-            characterId,
-            date,
-            uuid,
-            name,
-            topText,
-            bottomText
-        )
+            val drift = CustomAnniversary.Draft(
+                id,
+                characterId,
+                date,
+                uuid,
+                name,
+                topText,
+                bottomText
+            )
 
-        onComplete(drift)
+            onComplete(drift)
 
-        this.id.value = null
-        this.characterId.value = null
-        this.uuid.value = null
-        this.date.value = null
-        this.name.value = null
-        this.topText.value = null
-        this.bottomText.value = null
+            this.id.value = null
+            this.characterId.value = null
+            this.uuid.value = null
+            this.date.value = null
+            this.name.value = null
+            this.topText.value = null
+            this.bottomText.value = null
+        }catch(e: Exception){
+            onError(e)
+            print("test!!" + e)
+        }
     }
 }

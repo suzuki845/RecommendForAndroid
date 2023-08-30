@@ -142,7 +142,7 @@ class CreateCharacterActivity : AppCompatActivity() {
         }, {
             finish()
         }, { e ->
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG)
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
         }))
     }
 
@@ -295,7 +295,6 @@ class CreateCharacterActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_save -> {
                 save()
-                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)

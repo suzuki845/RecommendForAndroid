@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityEditAnniversaryBinding
@@ -41,11 +42,14 @@ class EditAnniversaryActivity : AppCompatActivity() {
     }
 
     private fun save(){
-        anniversaryVm.save {
+        anniversaryVm.save ({
             val resultIntent = Intent()
             resultIntent.putExtra(INTENT_EDIT_ANNIVERSARY, it.toJson())
             setResult(RESULT_OK, resultIntent)
-        }
+            finish()
+        }, {
+            Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_LONG).show()
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -57,7 +61,6 @@ class EditAnniversaryActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_save -> {
                 save()
-                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
