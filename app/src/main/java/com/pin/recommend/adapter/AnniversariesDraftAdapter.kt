@@ -1,75 +1,59 @@
 package com.pin.recommend.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.pin.recommend.EditAnniversaryActivity
+import com.pin.recommend.EditAnniversaryActivity.Companion.INTENT_EDIT_ANNIVERSARY
 import com.pin.recommend.databinding.RowAnniversaryDraftBinding
-import com.pin.recommend.databinding.RowPaymentTagBinding
 import com.pin.recommend.model.entity.CustomAnniversary
-import com.pin.recommend.model.entity.PaymentTag
 
 class AnniversariesDraftAdapter(
     private val context: Context,
-    private var items: List<CustomAnniversary.Draft> = mutableListOf(),
-    private var onDelete: ((CustomAnniversary.Draft) -> Unit)? = null
-) : BaseAdapter() {
+    private var items: MutableList<CustomAnniversary.Draft> = mutableListOf(),
+    private var itemClickListener: ((CustomAnniversary.Draft) -> Unit)? = null
+) : RecyclerView.Adapter<AnniversariesDraftAdapter.ViewHolder>() {
 
     val inflater: LayoutInflater =
         (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
 
-    private var _isEditMode = false
-    var isEditMode
-        get() = _isEditMode
-        set(value) {
-            _isEditMode = value
-            notifyDataSetChanged()
-        }
-
-    fun setOnDeleteListener(onDelete: (CustomAnniversary.Draft) -> Unit){
-        this.onDelete = onDelete
+    fun setOnItemClickListener(listener: (CustomAnniversary.Draft) -> Unit){
+        itemClickListener = listener
     }
 
     fun setItems(items: List<CustomAnniversary.Draft>) {
-        this.items = items
+        this.items = items.toMutableList()
         notifyDataSetChanged()
     }
 
-    override fun getCount(): Int {
-        return items.size
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val inflater = LayoutInflater.from(context)
+        val binding =
+            RowAnniversaryDraftBinding.inflate(inflater, parent, false)
+        return ViewHolder(binding)
     }
 
-    override fun getItem(p0: Int): CustomAnniversary.Draft {
-        return items[p0]
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val anniversary = items[position]
+        holder.binding.anniversary = anniversary
+        holder.binding.container.setOnClickListener{
+            itemClickListener?.invoke(anniversary)
+        }
+        holder.binding.executePendingBindings()
     }
 
     override fun getItemId(p0: Int): Long {
         return p0.toLong()
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val binding =
-            if (convertView == null) {
-                val inflater = LayoutInflater.from(context)
-                val tBinding: RowAnniversaryDraftBinding =
-                    RowAnniversaryDraftBinding.inflate(inflater, parent, false)
-                tBinding.root.tag = tBinding
-                tBinding
-            } else {
-                convertView.tag as RowAnniversaryDraftBinding
-            }
-
-        val anniversary = getItem(position)
-        binding.anniversary = anniversary
-        binding.isEditMode = isEditMode
-        binding.delete.setOnClickListener(View.OnClickListener {
-            onDelete?.invoke(anniversary)
-        })
-        // 即時バインド
-        binding.executePendingBindings()
-
-        return binding.root
+    override fun getItemCount(): Int {
+        return items.size
     }
+
+    inner class ViewHolder(val binding: RowAnniversaryDraftBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
 
 }

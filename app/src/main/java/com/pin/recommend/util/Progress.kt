@@ -1,9 +1,9 @@
 package com.pin.recommend.util
 
 class Progress(
-    private val onStart: () -> Void,
-    private val onComplete: () -> Void,
-    private val onError: (Exception) -> Void
+    private val onStart: () -> Unit,
+    private val onComplete: () -> Unit,
+    private val onError: (Exception) -> Unit
 ){
     fun onStart(){
         onStart.invoke()

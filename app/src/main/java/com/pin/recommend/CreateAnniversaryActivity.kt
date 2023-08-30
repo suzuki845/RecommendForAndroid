@@ -1,37 +1,37 @@
 package com.pin.recommend
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import com.pin.recommend.databinding.ActivityCreateAnniversaryBinding
-import com.pin.recommend.model.viewmodel.AnniversaryEditViewModel
-import com.pin.recommend.model.viewmodel.CharacterEditViewModel
+import com.pin.recommend.model.viewmodel.AnniversaryEditorViewModel
 import java.util.*
 
-class CreateAnniversaryActivity : AppCompatActivity() {
+class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
+
     companion object {
         const val INTENT_CHARACTER_ID = "com.suzuki.Recommend.CreateAnniversaryActivity.CHARACTER_ID"
+        const val INTENT_CREATE_ANNIVERSARY = "com.suzuki.Recommend.CreateAnniversaryActivity.INTENT_CREATE_ANNIVERSARY"
     }
+
     private lateinit var binding: ActivityCreateAnniversaryBinding
 
-    private val anniversaryVm: AnniversaryEditViewModel by lazy {
-        ViewModelProvider(this).get(AnniversaryEditViewModel::class.java)
-    }
-
-    private val characterVm: CharacterEditViewModel by lazy {
-        ViewModelProvider(this).get(CharacterEditViewModel::class.java)
+    private val anniversaryVm: AnniversaryEditorViewModel by lazy {
+        ViewModelProvider(this).get(AnniversaryEditorViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var characterId = intent.getLongExtra(EditAnniversaryActivity.INTENT_CHARACTER_ID, -1);
+        var characterId = intent.getLongExtra(INTENT_CHARACTER_ID, -1);
 
         anniversaryVm.characterId.value = characterId
 
@@ -44,7 +44,9 @@ class CreateAnniversaryActivity : AppCompatActivity() {
 
     private fun save(){
         anniversaryVm.save {
-            characterVm.addAnniversary(it)
+            val resultIntent = Intent()
+            resultIntent.putExtra(INTENT_CREATE_ANNIVERSARY, it.toJson())
+            setResult(RESULT_OK, resultIntent)
         }
     }
 

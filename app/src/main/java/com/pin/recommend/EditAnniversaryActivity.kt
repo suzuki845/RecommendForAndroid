@@ -1,6 +1,7 @@
 package com.pin.recommend
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,27 +11,27 @@ import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityEditAnniversaryBinding
-import com.pin.recommend.model.viewmodel.AnniversaryEditViewModel
-import com.pin.recommend.model.viewmodel.CharacterEditViewModel
+import com.pin.recommend.model.entity.CustomAnniversary
+import com.pin.recommend.model.viewmodel.AnniversaryEditorViewModel
 import java.util.*
 
 
 class EditAnniversaryActivity : AppCompatActivity() {
     companion object {
-        const val INTENT_CHARACTER_ID = "com.suzuki.Recommend.EditAnniversaryActivity.CHARACTER_ID"
+        const val INTENT_EDIT_ANNIVERSARY = "com.suzuki.Recommend.CreateAnniversaryActivity.INTENT_EDIT_ANNIVERSARY"
     }
     private lateinit var binding: ActivityEditAnniversaryBinding
 
-    private val anniversaryVm: AnniversaryEditViewModel by lazy {
-        ViewModelProvider(this).get(AnniversaryEditViewModel::class.java)
-    }
-
-    private val characterVm: CharacterEditViewModel by lazy {
-        ViewModelProvider(this).get(CharacterEditViewModel::class.java)
+    private val anniversaryVm: AnniversaryEditorViewModel by lazy {
+        ViewModelProvider(this).get(AnniversaryEditorViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val json = intent.getStringExtra(INTENT_EDIT_ANNIVERSARY)
+        val anniversary = CustomAnniversary.Draft.fromJson(json ?: "")
+        anniversaryVm.initialize(anniversary)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_anniversary)
         binding.vm = anniversaryVm
@@ -41,7 +42,9 @@ class EditAnniversaryActivity : AppCompatActivity() {
 
     private fun save(){
         anniversaryVm.save {
-            characterVm.replaceAnniversary(it)
+            val resultIntent = Intent()
+            resultIntent.putExtra(INTENT_EDIT_ANNIVERSARY, it.toJson())
+            setResult(RESULT_OK, resultIntent)
         }
     }
 

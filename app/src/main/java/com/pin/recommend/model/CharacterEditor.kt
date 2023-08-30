@@ -14,12 +14,9 @@ import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.util.Progress
-import com.pin.recommend.util.combine2
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.util.*
 
-class CharacterEditModel(val context: Context) {
+class CharacterEditor(val context: Context) {
 
     private val db = AppDatabase.getDatabase(context)
 
@@ -48,19 +45,19 @@ class CharacterEditModel(val context: Context) {
 
     val homeTextColor = MutableLiveData(Color.parseColor("#444444"))
 
-    val aboveText = MutableLiveData<String?>("と出会ってから")
+    val aboveText = MutableLiveData("を推して")
 
-    val belowText = MutableLiveData<String?>("に出会いました")
+    val belowText = MutableLiveData("になりました")
 
     val isZeroDayStart = MutableLiveData(false)
 
     val elapsedDateFormat = MutableLiveData(0)
 
-    val fontFamily = MutableLiveData<String?>()
+    val fontFamily = MutableLiveData("デフォルト")
 
     val typeface = fontFamily.map {
         if(it == null) return@map null
-        if(it == "default") return@map null
+        if(it == "デフォルト") return@map null
         return@map Typeface.createFromAsset(context.assets, "fonts/" + it + ".ttf")
     }
 
@@ -68,7 +65,7 @@ class CharacterEditModel(val context: Context) {
 
     val homeTextShadowColor = MutableLiveData<Int?>()
 
-    val anniversaries = MutableLiveData<List<CustomAnniversary.Draft>>(mutableListOf())
+    val anniversaries = MutableLiveData<MutableList<CustomAnniversary.Draft>>(mutableListOf())
 
     fun initialize(id: Long){
         val entity = db.recommendCharacterDao().findByIdCharacterWithAnniversaries(id)
@@ -77,7 +74,7 @@ class CharacterEditModel(val context: Context) {
         }
     }
 
-    fun initialize(entity: CharacterWithAnniversaries? = null) {
+    open fun initialize(entity: CharacterWithAnniversaries? = null) {
         id.value = entity?.id
         name.value = entity?.character?.name
         created.value = entity?.character?.created
@@ -92,27 +89,32 @@ class CharacterEditModel(val context: Context) {
         beforeIconImageUri.value = entity?.character?.iconImageUri
         backgroundImage.value = entity?.character?.getBackgroundBitmap(context, 500, 500)
         beforeBackgroundImageUri.value = entity?.character?.backgroundImageUri
-        anniversaries.value = entity?.anniversaries?.map { it.toDraft() } ?: mutableListOf()
+        anniversaries.value = entity?.anniversaries?.map { it.toDraft() }?.toMutableList() ?: mutableListOf()
     }
 
     fun addAnniversary(anniversary: CustomAnniversary.Draft){
-        val list = anniversaries.value?.toMutableList() ?: mutableListOf()
+        val list = anniversaries.value ?: mutableListOf()
         list.add(anniversary)
         anniversaries.value = list
     }
 
     fun replaceAnniversary(anniversary: CustomAnniversary.Draft){
-        val list = anniversaries.value?.toMutableList()
-        list?.let{
-            val index = it.indexOfFirst { e -> e.uuid == anniversary.uuid }
-            if(index != -1){
-                it[index] = anniversary
-            }
-            anniversaries.value = it
+        val list = anniversaries.value ?: mutableListOf()
+        val index = list.indexOfFirst { e -> e.uuid == anniversary.uuid }
+        if(index != -1){
+            list[index] = anniversary
         }
+
+        anniversaries.value = list
     }
 
-    fun save(p: Progress) {
+    fun removeAnniversary(pos: Int){
+        val items = anniversaries.value ?: mutableListOf()
+        items.removeAt(pos)
+        anniversaries.value = items
+    }
+
+    fun save(p: Progress){
         try {
             p.onStart()
 
@@ -168,6 +170,12 @@ class CharacterEditModel(val context: Context) {
                     db.recommendCharacterDao().insertCharacter(entity)
                 }
 
+                db.customAnniversaryDao().deleteByCharacterId(entity.id)
+
+                anniversaries.value?.forEach {
+                    db.customAnniversaryDao().insertAnniversary(it.toFinal())
+                }
+
                 initialize(null)
             }
 
@@ -176,5 +184,5 @@ class CharacterEditModel(val context: Context) {
             p.onError(e)
         }
     }
-
 }
+

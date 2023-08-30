@@ -2,12 +2,12 @@ package com.pin.recommend.model.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.pin.recommend.model.AnniversaryEditModel
+import com.pin.recommend.model.AnniversaryEditor
 import com.pin.recommend.model.entity.CustomAnniversary
 
-class AnniversaryEditViewModel(application: Application) : AndroidViewModel(application) {
+class AnniversaryEditorViewModel(application: Application) : AndroidViewModel(application) {
 
-    val model = AnniversaryEditModel()
+    val model = AnniversaryEditor()
 
     val characterId = model.characterId
     val name = model.name
@@ -20,6 +20,10 @@ class AnniversaryEditViewModel(application: Application) : AndroidViewModel(appl
     }
 
     fun initialize(e: CustomAnniversary? = null){
+        model.initialize(e)
+    }
+
+    fun initialize(e: CustomAnniversary.Draft? = null){
         model.initialize(e)
     }
 

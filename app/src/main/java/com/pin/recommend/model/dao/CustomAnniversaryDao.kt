@@ -15,6 +15,8 @@ interface CustomAnniversaryDao {
 
     @Delete
     fun deleteAnniversary(anniversary: CustomAnniversary?)
+    @Query("DELETE FROM CustomAnniversary WHERE characterId = :characterId")
+    fun deleteByCharacterId(characterId: Long)
 
     @Query("DELETE FROM CustomAnniversary")
     fun deleteAll()

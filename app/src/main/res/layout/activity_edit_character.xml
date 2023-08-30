@@ -8,7 +8,7 @@
         <import type="com.pin.recommend.model.viewmodel.DateConverter" />
         <variable
             name="vm"
-            type="com.pin.recommend.model.viewmodel.CharacterEditViewModel" />
+            type="com.pin.recommend.model.viewmodel.CharacterEditorViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -159,7 +159,7 @@
                                 android:id="@+id/above_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@{vm.aboveText}" />
+                                android:text='@{vm.aboveText ?? "を推して"}' />
                         </LinearLayout>
 
                         <TextView
@@ -178,7 +178,7 @@
                                 android:id="@+id/below_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@{vm.belowText}" />
+                                android:text='@{vm.belowText ?? "になりました"}' />
                         </LinearLayout>
 
                         <TextView
@@ -251,7 +251,7 @@
                                     android:src="@drawable/ic_add_24dp" />
                             </LinearLayout>
 
-                            <ListView
+                            <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/anniversaries"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" />

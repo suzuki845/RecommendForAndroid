@@ -12,18 +12,24 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.pin.imageutil.BitmapUtility
+import com.pin.recommend.CreateAnniversaryActivity.Companion.INTENT_CREATE_ANNIVERSARY
+import com.pin.recommend.EditAnniversaryActivity.Companion.INTENT_EDIT_ANNIVERSARY
 import com.pin.recommend.adapter.AnniversariesDraftAdapter
 import com.pin.recommend.adapter.FontAdapter
-import com.pin.recommend.databinding.ActivityCreateEventBinding
 import com.pin.recommend.databinding.ActivityEditCharacterBinding
-import com.pin.recommend.model.viewmodel.AnniversaryEditViewModel
-import com.pin.recommend.model.viewmodel.CharacterEditViewModel
+import com.pin.recommend.model.entity.CustomAnniversary
+import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
+import com.pin.recommend.util.Progress
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.Reward.Companion.getInstance
 import com.pin.util.RuntimePermissionUtils
@@ -32,24 +38,26 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class EditCharacterActivity : AppCompatActivity() {
 
-    companion object{
+    companion object {
         @JvmField
         val INTENT_EDIT_CHARACTER = "com.pin.recommend.EditCharacterActivity.INTENT_EDIT_CHARACTER"
+        val REQUEST_CODE_CREATE_ANNIVERSARY = 2983179
+        val REQUEST_CODE_EDIT_ANNIVERSARY = 3982432
     }
 
     private val FORMAT = SimpleDateFormat("yyyy年MM月dd日")
 
-    private val characterVM: CharacterEditViewModel by lazy{
-        ViewModelProvider(this).get(CharacterEditViewModel::class.java)
+    private val characterVM: CharacterEditorViewModel by lazy {
+        ViewModelProvider(this).get(CharacterEditorViewModel::class.java)
     }
 
-    private val anniversaryVM: AnniversaryEditViewModel by lazy {
-        ViewModelProvider(this).get(AnniversaryEditViewModel::class.java)
-    }
+    private var id = -1L
 
     private lateinit var binding: ActivityEditCharacterBinding
+    private lateinit var listView: RecyclerView
 
     private lateinit var adMobManager: AdMobAdaptiveBannerManager
     private lateinit var adViewContainer: ViewGroup
@@ -60,7 +68,8 @@ class EditCharacterActivity : AppCompatActivity() {
 
         adViewContainer = findViewById(R.id.ad_container)
 
-        adMobManager = AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id))
+        adMobManager =
+            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id))
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
@@ -72,19 +81,47 @@ class EditCharacterActivity : AppCompatActivity() {
             adMobManager.checkFirst()
         }
 
-        val id = intent.getLongExtra(INTENT_EDIT_CHARACTER, -1)
+        id = intent.getLongExtra(INTENT_EDIT_CHARACTER, -1)
         characterVM.initialize(id)
 
-        binding  = DataBindingUtil.setContentView(this, R.layout.activity_edit_character)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_character)
         binding.vm = characterVM
         binding.lifecycleOwner = this
 
-        val listView = binding.anniversaries
+        listView = binding.anniversaries
         val adapter = AnniversariesDraftAdapter(this)
         listView.adapter = adapter
-        characterVM.anniversaries.observe(this){
+        adapter.setOnItemClickListener {
+            val intent = Intent(this, EditAnniversaryActivity::class.java)
+            intent.putExtra(EditAnniversaryActivity.INTENT_EDIT_ANNIVERSARY, it.toJson())
+            startActivityForResult(intent, REQUEST_CODE_EDIT_ANNIVERSARY)
+        }
+        characterVM.anniversaries.observeForever {
             adapter.setItems(it)
         }
+        listView.layoutManager = LinearLayoutManager(this)
+
+        val simpleItemTouchCallback: ItemTouchHelper.SimpleCallback = object :
+            ItemTouchHelper.SimpleCallback(
+                0,
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.DOWN or ItemTouchHelper.UP
+            ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+                val position = viewHolder.adapterPosition
+                characterVM.removeAnniversary(position)
+                adapter.notifyDataSetChanged()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
+        itemTouchHelper.attachToRecyclerView(listView)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         initializeToolbar(toolbar)
@@ -95,27 +132,34 @@ class EditCharacterActivity : AppCompatActivity() {
         adMobManager.checkAndLoad()
     }
 
-    fun save(){
+    fun save() {
+        characterVM.save(Progress({
+
+        }, {
+            finish()
+        }, { e ->
+            println(e)
+        }))
     }
 
-    fun onAddAnniversary(v: View){
+    fun onAddAnniversary(v: View) {
         val intent = Intent(this, CreateAnniversaryActivity::class.java)
-        startActivity(intent)
+        intent.putExtra(CreateAnniversaryActivity.INTENT_CHARACTER_ID, id)
+        startActivityForResult(intent, REQUEST_CODE_CREATE_ANNIVERSARY)
     }
 
-    fun onShowFontDialog(view: View?){
+    fun onShowFontDialog(view: View?) {
         val adapter = FontAdapter(this)
         val listView = ListView(this)
         listView.adapter = adapter
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                .setTitle("選択してくだい。")
-                .setView(listView)
+        val builder: AlertDialog.Builder =
+            AlertDialog.Builder(this).setTitle("選択してくだい。").setView(listView)
         builder.setNegativeButton("キャンセル") { d, _ ->
             d.cancel()
         }
 
         val dialog = builder.create()
-        listView.setOnItemClickListener{ parent, view, pos, id ->
+        listView.setOnItemClickListener { parent, view, pos, id ->
             characterVM.fontFamily.value = adapter.getItem(pos)
             dialog.cancel()
         }
@@ -128,17 +172,17 @@ class EditCharacterActivity : AppCompatActivity() {
         val year = calendar[Calendar.YEAR]
         val month = calendar[Calendar.MONTH]
         val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-        val datePickerDialog = DatePickerDialog(this, OnDateSetListener { dialog, year, month, dayOfMonth ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
-                    !dialog.isShown) {
-                return@OnDateSetListener
-                //api19はクリックするとonDateSetが２回呼ばれるため
-            }
-            val newCalender = Calendar.getInstance()
-            newCalender[year, month] = dayOfMonth
-            val date = newCalender.time
-            characterVM.created.value = date
-        }, year, month, dayOfMonth)
+        val datePickerDialog =
+            DatePickerDialog(this, OnDateSetListener { dialog, year, month, dayOfMonth ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT && !dialog.isShown) {
+                    return@OnDateSetListener
+                    //api19はクリックするとonDateSetが２回呼ばれるため
+                }
+                val newCalender = Calendar.getInstance()
+                newCalender[year, month] = dayOfMonth
+                val date = newCalender.time
+                characterVM.created.value = date
+            }, year, month, dayOfMonth)
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
@@ -152,14 +196,24 @@ class EditCharacterActivity : AppCompatActivity() {
     private val REQUEST_PICK_ICON = 2000
     fun onSetIcon(v: View?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!RuntimePermissionUtils.hasSelfPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                if (RuntimePermissionUtils.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    RuntimePermissionUtils.showAlertDialog(this.fragmentManager,
-                            "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください")
+            if (!RuntimePermissionUtils.hasSelfPermissions(
+                    this, Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            ) {
+                if (RuntimePermissionUtils.shouldShowRequestPermissionRationale(
+                        this, Manifest.permission.READ_EXTERNAL_STORAGE
+                    )
+                ) {
+                    RuntimePermissionUtils.showAlertDialog(
+                        this.fragmentManager,
+                        "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください"
+                    )
                     return
                 } else {
-                    requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                            MyApplication.REQUEST_PICK_IMAGE)
+                    requestPermissions(
+                        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                        MyApplication.REQUEST_PICK_IMAGE
+                    )
                     return
                 }
             }
@@ -180,13 +234,33 @@ class EditCharacterActivity : AppCompatActivity() {
     private var pickMode = 0
     override fun onActivityResult(requestCode: Int, resultCode: Int, result: Intent?) {
         if (requestCode == REQUEST_PICK_ICON && resultCode == RESULT_OK) {
-            result?.let{beginCropIcon(it.data)}
+            result?.let { beginCropIcon(it.data) }
             pickMode = REQUEST_PICK_ICON
+            intent.putExtra(Constants.PICK_IMAGE, true)
         } else if (pickMode == REQUEST_PICK_ICON) {
             result?.let { handleCropIcon(resultCode, it) }
             pickMode = 0
+            intent.putExtra(Constants.PICK_IMAGE, true)
         }
-        this.intent.putExtra(Constants.PICK_IMAGE, true)
+
+        if (requestCode == REQUEST_CODE_CREATE_ANNIVERSARY && resultCode == RESULT_OK) {
+            result?.let {
+                it.getStringExtra(INTENT_CREATE_ANNIVERSARY)?.let {
+                    val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
+                    characterVM.addAnniversary(anniversary)
+                }
+            }
+        }
+
+        if (requestCode == REQUEST_CODE_EDIT_ANNIVERSARY && resultCode == RESULT_OK) {
+            result?.let {
+                it.getStringExtra(INTENT_EDIT_ANNIVERSARY)?.let {
+                    val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
+                    characterVM.replaceAnniversary(anniversary)
+                }
+            }
+        }
+
         return super.onActivityResult(requestCode, resultCode, result)
     }
 
@@ -199,10 +273,7 @@ class EditCharacterActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK) {
             val uri = Crop.getOutput(result)
             val bitmap = BitmapUtility.decodeUri(
-                this,
-                uri,
-                500,
-                500
+                this, uri, 500, 500
             )
             characterVM.iconImage.value = bitmap
         } else if (resultCode == Crop.RESULT_ERROR) {

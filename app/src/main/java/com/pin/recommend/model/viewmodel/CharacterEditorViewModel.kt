@@ -2,14 +2,12 @@ package com.pin.recommend.model.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.pin.recommend.model.CharacterEditModel
-import com.pin.recommend.model.entity.CharacterWithAnniversaries
+import com.pin.recommend.model.CharacterEditor
 import com.pin.recommend.model.entity.CustomAnniversary
-import com.pin.recommend.model.entity.RecommendCharacter
+import com.pin.recommend.util.Progress
 
-class CharacterEditViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val model = CharacterEditModel(application)
+class CharacterEditorViewModel(application: Application) : AndroidViewModel(application)  {
+    private val model = CharacterEditor(application)
 
     val name = model.name
 
@@ -55,8 +53,12 @@ class CharacterEditViewModel(application: Application) : AndroidViewModel(applic
         model.replaceAnniversary(anniversary)
     }
 
-    fun update(character: RecommendCharacter) {
+    fun removeAnniversary(pos: Int){
+        model.removeAnniversary(pos)
+    }
 
+    fun save(p: Progress) {
+        model.save(p)
     }
 
 }
