@@ -24,7 +24,7 @@ class CharacterEditor(val context: Context) {
 
     val name = MutableLiveData<String?>()
 
-    val created = MutableLiveData<Date>()
+    val created = MutableLiveData(Date())
 
     val iconImage = MutableLiveData<Bitmap?>()
 
@@ -57,7 +57,7 @@ class CharacterEditor(val context: Context) {
 
     val typeface = fontFamily.map {
         if(it == null) return@map null
-        if(it == "デフォルト") return@map null
+        if(it == "Default") return@map null
         return@map Typeface.createFromAsset(context.assets, "fonts/" + it + ".ttf")
     }
 
@@ -77,7 +77,7 @@ class CharacterEditor(val context: Context) {
     open fun initialize(entity: CharacterWithAnniversaries? = null) {
         id.value = entity?.id
         name.value = entity?.character?.name
-        created.value = entity?.character?.created
+        created.value = entity?.character?.created ?: Date()
         aboveText.value = entity?.character?.aboveText
         belowText.value = entity?.character?.belowText
         homeTextColor.value = entity?.character?.homeTextColor

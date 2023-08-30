@@ -3,8 +3,8 @@ package com.pin.recommend
 import android.Manifest
 import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,7 +12,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -21,29 +23,32 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pin.imageutil.BitmapUtility
-import com.pin.recommend.CreateAnniversaryActivity.Companion.INTENT_CREATE_ANNIVERSARY
-import com.pin.recommend.EditAnniversaryActivity.Companion.INTENT_EDIT_ANNIVERSARY
 import com.pin.recommend.adapter.AnniversariesDraftAdapter
 import com.pin.recommend.adapter.FontAdapter
+import com.pin.recommend.databinding.ActivityCreateCharacterBinding
 import com.pin.recommend.databinding.ActivityEditCharacterBinding
+import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.CustomAnniversary
+import com.pin.recommend.model.entity.RecommendCharacter
+import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
+import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.recommend.util.Progress
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.Reward.Companion.getInstance
 import com.pin.util.RuntimePermissionUtils
 import com.soundcloud.android.crop.Crop
+import de.hdodenhof.circleimageview.CircleImageView
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-class EditCharacterActivity : AppCompatActivity() {
-
+class CreateCharacterActivity : AppCompatActivity() {
     companion object {
         @JvmField
-        val INTENT_EDIT_CHARACTER = "com.pin.recommend.EditCharacterActivity.INTENT_EDIT_CHARACTER"
+        val INTENT_CREATE_CHARACTER = "com.pin.recommend.EditCharacterActivity.INTENT_CREATE_CHARACTER"
         val REQUEST_CODE_CREATE_ANNIVERSARY = 2983179
         val REQUEST_CODE_EDIT_ANNIVERSARY = 3982432
     }
@@ -56,7 +61,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
     private var id = -1L
 
-    private lateinit var binding: ActivityEditCharacterBinding
+    private lateinit var binding: ActivityCreateCharacterBinding
     private lateinit var listView: RecyclerView
 
     private lateinit var adMobManager: AdMobAdaptiveBannerManager
@@ -81,10 +86,9 @@ class EditCharacterActivity : AppCompatActivity() {
             adMobManager.checkFirst()
         }
 
-        id = intent.getLongExtra(INTENT_EDIT_CHARACTER, -1)
-        characterVM.initialize(id)
+        characterVM.initialize(null)
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_character)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_create_character)
         binding.vm = characterVM
         binding.lifecycleOwner = this
 
@@ -93,7 +97,7 @@ class EditCharacterActivity : AppCompatActivity() {
         listView.adapter = adapter
         adapter.setOnItemClickListener {
             val intent = Intent(this, EditAnniversaryActivity::class.java)
-            intent.putExtra(INTENT_EDIT_ANNIVERSARY, it.toJson())
+            intent.putExtra(EditAnniversaryActivity.INTENT_EDIT_ANNIVERSARY, it.toJson())
             startActivityForResult(intent, REQUEST_CODE_EDIT_ANNIVERSARY)
         }
         characterVM.anniversaries.observeForever {
@@ -138,7 +142,7 @@ class EditCharacterActivity : AppCompatActivity() {
         }, {
             finish()
         }, { e ->
-            println(e)
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG)
         }))
     }
 
@@ -173,23 +177,24 @@ class EditCharacterActivity : AppCompatActivity() {
         val month = calendar[Calendar.MONTH]
         val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
         val datePickerDialog =
-            DatePickerDialog(this, OnDateSetListener { dialog, year, month, dayOfMonth ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT && !dialog.isShown) {
-                    return@OnDateSetListener
-                    //api19はクリックするとonDateSetが２回呼ばれるため
-                }
-                val newCalender = Calendar.getInstance()
-                newCalender[year, month] = dayOfMonth
-                val date = newCalender.time
-                characterVM.created.value = date
-            }, year, month, dayOfMonth)
+            DatePickerDialog(this,
+                DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT && !dialog.isShown) {
+                        return@OnDateSetListener
+                        //api19はクリックするとonDateSetが２回呼ばれるため
+                    }
+                    val newCalender = Calendar.getInstance()
+                    newCalender[year, month] = dayOfMonth
+                    val date = newCalender.time
+                    characterVM.created.value = date
+                }, year, month, dayOfMonth)
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
 
 
     private fun initializeToolbar(toolbar: Toolbar) {
-        toolbar.title = "編集"
+        toolbar.title = "作成"
         setSupportActionBar(toolbar)
     }
 
@@ -245,7 +250,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
         if (requestCode == REQUEST_CODE_CREATE_ANNIVERSARY && resultCode == RESULT_OK) {
             result?.let {
-                it.getStringExtra(INTENT_CREATE_ANNIVERSARY)?.let {
+                it.getStringExtra(CreateAnniversaryActivity.INTENT_CREATE_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
                     characterVM.addAnniversary(anniversary)
                 }
@@ -254,7 +259,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
         if (requestCode == REQUEST_CODE_EDIT_ANNIVERSARY && resultCode == RESULT_OK) {
             result?.let {
-                it.getStringExtra(INTENT_EDIT_ANNIVERSARY)?.let {
+                it.getStringExtra(EditAnniversaryActivity.INTENT_EDIT_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
                     characterVM.replaceAnniversary(anniversary)
                 }
@@ -296,6 +301,5 @@ class EditCharacterActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 
 }

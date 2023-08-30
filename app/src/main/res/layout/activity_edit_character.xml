@@ -136,7 +136,7 @@
                                 android:id="@+id/is_zero_day_start"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:checked="@{vm.isZeroDayStart}"
+                                android:checked="@={vm.isZeroDayStart}"
                                 android:paddingLeft="6dp"
                                 android:paddingTop="8dp"
                                 android:paddingRight="6dp"
@@ -159,7 +159,8 @@
                                 android:id="@+id/above_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text='@{vm.aboveText ?? "を推して"}' />
+                                android:hint="推して"
+                                android:text='@={vm.aboveText}' />
                         </LinearLayout>
 
                         <TextView
@@ -178,7 +179,8 @@
                                 android:id="@+id/below_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text='@{vm.belowText ?? "になりました"}' />
+                                android:hint="になりました"
+                                android:text='@={vm.belowText}' />
                         </LinearLayout>
 
                         <TextView
@@ -202,7 +204,7 @@
                                 android:paddingTop="8dp"
                                 android:paddingRight="6dp"
                                 android:paddingBottom="2dp"
-                                android:text="@{vm.fontFamily}"
+                                android:text='@{vm.fontFamily ?? "Default"}'
                                 android:textColor="#000000"
                                 android:textSize="20sp"
                                 android:typeface="@{vm.typeface}" />

@@ -3,7 +3,9 @@ package com.pin.recommend.model.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.pin.recommend.model.CharacterEditor
+import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.CustomAnniversary
+import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.util.Progress
 
 class CharacterEditorViewModel(application: Application) : AndroidViewModel(application)  {
@@ -43,6 +45,10 @@ class CharacterEditorViewModel(application: Application) : AndroidViewModel(appl
 
     fun initialize(id: Long){
         model.initialize(id)
+    }
+
+    fun initialize(entity: CharacterWithAnniversaries?){
+        model.initialize(entity)
     }
 
     fun addAnniversary(anniversary: CustomAnniversary.Draft){

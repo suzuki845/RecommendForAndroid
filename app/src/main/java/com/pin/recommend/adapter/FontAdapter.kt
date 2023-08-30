@@ -8,29 +8,27 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.pin.recommend.R
+import com.pin.recommend.model.entity.CustomFont
 
-class FontAdapter: BaseAdapter {
+class FontAdapter : BaseAdapter {
 
     private var context: Context
     private var inflater: LayoutInflater
 
     private var fonts = listOf(
-            "default",
-
-            "huifont29",
-
-            "NotoSans-Black",
-            "NotoSans-BlackItalic",
-            "NotoSans-Condensed",
-            "NotoSans-CondensedItalic",
-
-            "NotoSerifDisplay-Black",
-            "NotoSerifDisplay-Condensed",
-            "NotoSerifDisplay-BlackItalic",
-            "NotoSerifDisplay-CondensedItalic"
+        CustomFont("Default", false),
+        CustomFont("huifont29", false),
+        CustomFont("NotoSans-Black", false),
+        CustomFont("NotoSans-BlackItalic", false),
+        CustomFont("NotoSans-Condensed", false),
+        CustomFont("NotoSans-CondensedItalic", false),
+        CustomFont("NotoSerifDisplay-Black", false),
+        CustomFont("NotoSerifDisplay-Condensed", false),
+        CustomFont("NotoSerifDisplay-BlackItalic", false),
+        CustomFont("NotoSerifDisplay-CondensedItalic", false)
     )
 
-    constructor(context: Context){
+    constructor(context: Context) {
         this.context = context
         this.inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater;
     }
@@ -39,7 +37,7 @@ class FontAdapter: BaseAdapter {
         return fonts.size
     }
 
-    override fun getItem(position: Int): String {
+    override fun getItem(position: Int): CustomFont {
         return fonts[position]
     }
 
@@ -53,8 +51,8 @@ class FontAdapter: BaseAdapter {
         var font = fonts[position]
 
         val textView = v.findViewById<TextView>(R.id.font_item)
-        textView.text = font
-        if(!font.equals("default")){
+        textView.text = font.name
+        if (!font.name.equals("Default")) {
             try {
                 val type = Typeface.createFromAsset(context.getAssets(), "fonts/" + font + ".ttf")
                 textView.typeface = type

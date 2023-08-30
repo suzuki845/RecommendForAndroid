@@ -128,8 +128,7 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         backgroundImage.background = character.getBackgroundImageDrawable(this@CharacterDetailActivity, 1000, 1000)
         backgroundImage.alpha = character.backgroundImageOpacity
 
-        character.backgroundColor
-            .let {
+        character.backgroundColor?.let {
                 backgroundColor.setBackgroundColor(it)
             }
     }
