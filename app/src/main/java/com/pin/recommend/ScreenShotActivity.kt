@@ -159,7 +159,7 @@ class ScreenShotActivity : AppCompatActivity() {
                                 )
                             ) {
                                 RuntimePermissionUtils.showAlertDialog(
-                                    fragmentManager,
+                                    supportFragmentManager,
                                     "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください"
                                 )
                                 return@setOnMenuItemClickListener false

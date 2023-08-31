@@ -192,7 +192,7 @@ public class EditStoryActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!RuntimePermissionUtils.hasSelfPermissions(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 if(RuntimePermissionUtils.shouldShowRequestPermissionRationale(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    RuntimePermissionUtils.showAlertDialog(this.getFragmentManager(),
+                    RuntimePermissionUtils.showAlertDialog(this.getSupportFragmentManager(),
                             "画像ストレージへアクセスの権限がありません。アプリ情報からこのアプリのストレージへのアクセスを許可してください");
                     return;
                 }else{

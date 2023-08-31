@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,9 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ListView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -23,24 +20,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.adapter.AnniversariesDraftAdapter
 import com.pin.recommend.adapter.FontAdapter
 import com.pin.recommend.databinding.ActivityCreateCharacterBinding
-import com.pin.recommend.databinding.ActivityEditCharacterBinding
-import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.CustomAnniversary
-import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.recommend.util.Progress
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.Reward.Companion.getInstance
 import com.pin.util.RuntimePermissionUtils
 import com.soundcloud.android.crop.Crop
-import de.hdodenhof.circleimageview.CircleImageView
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -210,7 +200,7 @@ class CreateCharacterActivity : AppCompatActivity() {
                     )
                 ) {
                     RuntimePermissionUtils.showAlertDialog(
-                        this.fragmentManager,
+                        supportFragmentManager,
                         "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください"
                     )
                     return

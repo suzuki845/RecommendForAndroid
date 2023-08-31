@@ -25,7 +25,7 @@ import com.pin.util.Reward;
 
 public class MyApplication extends android.app.Application implements ViewModelStoreOwner,  Application.ActivityLifecycleCallbacks{
 
-    public static final int REQUEST_PICK_IMAGE = 10000;
+    public static final int REQUEST_PICK_IMAGE = 231132;
 
     @Override
     protected void attachBaseContext(Context base) {

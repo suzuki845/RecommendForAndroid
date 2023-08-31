@@ -189,7 +189,7 @@ public class BackgroundSettingDialogFragment extends DialogFragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!RuntimePermissionUtils.hasSelfPermissions(getActivity(), android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 if(RuntimePermissionUtils.shouldShowRequestPermissionRationale(getActivity(), android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    RuntimePermissionUtils.showAlertDialog(getActivity().getFragmentManager(),
+                    RuntimePermissionUtils.showAlertDialog(getActivity().getSupportFragmentManager(),
                             "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください");
                     return;
                 }else{

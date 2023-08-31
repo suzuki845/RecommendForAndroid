@@ -31,6 +31,7 @@ import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
 import com.pin.recommend.util.Progress
 import com.pin.util.AdMobAdaptiveBannerManager
+import com.pin.util.PermissionUtil
 import com.pin.util.Reward.Companion.getInstance
 import com.pin.util.RuntimePermissionUtils
 import com.soundcloud.android.crop.Crop
@@ -195,39 +196,39 @@ class EditCharacterActivity : AppCompatActivity() {
 
     private val REQUEST_PICK_ICON = 2000
     fun onSetIcon(v: View?) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!RuntimePermissionUtils.hasSelfPermissions(
-                    this, Manifest.permission.READ_EXTERNAL_STORAGE
+        val deniedList = PermissionUtil.hasSelfPermissions(
+            this, listOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_MEDIA_IMAGES
+            )
+        )
+
+        if(deniedList.isNotEmpty()){
+            val requestDialogs =
+                PermissionUtil.shouldShowRequestPermissionRationale(this, deniedList)
+
+            for (requestDialog in requestDialogs) {
+                PermissionUtil.showAlertDialog(
+                    supportFragmentManager,
+                    "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください"
                 )
-            ) {
-                if (RuntimePermissionUtils.shouldShowRequestPermissionRationale(
-                        this, Manifest.permission.READ_EXTERNAL_STORAGE
-                    )
-                ) {
-                    RuntimePermissionUtils.showAlertDialog(
-                        this.fragmentManager,
-                        "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください"
-                    )
-                    return
-                } else {
-                    requestPermissions(
-                        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                        MyApplication.REQUEST_PICK_IMAGE
-                    )
-                    return
-                }
             }
+
+            val requests = deniedList.filter { deny ->
+                requestDialogs.firstOrNull { it.name == deny.name } == null
+            }
+
+            requestPermissions(
+                requests.map { it.name }.toTypedArray(),
+                MyApplication.REQUEST_PICK_IMAGE
+            )
+            return
         }
-        if (Build.VERSION.SDK_INT < 19) {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "image/*"
-            startActivityForResult(intent, REQUEST_PICK_ICON)
-        } else {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "image/*"
-            startActivityForResult(intent, REQUEST_PICK_ICON)
-        }
+
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "image/*"
+        startActivityForResult(intent, REQUEST_PICK_ICON)
     }
 
 
