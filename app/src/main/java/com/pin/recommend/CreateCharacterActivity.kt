@@ -26,8 +26,11 @@ import com.pin.recommend.adapter.FontAdapter
 import com.pin.recommend.databinding.ActivityCreateCharacterBinding
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
+import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
 import com.pin.util.AdMobAdaptiveBannerManager
+import com.pin.util.PermissionChecker
+import com.pin.util.PermissionRequest
 import com.pin.util.Reward.Companion.getInstance
 import com.pin.util.RuntimePermissionUtils
 import com.soundcloud.android.crop.Crop
@@ -38,7 +41,8 @@ import java.util.*
 class CreateCharacterActivity : AppCompatActivity() {
     companion object {
         @JvmField
-        val INTENT_CREATE_CHARACTER = "com.pin.recommend.EditCharacterActivity.INTENT_CREATE_CHARACTER"
+        val INTENT_CREATE_CHARACTER =
+            "com.pin.recommend.EditCharacterActivity.INTENT_CREATE_CHARACTER"
         val REQUEST_CODE_CREATE_ANNIVERSARY = 2983179
         val REQUEST_CODE_EDIT_ANNIVERSARY = 3982432
     }
@@ -177,7 +181,8 @@ class CreateCharacterActivity : AppCompatActivity() {
                     newCalender[year, month] = dayOfMonth
                     val date = newCalender.time
                     characterVM.created.value = date
-                }, year, month, dayOfMonth)
+                }, year, month, dayOfMonth
+            )
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
@@ -190,39 +195,17 @@ class CreateCharacterActivity : AppCompatActivity() {
 
     private val REQUEST_PICK_ICON = 2000
     fun onSetIcon(v: View?) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!RuntimePermissionUtils.hasSelfPermissions(
-                    this, Manifest.permission.READ_EXTERNAL_STORAGE
-                )
-            ) {
-                if (RuntimePermissionUtils.shouldShowRequestPermissionRationale(
-                        this, Manifest.permission.READ_EXTERNAL_STORAGE
-                    )
-                ) {
-                    RuntimePermissionUtils.showAlertDialog(
-                        supportFragmentManager,
-                        "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください"
-                    )
-                    return
-                } else {
-                    requestPermissions(
-                        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                        MyApplication.REQUEST_PICK_IMAGE
-                    )
-                    return
-                }
-            }
+        if (!PermissionChecker.requestPermissions(
+                this, MyApplication.REQUEST_PICK_IMAGE, PermissionRequests().requestImages()
+            )
+        ) {
+            return
         }
-        if (Build.VERSION.SDK_INT < 19) {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "image/*"
-            startActivityForResult(intent, REQUEST_PICK_ICON)
-        } else {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "image/*"
-            startActivityForResult(intent, REQUEST_PICK_ICON)
-        }
+
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "image/*"
+        startActivityForResult(intent, REQUEST_PICK_ICON)
     }
 
 

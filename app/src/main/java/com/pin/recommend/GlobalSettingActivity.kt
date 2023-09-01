@@ -24,7 +24,6 @@ import com.pin.recommend.model.BackupImportModel
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.util.PrefUtil
-import com.pin.recommend.util.ShowToast
 import com.pin.util.Reward
 import com.pin.util.reward.RewardDialogFragment
 import kotlinx.coroutines.GlobalScope
@@ -84,7 +83,7 @@ class GlobalSettingActivity : AppCompatActivity() {
             } else {
                 PrefUtil.putBoolean(Constants.PREF_KEY_IS_LOCKED, false);
                 PrefUtil.putInt(Constants.PREF_KEY_PASSWORD, 0);
-                ShowToast.show("ロックを解除しました。", this);
+                Toast.makeText(this, "ロックを解除しました。", Toast.LENGTH_SHORT).show();
             }
         })
     }

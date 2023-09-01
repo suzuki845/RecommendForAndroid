@@ -13,13 +13,13 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.pin.recommend.util.PrefUtil;
-import com.pin.recommend.util.ShowToast;
 
 public class PassCodeSetActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -138,7 +138,7 @@ public class PassCodeSetActivity extends AppCompatActivity implements View.OnCli
     private void confirmPassword() {
         if (isDoubleCheck) {
             if (password == Integer.parseInt(stringBuilder.toString())) {
-                ShowToast.show("ロックしました。", this);
+                Toast.makeText(this, "ロックしました。", Toast.LENGTH_SHORT).show();
                 PrefUtil.putInt(Constants.PREF_KEY_PASSWORD, password);
                 PrefUtil.putBoolean(Constants.PREF_KEY_IS_LOCKED, true);
                 finish();

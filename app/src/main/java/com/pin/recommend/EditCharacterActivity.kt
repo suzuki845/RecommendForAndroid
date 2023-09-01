@@ -29,9 +29,11 @@ import com.pin.recommend.adapter.FontAdapter
 import com.pin.recommend.databinding.ActivityEditCharacterBinding
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
+import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
 import com.pin.util.AdMobAdaptiveBannerManager
-import com.pin.util.PermissionUtil
+import com.pin.util.PermissionChecker
+import com.pin.util.PermissionRequest
 import com.pin.util.Reward.Companion.getInstance
 import com.pin.util.RuntimePermissionUtils
 import com.soundcloud.android.crop.Crop
@@ -196,32 +198,10 @@ class EditCharacterActivity : AppCompatActivity() {
 
     private val REQUEST_PICK_ICON = 2000
     fun onSetIcon(v: View?) {
-        val deniedList = PermissionUtil.hasSelfPermissions(
-            this, listOf(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_MEDIA_IMAGES
+        if (!PermissionChecker.requestPermissions(
+                this, MyApplication.REQUEST_PICK_IMAGE, PermissionRequests().requestImages()
             )
-        )
-
-        if(deniedList.isNotEmpty()){
-            val requestDialogs =
-                PermissionUtil.shouldShowRequestPermissionRationale(this, deniedList)
-
-            for (requestDialog in requestDialogs) {
-                PermissionUtil.showAlertDialog(
-                    supportFragmentManager,
-                    "画像ストレージへアクセスの権限がないので、アプリ情報からこのアプリのストレージへのアクセスを許可してください"
-                )
-            }
-
-            val requests = deniedList.filter { deny ->
-                requestDialogs.firstOrNull { it.name == deny.name } == null
-            }
-
-            requestPermissions(
-                requests.map { it.name }.toTypedArray(),
-                MyApplication.REQUEST_PICK_IMAGE
-            )
+        ) {
             return
         }
 
