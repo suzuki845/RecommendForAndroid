@@ -7,20 +7,5 @@
         app:showAsAction="ifRoom"
         android:title="トップ画面に固定"
         android:orderInCategory="1" />
-    <item
-        android:id="@+id/change_background_image"
-        android:orderInCategory="2"
-        android:title="背景を設定"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/delete_background_image"
-        android:orderInCategory="2"
-        android:title="背景画像を削除"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/change_body_text_color"
-        android:orderInCategory="5"
-        android:title="ホームの文字色の設定"
-        app:showAsAction="never" />
 
 </menu>

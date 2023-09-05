@@ -1,10 +1,10 @@
 package com.pin.recommend
 
-import android.Manifest
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,8 +13,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -27,15 +29,14 @@ import com.pin.recommend.EditAnniversaryActivity.Companion.INTENT_EDIT_ANNIVERSA
 import com.pin.recommend.adapter.AnniversariesDraftAdapter
 import com.pin.recommend.adapter.FontAdapter
 import com.pin.recommend.databinding.ActivityEditCharacterBinding
+import com.pin.recommend.dialog.ColorPickerDialogFragment
+import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
-import com.pin.util.AdMobAdaptiveBannerManager
-import com.pin.util.PermissionChecker
-import com.pin.util.PermissionRequest
+import com.pin.util.*
 import com.pin.util.Reward.Companion.getInstance
-import com.pin.util.RuntimePermissionUtils
 import com.soundcloud.android.crop.Crop
 import java.io.File
 import java.text.SimpleDateFormat
@@ -50,6 +51,9 @@ class EditCharacterActivity : AppCompatActivity() {
         val REQUEST_CODE_CREATE_ANNIVERSARY = 2983179
         val REQUEST_CODE_EDIT_ANNIVERSARY = 3982432
     }
+
+    private val REQUEST_PICK_ICON = 2000
+    private val REQUEST_PICK_BACKGROUND = 2001
 
     private val FORMAT = SimpleDateFormat("yyyy年MM月dd日")
 
@@ -91,6 +95,85 @@ class EditCharacterActivity : AppCompatActivity() {
         binding.vm = characterVM
         binding.lifecycleOwner = this
 
+        binding.imageOpacity.max = 100
+        binding.imageOpacity.progress = 100
+        binding.imageOpacity.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(
+                seekBar: SeekBar, progress: Int, fromUser: Boolean
+            ) {
+                val o = progress * 0.01f
+                characterVM.backgroundImageOpacity.value = o
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        })
+
+        binding.previewBackgroundImage.setOnLongClickListener {
+            val popup = PopupMenu(this, binding.previewBackgroundImage)
+            val inflater = popup.menuInflater
+            inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.remove -> {
+                        characterVM.backgroundImage.value = null
+                    }
+                }
+                false
+            }
+            popup.show()
+            return@setOnLongClickListener true
+        }
+
+        binding.previewBackgroundColor.setOnLongClickListener {
+            val popup = PopupMenu(this, binding.previewBackgroundColor)
+            val inflater = popup.menuInflater
+            inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.remove -> {
+                        characterVM.backgroundColor.value = Color.WHITE
+                    }
+                }
+                false
+            }
+            popup.show()
+            return@setOnLongClickListener true
+        }
+
+        binding.previewTextColor.setOnClickListener {
+            val dialog = ColorPickerDialogFragment(object :
+                DialogActionListener<ColorPickerDialogFragment?> {
+                override fun onCancel() {}
+                override fun onDecision(dialog: ColorPickerDialogFragment?) {
+                    dialog?.let {
+                        characterVM.homeTextColor.value = it.color
+                    }
+                }
+            })
+            characterVM.homeTextColor.value?.let {
+                dialog.setDefaultColor(it)
+            }
+            dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
+        }
+
+
+        binding.previewTextShadow.setOnClickListener {
+            val dialog = ColorPickerDialogFragment(object :
+                DialogActionListener<ColorPickerDialogFragment?> {
+                override fun onCancel() {}
+                override fun onDecision(dialog: ColorPickerDialogFragment?) {
+                    dialog?.let {
+                        characterVM.homeTextShadowColor.value = it.color
+                    }
+                }
+            })
+            characterVM.homeTextColor.value?.let {
+                dialog.setDefaultColor(it)
+            }
+            dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
+        }
+
         listView = binding.anniversaries
         val adapter = AnniversariesDraftAdapter(this)
         listView.adapter = adapter
@@ -128,6 +211,11 @@ class EditCharacterActivity : AppCompatActivity() {
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         initializeToolbar(toolbar)
+    }
+
+    private fun initializeToolbar(toolbar: Toolbar) {
+        toolbar.title = "編集"
+        setSupportActionBar(toolbar)
     }
 
     override fun onResume() {
@@ -191,12 +279,6 @@ class EditCharacterActivity : AppCompatActivity() {
     }
 
 
-    private fun initializeToolbar(toolbar: Toolbar) {
-        toolbar.title = "編集"
-        setSupportActionBar(toolbar)
-    }
-
-    private val REQUEST_PICK_ICON = 2000
     fun onSetIcon(v: View?) {
         if (!PermissionChecker.requestPermissions(
                 this, MyApplication.REQUEST_PICK_IMAGE, PermissionRequests().requestImages()
@@ -211,15 +293,59 @@ class EditCharacterActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_PICK_ICON)
     }
 
+    fun onSetBackground(v: View?) {
+        if (!PermissionChecker.requestPermissions(
+                this, MyApplication.REQUEST_PICK_IMAGE, PermissionRequests().requestImages()
+            )
+        ) {
+            return
+        }
 
-    private var pickMode = 0
-    override fun onActivityResult(requestCode: Int, resultCode: Int, result: Intent?) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "image/*"
+        startActivityForResult(intent, REQUEST_PICK_BACKGROUND)
+    }
+
+    fun onSetBackgroundColor(v: View?) {
+        val dialog =
+            ColorPickerDialogFragment(object :
+                DialogActionListener<ColorPickerDialogFragment> {
+                override fun onDecision(dialog: ColorPickerDialogFragment) {
+                    characterVM.backgroundColor.value = dialog.color
+                }
+
+                override fun onCancel() {}
+            })
+        characterVM.backgroundColor.value?.let {
+            dialog.setDefaultColor(it)
+        }
+        dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
+    }
+
+    private
+    var pickMode = 0
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        result: Intent?
+    ) {
         if (requestCode == REQUEST_PICK_ICON && resultCode == RESULT_OK) {
             result?.let { beginCropIcon(it.data) }
             pickMode = REQUEST_PICK_ICON
             intent.putExtra(Constants.PICK_IMAGE, true)
         } else if (pickMode == REQUEST_PICK_ICON) {
             result?.let { handleCropIcon(resultCode, it) }
+            pickMode = 0
+            intent.putExtra(Constants.PICK_IMAGE, true)
+        }
+
+        if (requestCode == REQUEST_PICK_BACKGROUND && resultCode == RESULT_OK) {
+            result?.let { beginCropBackground(it.data) }
+            pickMode = REQUEST_PICK_BACKGROUND
+            intent.putExtra(Constants.PICK_IMAGE, true)
+        } else if (pickMode == REQUEST_PICK_BACKGROUND) {
+            result?.let { handleCropBackground(resultCode, it) }
             pickMode = 0
             intent.putExtra(Constants.PICK_IMAGE, true)
         }
@@ -258,7 +384,28 @@ class EditCharacterActivity : AppCompatActivity() {
             )
             characterVM.iconImage.value = bitmap
         } else if (resultCode == Crop.RESULT_ERROR) {
-            Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    private fun beginCropBackground(source: Uri?) {
+        val destination = Uri.fromFile(File(this.cacheDir, "cropped"))
+        val displaySize = DisplaySizeCheck.getDisplaySize(this)
+        Crop.of(source, destination).withAspect(displaySize.x, displaySize.y)
+            .start(this)
+    }
+
+    private fun handleCropBackground(resultCode: Int, result: Intent) {
+        println("test!!! handleCropBackground")
+        if (resultCode == RESULT_OK) {
+            val uri = Crop.getOutput(result)
+            val bitmap = BitmapUtility.decodeUri(this, uri)
+            characterVM.backgroundImage.value = bitmap
+            println("test!!! handleCropBackground")
+        } else if (resultCode == Crop.RESULT_ERROR) {
+            Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 

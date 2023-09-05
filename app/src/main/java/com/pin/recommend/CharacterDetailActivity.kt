@@ -14,7 +14,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.pin.recommend.dialog.BackgroundSettingDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.dialog.TextSettingDialogFragment
 import com.pin.recommend.dialog.ToolbarSettingDialogFragment
@@ -140,8 +139,6 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
-        val deleteBackgroundImage = menu.findItem(R.id.delete_background_image)
-        deleteBackgroundImage.isVisible = character.hasBackgroundImage()
         val account = accountViewModel.accountLiveData.value
 
         val item = menu.findItem(R.id.fix_home)
@@ -173,45 +170,6 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.change_body_text_color -> {
-                val bodyTextSettingDialogFragment = TextSettingDialogFragment(object : DialogActionListener<TextSettingDialogFragment> {
-                    override fun onDecision(dialog: TextSettingDialogFragment) {
-                        character.homeTextColor = dialog.textColor
-                        character.homeTextShadowColor = dialog.textShadowColor
-                        characterViewModel.update(character)
-                    }
-
-                    override fun onCancel() {}
-                })
-                bodyTextSettingDialogFragment.setDefaultTextColor(character.getHomeTextColor())
-                bodyTextSettingDialogFragment.setDefaultTextShadowColor(character.getHomeTextShadowColor())
-                bodyTextSettingDialogFragment.show(supportFragmentManager, ToolbarSettingDialogFragment.TAG)
-                true
-            }
-            R.id.change_background_image -> {
-                val backgroundSettingDialogFragment = BackgroundSettingDialogFragment(object : DialogActionListener<BackgroundSettingDialogFragment> {
-                    override fun onDecision(dialog: BackgroundSettingDialogFragment) {
-                        if (dialog.backgroundImage != null) {
-                            character.backgroundImageOpacity = dialog.imageOpacity
-                            character.saveBackgroundImage(this@CharacterDetailActivity, dialog.backgroundImage)
-                        }
-                        character.backgroundColor = dialog.backgroundColor
-                        characterViewModel.update(character)
-                    }
-
-                    override fun onCancel() {}
-                })
-                backgroundSettingDialogFragment.setDefaultBackgroundImage(character.getBackgroundBitmap(this, 300, 300))
-                backgroundSettingDialogFragment.setDefaultBackgroundColor(character.getBackgroundColor())
-                backgroundSettingDialogFragment.setDefaultImageOpacity(character.backgroundImageOpacity)
-                backgroundSettingDialogFragment.show(supportFragmentManager, BackgroundSettingDialogFragment.TAG)
-                true
-            }
-            R.id.delete_background_image -> {
-                character.deleteBackgroundImage(this)
-                characterViewModel.update(character)
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }

@@ -1,5 +1,8 @@
 package com.pin.recommend.model.viewmodel
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import androidx.databinding.InverseMethod
 import java.text.Format
 import java.text.SimpleDateFormat
@@ -60,5 +63,17 @@ object DateMonthConverter {
     fun toDate(value: String?): Date? {
         if(value == null) return null
         return FORMAT.parse(value)
+    }
+}
+
+object ColorConverter {
+    @JvmStatic
+    fun toBitmap(colorString: String?): Bitmap?{
+        if(colorString == null) return null
+        val color = Color.parseColor(colorString)
+        val bitmap = Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(color)
+        return bitmap
     }
 }

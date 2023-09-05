@@ -2,6 +2,7 @@ package com.pin.recommend.model
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Typeface
 import androidx.core.graphics.drawable.toBitmapOrNull
@@ -41,9 +42,23 @@ class CharacterEditor(val context: Context) {
 
     private val beforeBackgroundImageUri = MutableLiveData<String?>()
 
-    val backgroundColor = MutableLiveData(Color.WHITE)
+    val backgroundColor = MutableLiveData<Int?>(Color.parseColor("#ffffff"))
 
-    val homeTextColor = MutableLiveData(Color.parseColor("#444444"))
+    val backgroundColorToBitmap = backgroundColor.map {
+        colorIntToBitmap(it)
+    }
+
+    val homeTextColor = MutableLiveData<Int?>(Color.parseColor("#444444"))
+
+    val homeTextColorToBitmap = homeTextColor.map {
+        colorIntToBitmap(it)
+    }
+
+    val homeTextShadowColor = MutableLiveData<Int?>()
+
+    val homeTextShadowColorToBitmap = homeTextShadowColor.map {
+        colorIntToBitmap(it)
+    }
 
     val aboveText = MutableLiveData("を推して")
 
@@ -63,9 +78,15 @@ class CharacterEditor(val context: Context) {
 
     val backgroundImageOpacity = MutableLiveData(1f)
 
-    val homeTextShadowColor = MutableLiveData<Int?>()
-
     val anniversaries = MutableLiveData<MutableList<CustomAnniversary.Draft>>(mutableListOf())
+
+    private fun colorIntToBitmap(color: Int?): Bitmap?{
+        if(color == null) return null
+        val bitmap = Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(color)
+        return bitmap
+    }
 
     fun initialize(id: Long){
         val entity = db.recommendCharacterDao().findByIdCharacterWithAnniversaries(id)
@@ -81,8 +102,9 @@ class CharacterEditor(val context: Context) {
         aboveText.value = entity?.character?.aboveText
         belowText.value = entity?.character?.belowText
         homeTextColor.value = entity?.character?.homeTextColor
+        homeTextShadowColor.value = entity?.character?.homeTextShadowColor
         backgroundColor.value = entity?.character?.backgroundColor
-        backgroundImageOpacity.value = entity?.character?.backgroundImageOpacity
+        backgroundImageOpacity.value = entity?.character?.backgroundImageOpacity ?: 1f
         isZeroDayStart.value = entity?.character?.isZeroDayStart
         fontFamily.value = entity?.character?.fontFamily
         iconImage.value = entity?.character?.getIconImage(context, 500, 500)
@@ -127,6 +149,7 @@ class CharacterEditor(val context: Context) {
                 entity.aboveText = aboveText.value
                 entity.belowText = belowText.value
                 entity.homeTextColor = homeTextColor.value
+                entity.homeTextShadowColor = homeTextShadowColor.value
                 entity.backgroundColor = backgroundColor.value
                 entity.backgroundImageOpacity = backgroundImageOpacity.value ?: 1f
                 entity.isZeroDayStart = isZeroDayStart.value ?: false

@@ -4,8 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <import type="com.pin.recommend.model.viewmodel.IntConverter" />
+
         <import type="com.pin.recommend.model.viewmodel.DateConverter" />
+
+        <import type="com.pin.recommend.model.viewmodel.ColorConverter" />
+
         <variable
             name="vm"
             type="com.pin.recommend.model.viewmodel.CharacterEditorViewModel" />
@@ -69,8 +74,8 @@
                                 android:layout_height="40dp"
                                 android:layout_centerInParent="true"
                                 android:layout_gravity="center"
-                                android:onClick="onSetIcon"
                                 android:imageBitmap="@{vm.iconWithDefaultImage}"
+                                android:onClick="onSetIcon"
                                 app:civ_border_color="#eeeeee"
                                 app:civ_border_width="2dp" />
                         </LinearLayout>
@@ -97,6 +102,130 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:labelFor="@id/preview_background_image"
+                            android:padding="6dp"
+                            android:text="背景画像" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#ffffff"
+                            android:orientation="vertical"
+                            android:padding="6dp">
+
+                            <LinearLayout
+                                android:layout_width="77dp"
+                                android:layout_height="138dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/border">
+
+                                <ImageView
+                                    android:id="@+id/preview_background_image"
+                                    android:layout_width="77dp"
+                                    android:layout_height="138dp"
+                                    android:layout_gravity="center"
+                                    android:alpha="@{vm.backgroundImageOpacity}"
+                                    android:onClick="onSetBackground"
+                                    android:src="@{vm.backgroundImage}" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/image_opacity_label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:labelFor="@id/image_opacity"
+                            android:text="背景画像の透明度"
+                            android:visibility="@{vm.isVisibleBackgroundImageOpacityView}" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#ffffff"
+                            android:orientation="vertical"
+                            android:visibility="@{vm.isVisibleBackgroundImageOpacityView}">
+
+                            <SeekBar
+                                android:id="@+id/image_opacity"
+                                android:layout_width="match_parent"
+                                android:layout_height="20dp"
+                                android:layout_margin="4dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:labelFor="@id/preview_background_color"
+                            android:text="背景のフィルターカラー" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#ffffff"
+                            android:orientation="vertical"
+                            android:padding="6dp">
+
+                            <ImageView
+                                android:id="@+id/preview_background_color"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/border"
+                                android:onClick="onSetBackgroundColor"
+                                android:padding="2dp"
+                                android:src="@{vm.backgroundColorToBitmap}" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:labelFor="@id/preview_text_color"
+                            android:text="テキスト色" />
+
+                        <LinearLayout
+                            android:padding="4dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#ffffff"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/preview_text_color"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/border"
+                                android:src='@{vm.homeTextColorToBitmap ?? ColorConverter.toBitmap("#444444")}'
+                                android:padding="2dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:labelFor="@id/preview_text_shadow"
+                            android:text="テキストのドロップシャドウ色" />
+
+                        <LinearLayout
+                            android:padding="4dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#ffffff"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/preview_text_shadow"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center"
+                                android:src='@{vm.homeTextShadowColorToBitmap}'
+                                android:background="@drawable/border"
+                                android:padding="2dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             android:labelFor="@id/created"
                             android:text="推し始めた日" />
 
@@ -108,9 +237,9 @@
 
                             <TextView
                                 android:id="@+id/created"
-                                android:onClick="onShowDatePickerDialog"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:onClick="onShowDatePickerDialog"
                                 android:paddingLeft="6dp"
                                 android:paddingTop="8dp"
                                 android:paddingRight="6dp"
@@ -223,9 +352,9 @@
                             android:orientation="vertical">
 
                             <LinearLayout
-                                android:onClick="onAddAnniversary"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:onClick="onAddAnniversary"
                                 android:orientation="horizontal">
 
                                 <TextView

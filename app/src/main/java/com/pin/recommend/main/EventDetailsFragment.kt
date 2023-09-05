@@ -222,19 +222,6 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.change_body_text_color -> {
-                val bodyTextPickerDialogFragment = ColorPickerDialogFragment(object : DialogActionListener<ColorPickerDialogFragment?> {
-                    override fun onDecision(dialog: ColorPickerDialogFragment?) {
-                        character.homeTextColor = dialog?.color
-                        characterViewModel.update(character)
-                    }
-
-                    override fun onCancel() {}
-                })
-                bodyTextPickerDialogFragment.setDefaultColor(character.getHomeTextColor())
-                bodyTextPickerDialogFragment.show(requireActivity().supportFragmentManager, ToolbarSettingDialogFragment.TAG)
-                return true
-            }
             R.id.edit_mode -> {
                 eventViewModel.isEditMode.value = eventViewModel.isEditMode.value != true
                 return true

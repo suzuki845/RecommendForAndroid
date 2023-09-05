@@ -1,14 +1,16 @@
 package com.pin.recommend.model.viewmodel
 
 import android.app.Application
+import android.view.View
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.map
 import com.pin.recommend.model.CharacterEditor
 import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.util.Progress
 
-class CharacterEditorViewModel(application: Application) : AndroidViewModel(application)  {
+class CharacterEditorViewModel(application: Application) : AndroidViewModel(application) {
     private val model = CharacterEditor(application)
 
     val name = model.name
@@ -23,7 +25,15 @@ class CharacterEditorViewModel(application: Application) : AndroidViewModel(appl
 
     val backgroundColor = model.backgroundColor
 
+    val backgroundColorToBitmap = model.backgroundColorToBitmap
+
     val homeTextColor = model.homeTextColor
+
+    val homeTextColorToBitmap = model.homeTextColorToBitmap
+
+    val homeTextShadowColor = model.homeTextShadowColor
+
+    val homeTextShadowColorToBitmap = model.homeTextShadowColorToBitmap
 
     val aboveText = model.aboveText
 
@@ -39,27 +49,29 @@ class CharacterEditorViewModel(application: Application) : AndroidViewModel(appl
 
     val backgroundImageOpacity = model.backgroundImageOpacity
 
-    val homeTextShadowColor = model.homeTextShadowColor
+    val isVisibleBackgroundImageOpacityView = backgroundImage.map {
+        if (it != null) View.VISIBLE else View.GONE
+    }
 
     val anniversaries = model.anniversaries
 
-    fun initialize(id: Long){
+    fun initialize(id: Long) {
         model.initialize(id)
     }
 
-    fun initialize(entity: CharacterWithAnniversaries?){
+    fun initialize(entity: CharacterWithAnniversaries?) {
         model.initialize(entity)
     }
 
-    fun addAnniversary(anniversary: CustomAnniversary.Draft){
+    fun addAnniversary(anniversary: CustomAnniversary.Draft) {
         model.addAnniversary(anniversary)
     }
 
-    fun replaceAnniversary(anniversary: CustomAnniversary.Draft){
+    fun replaceAnniversary(anniversary: CustomAnniversary.Draft) {
         model.replaceAnniversary(anniversary)
     }
 
-    fun removeAnniversary(pos: Int){
+    fun removeAnniversary(pos: Int) {
         model.removeAnniversary(pos)
     }
 
