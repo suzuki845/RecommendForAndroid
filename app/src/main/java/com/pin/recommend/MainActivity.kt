@@ -9,10 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModelProvider
 import com.pin.imageutil.CaptureConfig
 import com.pin.recommend.Constants.PREF_KEY_IS_LOCKED
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.viewmodel.AccountViewModel
+import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.util.PrefUtil
 import com.pin.util.Interstitial
 import com.pin.util.Reward
@@ -23,6 +25,10 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var accountViewModel: AccountViewModel
+
+    private val detailsVM: CharacterDetailsViewModel by lazy {
+        ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,10 +51,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         fixedCharacter.observe(this, Observer { character ->
-
             if (character != null) {
                 val characterDetailIntent = Intent(this@MainActivity, CharacterDetailActivity::class.java)
-                characterDetailIntent.putExtra(CharacterDetailActivity.INTENT_CHARACTER, character)
+                characterDetailIntent.putExtra(CharacterDetailActivity.INTENT_CHARACTER, character.id)
                 intents.add(characterDetailIntent)
             }
             if (isNeedPassCodeConfirmation && PrefUtil.getBoolean(PREF_KEY_IS_LOCKED)) {
@@ -57,16 +62,6 @@ class MainActivity : AppCompatActivity() {
             isNeedPassCodeConfirmation = false;
 
             val notification = NotificationChecker(applicationContext);
-            /*
-            val data = NotificationData(
-                R.drawable.emotion_diary,
-                "新アプリリリースのお知らせ",
-                "独り言をつぶやくように、簡単にその時の感情を記録できる、誰にも見られないチャット風の気分日記アプリです。" +
-                        "\n\n推して何日？のユーザーさんならこんなアプリがあったら楽しんでくれるんじゃないかなぁと思って作ってみました。" +
-                        "\n\n気分アイコン、背景を自由に設定できるので推し仕様にカスタマイズできたりします！" +
-                        "\n\n唐突な宣伝で申し訳ないのですが、是非インストールしてみてください！",
-                "https://play.google.com/store/apps/details?id=com.suzuki.emotiondiary")
-             */
             val data = NotificationData(
                 R.drawable.oshitimer,
                 "新アプリリリースのお知らせ",

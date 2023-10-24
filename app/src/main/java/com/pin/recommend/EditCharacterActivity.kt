@@ -168,7 +168,7 @@ class EditCharacterActivity : AppCompatActivity() {
                     }
                 }
             })
-            characterVM.homeTextColor.value?.let {
+            characterVM.homeTextShadowColor.value?.let {
                 dialog.setDefaultColor(it)
             }
             dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)

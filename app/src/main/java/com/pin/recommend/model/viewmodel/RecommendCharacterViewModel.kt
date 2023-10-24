@@ -38,10 +38,10 @@ class RecommendCharacterViewModel(application: Application) : AndroidViewModel(a
     }
 
     fun getCharacter(characterId: Long?): LiveData<RecommendCharacter?> {
-        if (character == null) {
-            character = characterDao.watchById(characterId!!)
+        if (characterId != null) {
+            character = characterDao.watchById(characterId)
         }
-        return character!!
+        return MutableLiveData(null)
     }
 
     fun insert(character: RecommendCharacter?) {

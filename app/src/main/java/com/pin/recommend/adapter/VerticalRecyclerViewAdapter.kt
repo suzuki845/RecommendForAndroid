@@ -25,20 +25,20 @@ import com.pin.recommend.model.viewmodel.StoryPictureViewModel
 import com.pin.recommend.model.viewmodel.StoryViewModel
 import java.util.*
 
-class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharacter) :
+class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharacter?) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var stories: List<Story> = ArrayList()
     private val storyPictureViewModel: StoryPictureViewModel
     private val storyViewModel: StoryViewModel
     private val fragment: Fragment
     private var isEditMode = false
-    private var character: RecommendCharacter
+    private var character: RecommendCharacter?
     fun setList(list: List<Story>) {
         stories = list
         notifyDataSetChanged()
     }
 
-    fun updateCharacter(character: RecommendCharacter) {
+    fun updateCharacter(character: RecommendCharacter?) {
         this.character = character
         notifyDataSetChanged()
     }
@@ -77,7 +77,8 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
         val story = stories[position]
         holder.createdView.text = story.formattedDate
         holder.createdView.setTextColor(character?.homeTextColor ?: Color.parseColor("#444444"))
-        holder.createdView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
+        character?.getHomeTextShadowColor()
+            ?.let { holder.createdView.setShadowLayer(4f, 0f, 0f, it) }
         val elapsedDay = story.getDiffDays(now)
         if (elapsedDay < 0) {
             holder.elapsedTimeView
@@ -90,10 +91,12 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
             }
         }
         holder.elapsedTimeView.setTextColor(character?.homeTextColor ?: Color.parseColor("#444444"))
-        holder.elapsedTimeView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
+        character?.getHomeTextShadowColor()
+            ?.let { holder.elapsedTimeView.setShadowLayer(4f, 0f, 0f, it) }
         holder.commentView.text = story.getShortComment(20)
         holder.commentView.setTextColor(character?.homeTextColor ?: Color.parseColor("#444444"))
-        holder.commentView.setShadowLayer(4f, 0f, 0f, character.getHomeTextShadowColor())
+        character?.getHomeTextShadowColor()
+            ?.let { holder.commentView.setShadowLayer(4f, 0f, 0f, it) }
         val delete = holder.deleteView
         if (isEditMode) {
             delete.visibility = View.VISIBLE

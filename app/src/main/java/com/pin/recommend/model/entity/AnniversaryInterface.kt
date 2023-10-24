@@ -12,3 +12,11 @@ interface AnniversaryInterface {
     fun isAnniversary(current: Date): Boolean
     fun getMessage(current: Date): String
 }
+
+data class Anniversary(
+    val name: String = "",
+    val topText: String = "",
+    val bottomText: String = "",
+    val elapsedDays: String = "",
+    val message: String = ""
+)

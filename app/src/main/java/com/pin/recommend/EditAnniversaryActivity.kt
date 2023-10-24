@@ -14,13 +14,16 @@ import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityEditAnniversaryBinding
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.AnniversaryEditorViewModel
+import kotlinx.android.synthetic.main.row_date_separated.view.*
 import java.util.*
 
 
 class EditAnniversaryActivity : AppCompatActivity() {
     companion object {
-        const val INTENT_EDIT_ANNIVERSARY = "com.suzuki.Recommend.CreateAnniversaryActivity.INTENT_EDIT_ANNIVERSARY"
+        const val INTENT_EDIT_ANNIVERSARY =
+            "com.suzuki.Recommend.CreateAnniversaryActivity.INTENT_EDIT_ANNIVERSARY"
     }
+
     private lateinit var binding: ActivityEditAnniversaryBinding
 
     private val anniversaryVm: AnniversaryEditorViewModel by lazy {
@@ -41,8 +44,8 @@ class EditAnniversaryActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
     }
 
-    private fun save(){
-        anniversaryVm.save ({
+    private fun save() {
+        anniversaryVm.save({
             val resultIntent = Intent()
             resultIntent.putExtra(INTENT_EDIT_ANNIVERSARY, it.toJson())
             setResult(RESULT_OK, resultIntent)
@@ -84,8 +87,16 @@ class EditAnniversaryActivity : AppCompatActivity() {
                 newCalender[year, month] = dayOfMonth
                 val date = newCalender.time
                 anniversaryVm.date.value = date
-            }, year, month, dayOfMonth)
-        datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
+            }, year, month, dayOfMonth
+        )
+        anniversaryVm.date.value?.let {
+            val c = Calendar.getInstance().apply { time = it }
+            datePickerDialog.datePicker.updateDate(
+                c.get(Calendar.YEAR),
+                c.get(Calendar.MONTH),
+                c.get(Calendar.DAY_OF_MONTH)
+            )
+        }
         datePickerDialog.show()
     }
 

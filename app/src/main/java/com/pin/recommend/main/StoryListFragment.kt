@@ -29,6 +29,7 @@ import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.dialog.ToolbarSettingDialogFragment
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
+import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.model.viewmodel.EditStateViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.recommend.model.viewmodel.StoryViewModel
@@ -41,7 +42,9 @@ class StoryListFragment : Fragment() {
     private lateinit var characterViewModel: RecommendCharacterViewModel
     private lateinit var editListViewModel: EditStateViewModel
     private lateinit var sortView: TextView
-    private lateinit var character: RecommendCharacter
+    private val detailsVM: CharacterDetailsViewModel by lazy {
+        ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,8 +58,8 @@ class StoryListFragment : Fragment() {
         characterViewModel =
             ViewModelProvider(requireActivity()).get(RecommendCharacterViewModel::class.java)
         editListViewModel = ViewModelProvider(this).get(EditStateViewModel::class.java)
-        character =
-            requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
+        val characterId =
+            requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
 
         setHasOptionsMenu(true)
     }
@@ -67,6 +70,8 @@ class StoryListFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_story_list, container, false)
 
+        val character = detailsVM.character.value
+
         sortView = root.findViewById(R.id.sort)
         sortView.setOnClickListener(View.OnClickListener {
             val popup = PopupMenu(requireContext(), sortView)
@@ -75,13 +80,11 @@ class StoryListFragment : Fragment() {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.order_desc -> {
-                        character.storySortOrder = 0
-                        characterViewModel.update(character)
+                        detailsVM.updateStorySortOrder(0)
                         return@OnMenuItemClickListener true
                     }
                     R.id.order_asc -> {
-                        character.storySortOrder = 1
-                        characterViewModel.update(character)
+                        detailsVM.updateStorySortOrder(1)
                         return@OnMenuItemClickListener true
                     }
                 }
@@ -90,11 +93,10 @@ class StoryListFragment : Fragment() {
         })
 
         verticalRecyclerViewAdapter = VerticalRecyclerViewAdapter(this, character)
-        val characterLiveData = characterViewModel.getCharacter(character.id)
+        val characterLiveData = characterViewModel.getCharacter(character?.id)
 
         Transformations.switchMap(characterLiveData) {
-            if(it == null) return@switchMap MutableLiveData()
-            this.character = it
+            if (it == null) return@switchMap MutableLiveData()
             sortView.setTextColor(it.getHomeTextColor())
             val isAsc = it.storySortOrder == 1
             if (isAsc) {

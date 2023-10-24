@@ -16,10 +16,11 @@ import com.pin.recommend.model.entity.RecommendCharacter
 import kotlinx.coroutines.launch
 import java.util.*
 
-class EventDetailsViewModel(application: Application) : AndroidViewModel(application)  {
+class EventDetailsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val eventDao: EventDao = AppDatabase.getDatabase(application).eventDao()
-    private val characterDao: RecommendCharacterDao = AppDatabase.getDatabase(application).recommendCharacterDao()
+    private val characterDao: RecommendCharacterDao =
+        AppDatabase.getDatabase(application).recommendCharacterDao()
     private val monthlyEventModel by lazy {
         CharacterMonthlyEventModel(eventDao, characterDao)
     }
@@ -35,6 +36,9 @@ class EventDetailsViewModel(application: Application) : AndroidViewModel(applica
     fun prevMonth() = monthlyEventModel.prevMonth()
 
     fun setCharacter(character: RecommendCharacter) = monthlyEventModel.setCharacter(character)
+
+    fun setCharacter(id: Long) = monthlyEventModel.setCharacter(id)
+
 
     fun setCurrentDate(date: Date) = monthlyEventModel.setCurrentDate(date)
 

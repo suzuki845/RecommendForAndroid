@@ -1,19 +1,25 @@
 package com.pin.recommend.model.entity
 
-import androidx.core.graphics.createBitmap
 import com.pin.recommend.model.value.PeriodType
 import com.pin.recommend.util.TimeUtil
+import java.time.Year
 import java.util.*
 
 
-class UserDefinedAnniversary: AnniversaryInterface {
+class UserDefinedAnniversary : AnniversaryInterface {
     private val name: String
     private val date: Date
     private val isZeroDayStart: Boolean
     private val topText: String
     private val bottomText: String
 
-    constructor(name: String, date: Date, isZeroDayStart: Boolean, topText: String = "", bottomText: String = ""){
+    constructor(
+        name: String,
+        date: Date,
+        isZeroDayStart: Boolean,
+        topText: String = "",
+        bottomText: String = ""
+    ) {
         this.name = name
         this.isZeroDayStart = isZeroDayStart
         this.date = date
@@ -22,7 +28,7 @@ class UserDefinedAnniversary: AnniversaryInterface {
         this.bottomText = bottomText
     }
 
-    override fun getName(): String{
+    override fun getName(): String {
         return name
     }
 
@@ -34,28 +40,32 @@ class UserDefinedAnniversary: AnniversaryInterface {
         return bottomText
     }
 
-    fun getDate() : Date{
+    fun getDate(): Date {
         return date
     }
 
     override fun getElapsedDays(current: Date): Long {
-        val now = Calendar.getInstance().apply { time = TimeUtil.resetDate(current)}
-        val anniversary = Calendar.getInstance().apply { time = getDate()}
+        val now = Calendar.getInstance().apply { time = TimeUtil.resetDate(current) }
+        val anniversary = Calendar.getInstance().apply { time = getDate() }
         return TimeUtil.getDiffDays(now, anniversary)
     }
 
-    override fun getRemainingDays(current: Date) : Long?{
-        val now = Calendar.getInstance()
-        now.time = current
-        TimeUtil.resetTime(now)
-
-        val anniversary = Calendar.getInstance().apply { time = getDate() }
-        val remaining = TimeUtil.getDiffDays(now, anniversary)
-
-        if(remaining > 0){
-            return 365 - remaining
+    override fun getRemainingDays(current: Date): Long? {
+        val now = Calendar.getInstance().apply {
+            time = current
         }
-        return -remaining
+        val anniversary = Calendar.getInstance().apply {
+            time = date
+            set(Calendar.YEAR, now.get(Calendar.YEAR))
+        }
+        TimeUtil.resetTime(now)
+        TimeUtil.resetTime(anniversary)
+
+        val duration = TimeUtil.duration(now, anniversary)
+        if(duration.isNegative){
+            return 365 + duration.toDays()
+        }
+        return duration.toDays()
     }
 
     override fun isAnniversary(current: Date): Boolean {
@@ -66,21 +76,21 @@ class UserDefinedAnniversary: AnniversaryInterface {
                 && cc.get(Calendar.DAY_OF_MONTH) == ac.get(Calendar.DAY_OF_MONTH)
     }
 
-    override fun getMessage(current: Date) : String{
-        if(isAnniversary(current)){
+    override fun getMessage(current: Date): String {
+        if (isAnniversary(current)) {
             return getName() + "記念になりました！"
         }
 
         val remaining = getRemainingDays(current)
-        if(remaining != null){
-            return "${getName()}記念まであと ${current} 日"
+        if (remaining != null) {
+            return "${getName()}まであと $remaining 日"
         }
         return ""
     }
 
 }
 
-class SystemDefinedAnniversary: AnniversaryInterface {
+class SystemDefinedAnniversary : AnniversaryInterface {
 
     private val name: String
     private val startDate = Calendar.getInstance()
@@ -90,7 +100,15 @@ class SystemDefinedAnniversary: AnniversaryInterface {
     private val topText: String
     private val bottomText: String
 
-    constructor(name: String, startDate: Date, periodType: PeriodType, farInAdvance: Int, isZeroDayStart: Boolean, topText: String, bottomText: String){
+    constructor(
+        name: String,
+        startDate: Date,
+        periodType: PeriodType,
+        farInAdvance: Int,
+        isZeroDayStart: Boolean,
+        topText: String,
+        bottomText: String
+    ) {
         this.name = name
         this.startDate.time = startDate
         this.periodType = periodType
@@ -101,7 +119,7 @@ class SystemDefinedAnniversary: AnniversaryInterface {
         this.bottomText = bottomText
     }
 
-    override fun getName(): String{
+    override fun getName(): String {
         return name
     }
 
@@ -113,7 +131,7 @@ class SystemDefinedAnniversary: AnniversaryInterface {
         return bottomText
     }
 
-    fun getDate() : Date{
+    fun getDate(): Date {
         val anniversary = Calendar.getInstance()
         anniversary.time = startDate.time
         if (!isZeroDayStart) {
@@ -134,12 +152,12 @@ class SystemDefinedAnniversary: AnniversaryInterface {
     }
 
     override fun getElapsedDays(current: Date): Long {
-        val now = Calendar.getInstance().apply { time = TimeUtil.resetDate(current)}
-        val anniversary = Calendar.getInstance().apply { time = getDate()}
+        val now = Calendar.getInstance().apply { time = TimeUtil.resetDate(current) }
+        val anniversary = Calendar.getInstance().apply { time = getDate() }
         return TimeUtil.getDiffDays(now, anniversary)
     }
 
-    override fun getRemainingDays(current: Date) : Long?{
+    override fun getRemainingDays(current: Date): Long? {
         val now = Calendar.getInstance()
         now.time = current
         TimeUtil.resetTime(now)
@@ -147,7 +165,7 @@ class SystemDefinedAnniversary: AnniversaryInterface {
         val anniversary = Calendar.getInstance().apply { time = getDate() }
         val remaining = TimeUtil.getDiffDays(anniversary, now)
 
-        if(remaining < 0){
+        if (remaining < 0) {
             return null
         }
         return remaining
@@ -163,51 +181,71 @@ class SystemDefinedAnniversary: AnniversaryInterface {
 
 }
 
-class SystemDefinedAnniversaries: AnniversaryInterface {
+class SystemDefinedAnniversaries : AnniversaryInterface {
 
     private var character: RecommendCharacter
 
     private val anniversaries: MutableList<SystemDefinedAnniversary> = mutableListOf()
 
-    constructor(character: RecommendCharacter){
+    constructor(character: RecommendCharacter) {
         this.character = character
     }
 
-    fun initialize(){
+    fun initialize() {
         val created = Calendar.getInstance()
         created.time = character.created
         TimeUtil.resetTime(created)
         anniversaries.clear()
-        for (i in 1..18){
+        for (i in 1..18) {
             val unit = i * 100
-            anniversaries.add(SystemDefinedAnniversary("${unit}日", startDate = created.time, periodType = PeriodType.Days, farInAdvance = unit, isZeroDayStart = character.isZeroDayStart, topText = character.aboveText ?: "", bottomText = character.belowText ?: ""))
+            anniversaries.add(
+                SystemDefinedAnniversary(
+                    "${unit}日",
+                    startDate = created.time,
+                    periodType = PeriodType.Days,
+                    farInAdvance = unit,
+                    isZeroDayStart = character.isZeroDayStart,
+                    topText = character.aboveText ?: "",
+                    bottomText = character.belowText ?: ""
+                )
+            )
         }
-        for (i in 1..100){
+        for (i in 1..100) {
             val unit = i
-            anniversaries.add(SystemDefinedAnniversary("${unit}周年", startDate = created.time, periodType = PeriodType.Year, farInAdvance = unit, isZeroDayStart = character.isZeroDayStart, topText = character.aboveText ?: "", bottomText = character.belowText ?: ""))
+            anniversaries.add(
+                SystemDefinedAnniversary(
+                    "${unit}周年",
+                    startDate = created.time,
+                    periodType = PeriodType.Year,
+                    farInAdvance = unit,
+                    isZeroDayStart = character.isZeroDayStart,
+                    topText = character.aboveText ?: "",
+                    bottomText = character.belowText ?: ""
+                )
+            )
         }
     }
 
-    private fun getNextAnniversary(current: Date) : SystemDefinedAnniversary?{
+    private fun getNextAnniversary(current: Date): SystemDefinedAnniversary? {
         val c = Calendar.getInstance()
         c.time = current
-        return anniversaries.firstOrNull{
+        return anniversaries.firstOrNull {
             it.getDate() > c.time
         }
     }
 
-    private fun getCurrentAnniversary(current: Date): SystemDefinedAnniversary?{
-        val isInAnniversary = anniversaries.firstOrNull{
+    private fun getCurrentAnniversary(current: Date): SystemDefinedAnniversary? {
+        val isInAnniversary = anniversaries.firstOrNull {
             it.isAnniversary(current)
         }
-        if(isInAnniversary != null){
+        if (isInAnniversary != null) {
             return isInAnniversary
         }
         return getNextAnniversary(current)
     }
 
-    override fun isAnniversary(current: Date): Boolean{
-        return anniversaries.find{
+    override fun isAnniversary(current: Date): Boolean {
+        return anniversaries.find {
             it.isAnniversary(current)
         } != null
     }
@@ -232,13 +270,13 @@ class SystemDefinedAnniversaries: AnniversaryInterface {
         return character.getElapsedDays(current)
     }
 
-    override fun getMessage(current: Date) : String{
-        val isToday = anniversaries.find{
+    override fun getMessage(current: Date): String {
+        val isToday = anniversaries.find {
             it.isAnniversary(current)
         }?.let {
             it.getName()
         }
-        if(isToday != null){
+        if (isToday != null) {
             return isToday + "記念になりました！"
         }
 

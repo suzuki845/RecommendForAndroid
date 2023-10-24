@@ -4,6 +4,6 @@
     <item
         android:id="@+id/save"
         android:orderInCategory="1"
-        android:title="スクリーンショット"
+        android:title="保存"
         app:showAsAction="ifRoom" />
 </menu>

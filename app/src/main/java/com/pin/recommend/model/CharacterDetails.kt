@@ -7,81 +7,46 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import com.google.gson.Gson
+import com.pin.recommend.model.dao.AccountDao
 import com.pin.recommend.model.dao.CustomAnniversaryDao
 import com.pin.recommend.model.dao.RecommendCharacterDao
-import com.pin.recommend.model.entity.AnniversaryInterface
-import com.pin.recommend.model.entity.SystemDefinedAnniversaries
-import com.pin.recommend.model.entity.UserDefinedAnniversary
+import com.pin.recommend.model.entity.*
 import com.pin.recommend.util.combine2
+import com.pin.recommend.util.combine3
 import java.util.*
-
-data class CharacterDetailsState(
-    val characterId: Long,
-    val iconImage: Bitmap?,
-    val characterName: String,
-    val topText: String,
-    val bottomText: String,
-    val elapsedDays: Long,
-    val anniversaryMessage: String,
-    val fontFamily: String?,
-    val textColor: Int,
-    val textShadowColor: Int
-)
 
 class CharacterDetails(
     private val context: Context,
+    private val accountDao: AccountDao,
     private val characterDao: RecommendCharacterDao,
-    private val customAnniversaryDao: CustomAnniversaryDao,
 ) {
 
-    private val _id = MutableLiveData<Long?>()
 
-    fun setId(id: Long?) {
-        _id.value = id
-    }
+    val id = MutableLiveData<Long?>()
 
     private val _displayOnHomeAnniversaries = MutableLiveData<List<AnniversaryInterface>>(listOf())
 
-    val character = _id.switchMap {
-        return@switchMap characterDao.watchById(it ?: -1)
+    val cwa = id.switchMap {
+        return@switchMap characterDao.watchByIdCharacterWithAnniversaries(it ?: -1)
     }
 
-    private val systemDefinedAnniversaries: LiveData<AnniversaryInterface?> = character.map {character ->
-        if(character == null) return@map null
-        return@map SystemDefinedAnniversaries(character).apply { initialize() }
+    private val account = accountDao.findTrackedById(Account.ACCOUNT_ID.toLong())
+
+    private val displayOnHomeAnniversary = _displayOnHomeAnniversaries.map {
+        val a = it.firstOrNull()
+        Anniversary(
+            a?.getName() ?: "",
+            a?.getTopText() ?: "",
+            a?.getBottomText() ?: "",
+            a?.getElapsedDays(Date())?.let { d -> "${d}日" } ?: "",
+            a?.getMessage(Date()) ?: ""
+        )
     }
-
-    private val userDefinedAnniversaries: LiveData<List<AnniversaryInterface>> =
-        character.switchMap { character ->
-            if (character == null) return@switchMap MutableLiveData(listOf())
-            return@switchMap customAnniversaryDao.watchByCharacterId(character.id).map { list ->
-                return@map list.map {
-                    return@map UserDefinedAnniversary(
-                        name = it.name,
-                        date = it.date,
-                        isZeroDayStart = character.isZeroDayStart,
-                        topText = it.topText ?: "",
-                        bottomText = it.bottomText ?: ""
-                    )
-                }
-            }
-        }
-
-    private val allAnniversaries: LiveData<List<AnniversaryInterface>> =
-        combine2(systemDefinedAnniversaries, userDefinedAnniversaries) { a, b ->
-            val result = arrayListOf<AnniversaryInterface>()
-            if (a != null) {
-                result.add(a)
-            }
-            result.addAll(b ?: arrayListOf())
-            return@combine2 result
-        }
-
-    private val displayOnHomeAnniversary = _displayOnHomeAnniversaries.map { it.firstOrNull() }
 
     fun changeDisplayOnHomeAnniversary() {
         val current = LinkedList<AnniversaryInterface>()
-        allAnniversaries.value?.forEach {
+        _displayOnHomeAnniversaries.value?.forEach {
             current.add(it)
         }
         current.addFirst(current.removeLast())
@@ -89,25 +54,58 @@ class CharacterDetails(
     }
 
     fun initialize() {
-        //_displayOnHomeAnniversaries.value = allAnniversaries.value ?: listOf()
-        allAnniversaries.observeForever {
-            _displayOnHomeAnniversaries.value = it
+        cwa.observeForever {
+            _displayOnHomeAnniversaries.value = it?.anniversaries()
         }
     }
 
-    val state = combine2(character, allAnniversaries.map { it.firstOrNull() }) { a, b ->
-        return@combine2 CharacterDetailsState(
-            a?.id ?: -1,
-            a?.getIconImage(context, 500, 500),
-            a?.name ?: "",
-            b?.getTopText() ?: "",
-            b?.getTopText() ?: "",
-            b?.getElapsedDays(Date()) ?: -1,
-            b?.getMessage(Date()) ?: "",
-            a?.fontFamily,
-            a?.homeTextColor ?: Color.BLACK,
-            a?.homeTextShadowColor ?: Color.parseColor("#00000000")
+    val state = combine3(account, cwa, displayOnHomeAnniversary) { a, b, c ->
+        return@combine3 State(
+            b?.id ?: -1,
+            a?.fixedCharacterId != null,
+            b?.character?.name ?: "",
+            b?.appearance(context) ?: Appearance(),
+            c ?: Anniversary(),
+            b?.character?.storySortOrder ?: 0
         )
+    }
+
+    fun pinning() {
+        val account = accountDao.findById(Account.ACCOUNT_ID.toLong())
+        account.fixedCharacterId = id.value
+        AppDatabase.executor.execute { accountDao.updateAccount(account) }
+    }
+
+    fun unpinning() {
+        val account = accountDao.findById(Account.ACCOUNT_ID.toLong())
+        account.fixedCharacterId = null
+        AppDatabase.executor.execute { accountDao.updateAccount(account) }
+    }
+
+    fun updateStorySortOrder(order: Int) {
+        val character = cwa.value?.character
+        character?.storySortOrder = 0
+        AppDatabase.executor.execute { characterDao.updateCharacter(character) }
+    }
+
+
+    data class State(
+        val characterId: Long,
+        val isPinning: Boolean = false,
+        val characterName: String,
+        val appearance: Appearance,
+        val anniversary: Anniversary,
+        val storySortOrder: Int,
+    ){
+        fun toJson(): String {
+            return Gson().toJson(this)
+        }
+
+        companion object {
+            fun fromJson(json: String): State {
+                return Gson().fromJson(json, State::class.java)
+            }
+        }
     }
 
 }

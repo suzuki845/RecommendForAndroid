@@ -27,6 +27,10 @@ class CustomAnniversary(
     val bottomText: String?,
 ) {
 
+    fun toUserDefinedAnniversary(isZeroDayStart: Boolean): UserDefinedAnniversary {
+        return UserDefinedAnniversary(name, date, isZeroDayStart, topText ?: "", bottomText ?: "")
+    }
+
     fun toDraft(): Draft {
         return Draft(id, characterId, date, uuid, name, topText, bottomText)
     }
@@ -42,7 +46,7 @@ class CustomAnniversary(
         var bottomText: String?,
     ) {
 
-        fun toFinal(): CustomAnniversary{
+        fun toFinal(): CustomAnniversary {
             return CustomAnniversary(id, characterId, date, uuid, name, topText, bottomText)
         }
 
@@ -50,8 +54,8 @@ class CustomAnniversary(
             return Gson().toJson(this)
         }
 
-        companion object{
-            fun fromJson(json: String): Draft{
+        companion object {
+            fun fromJson(json: String): Draft {
                 return Gson().fromJson(json, Draft::class.java)
             }
         }

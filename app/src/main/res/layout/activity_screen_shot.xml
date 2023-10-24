@@ -1,46 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".CharacterDetailActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
 
-    <ImageView
-        android:id="@+id/backgroundImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:elevation="-1dp" />
+        <import type="com.pin.recommend.model.viewmodel.IntConverter" />
 
-    <FrameLayout
-        android:id="@+id/backgroundColor"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0.7" />
+        <import type="com.pin.recommend.model.viewmodel.DateConverter" />
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bar"
-        app:elevation="0dp">
+        <import type="com.pin.recommend.model.viewmodel.ColorConverter" />
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:theme="@style/ToolBarStyle" />
-
-    </com.google.android.material.appbar.AppBarLayout>
+        <variable
+            name="state"
+            type="com.pin.recommend.model.CharacterDetails.State" />
+    </data>
 
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context=".CharacterDetailActivity">
+
+
+        <ImageView
+            android:id="@+id/backgroundImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@{state.appearance.backgroundImage}"
+            android:elevation="-1dp" />
+
+        <FrameLayout
+            android:id="@+id/backgroundColor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@{state.appearance.backgroundColor}"
+            android:alpha="@{state.appearance.backgroundImageOpacity}" />
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bar"
+            app:elevation="0dp">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:theme="@style/ToolBarStyle" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -52,6 +68,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="-200dp"
                 android:background="@drawable/icon_background"
+                android:imageBitmap="@{state.appearance.iconImage}"
                 android:src="@drawable/ic_person_300dp"
                 app:civ_border_color="#eeeeee"
                 app:civ_border_width="2dp" />
@@ -69,14 +86,23 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:padding="4dp"
+                    android:shadowRadius="3"
+                    android:textColor="@{state.appearance.homeTextColor}"
+                    android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                    android:typeface="@{state.appearance.typeface}"
+                    android:text="@{state.characterName}"
                     android:textSize="26sp" />
 
                 <TextView
-                    android:id="@+id/first_text"
+                    android:id="@+id/top_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="と出会ってから"
+                    android:shadowRadius="3"
+                    android:textColor="@{state.appearance.homeTextColor}"
+                    android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                    android:typeface="@{state.appearance.typeface}"
+                    android:text="@{state.anniversary.topText}"
                     android:textSize="20sp" />
 
                 <TextView
@@ -85,14 +111,24 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:padding="4dp"
+                    android:shadowRadius="3"
+                    android:textColor="@{state.appearance.homeTextColor}"
+                    android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                    android:typeface="@{state.appearance.typeface}"
+                    android:text="@{state.anniversary.elapsedDays}"
                     android:textSize="34sp" />
 
                 <TextView
-                    android:id="@+id/created"
+                    android:id="@+id/bottom_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:padding="4dp"
+                    android:shadowRadius="3"
+                    android:textColor="@{state.appearance.homeTextColor}"
+                    android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                    android:typeface="@{state.appearance.typeface}"
+                    android:text="@{state.anniversary.bottomText}"
                     android:textSize="20sp" />
 
                 <TextView
@@ -101,13 +137,15 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:padding="4dp"
-                    android:text="test"
+                    android:shadowRadius="3"
+                    android:textColor="@{state.appearance.homeTextColor}"
+                    android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                    android:typeface="@{state.appearance.typeface}"
+                    android:text="@{state.anniversary.message}"
                     android:textSize="20sp" />
             </LinearLayout>
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

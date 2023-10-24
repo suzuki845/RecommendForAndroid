@@ -20,6 +20,7 @@ import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.dialog.ToolbarSettingDialogFragment
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
+import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.model.viewmodel.PaymentDetailsViewModel
 import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import java.util.*
@@ -41,11 +42,9 @@ class PaymentDetailsFragment : Fragment() {
         ViewModelProvider(this).get(PaymentDetailsViewModel::class.java)
     }
 
-    private val characterViewModel: RecommendCharacterViewModel by lazy {
-        ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
+    private val detailsVM: CharacterDetailsViewModel by lazy {
+        ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
     }
-
-    private lateinit var character: RecommendCharacter
 
     private lateinit var  binding: FragmentPaymentDetailsBinding
 
@@ -53,13 +52,8 @@ class PaymentDetailsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-        }
-        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
-        if(character != null){
-            //paymentViewModel.characterId.value = character.id
-            paymentViewModel.setCharacterId(character.id)
-        }
+        val characterId = requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+        paymentViewModel.setCharacterId(characterId)
         paymentViewModel.setCurrentDate(Date())
         adapter = DateSeparatedPaymentAdapter(this, onDelete = {
             val dialog = DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
@@ -86,10 +80,7 @@ class PaymentDetailsFragment : Fragment() {
             paymentViewModel.monthlyPayment.observe(viewLifecycleOwner, Observer {
                 adapter.setList(it)
                 val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
-                //val dividerItemDecoration = DividerItemDecoration(requireContext(), LinearLayoutManager(requireContext()).orientation)
-                //paymentRecycleView.addItemDecoration(dividerItemDecoration)
                 paymentRecycleView.layoutManager = layoutManager
-                //paymentRecycleView.setHasFixedSize(false)
                 paymentRecycleView.adapter = adapter
             })
 
@@ -101,8 +92,8 @@ class PaymentDetailsFragment : Fragment() {
         val fab: FloatingActionButton = binding.root.findViewById(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(activity, CreatePaymentActivity::class.java)
-            val character = requireActivity().intent.getParcelableExtra<RecommendCharacter>(CharacterDetailActivity.INTENT_CHARACTER)
-            intent.putExtra(CreatePaymentActivity.INTENT_CREATE_PAYMENT, character?.id)
+            val characterId = requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+            intent.putExtra(CreatePaymentActivity.INTENT_CREATE_PAYMENT, characterId)
             startActivity(intent)
         }
 
