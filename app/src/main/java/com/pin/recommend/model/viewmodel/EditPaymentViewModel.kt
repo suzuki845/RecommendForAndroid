@@ -29,7 +29,7 @@ class EditPaymentViewModel(application: Application) : AndroidViewModel(applicat
     val paymentAndTag = MutableLiveData<PaymentAndTag>()
 
     val tags
-        get() = Transformations.switchMap(paymentAndTag) {paymentAndTag ->
+        get() = paymentAndTag.switchMap {paymentAndTag ->
             _tags.map { paymentTags ->
                 paymentTags.filter {
                     it.type == paymentAndTag.payment.type

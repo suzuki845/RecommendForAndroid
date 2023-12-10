@@ -2,6 +2,7 @@ package com.pin.recommend.model.entity;
 
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -127,36 +128,12 @@ public class RecommendCharacter implements Parcelable {
         return belowText != null ? belowText : "になりました";
     }
 
-    public boolean saveIconImage(Context context, Bitmap bitmap) {
-        if (BitmapUtility.fileExistsByPrivate(context, iconImageUri)) {
-            BitmapUtility.deletePrivateImage(context, iconImageUri);
-        }
-
-        String filename = BitmapUtility.generateFilename();
-        String ext = ".png";
-        boolean success = BitmapUtility.insertPrivateImage(context, bitmap, filename, ext);
-
-        iconImageUri = filename + ext;
-        return success;
-    }
-
-    public boolean saveBackgroundImage(Context context, Bitmap bitmap) {
-        if (backgroundImageUri != null && BitmapUtility.fileExistsByPrivate(context, backgroundImageUri)) {
-            BitmapUtility.deletePrivateImage(context, backgroundImageUri);
-        }
-
-        String filename = BitmapUtility.generateFilename();
-        String ext = ".png";
-        boolean success = BitmapUtility.insertPrivateImage(context, bitmap, filename, ext);
-
-        backgroundImageUri = filename + ext;
-        return success;
-    }
-
     public Bitmap getIconImage(Context context, int width, int height) {
         Bitmap bitmap;
+
         if (iconImageUri == null) {
-            return null;
+            Drawable d = context.getDrawable(R.drawable.ic_person_300dp);
+            return BitmapUtility.drawableToBitmap(d);
         }
 
         bitmap = BitmapUtility.readPrivateImage(context, iconImageUri, width, height);

@@ -16,9 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityCreateEventBinding
 import com.pin.recommend.databinding.ActivityEditEventBinding
 import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.entity.Event
-import com.pin.recommend.model.viewmodel.AccountViewModel
-import com.pin.recommend.model.viewmodel.CreateEventViewModel
 import com.pin.recommend.model.viewmodel.EditEventViewModel
 import com.pin.recommend.util.TimeUtil
 import java.util.*
@@ -37,7 +34,6 @@ class EditEventActivity : AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
 
-    private lateinit var accountViewModel: AccountViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,9 +50,6 @@ class EditEventActivity : AppCompatActivity() {
 
         toolbar = findViewById(R.id.toolbar)
 
-        accountViewModel = MyApplication.getAccountViewModel(this)
-        val accountLiveData = accountViewModel.accountLiveData
-        accountLiveData.observe(this, Observer { account -> initializeToolbar(account) })
     }
 
     private fun initializeToolbar(account: Account?) {

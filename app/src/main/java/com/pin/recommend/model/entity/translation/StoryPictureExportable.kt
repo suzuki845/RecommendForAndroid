@@ -4,7 +4,7 @@ import com.pin.recommend.model.entity.StoryPicture
 
 class StoryPictureExportable {
 
-    var src: String
+    var src: String?
 
     constructor(picture: StoryPicture){
         src = picture.uri

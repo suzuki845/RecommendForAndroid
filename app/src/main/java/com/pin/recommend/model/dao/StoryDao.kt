@@ -2,7 +2,6 @@ package com.pin.recommend.model.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.Story
 import com.pin.recommend.model.entity.StoryWithPictures
 
@@ -21,29 +20,29 @@ interface StoryDao {
     fun deleteAll()
 
     @Query("SELECT * FROM Story")
-    fun findByAll(): List<Story>
+    fun findAll(): List<Story>
 
     @Query("SELECT * FROM Story WHERE id = :id")
     fun findById(id: Long): Story?
 
     @Query("SELECT * FROM Story WHERE id = :id")
-    fun findByTrackedId(id: Long): LiveData<Story>
+    fun watchById(id: Long): LiveData<Story>
 
     @Query("SELECT * FROM Story WHERE characterId = :characterId")
     fun findByCharacterId(characterId: Long): List<Story>
 
     @Query("SELECT * FROM Story WHERE characterId = :characterId ORDER BY created DESC")
-    fun findByTrackedCharacterIdOrderDesc(characterId: Long): LiveData<List<Story>>
+    fun watchByCharacterIdOrderDesc(characterId: Long): LiveData<List<Story>>
 
     @Query("SELECT * FROM Story WHERE characterId = :characterId ORDER BY created ASC")
-    fun findByTrackedCharacterIdOrderAsc(characterId: Long): LiveData<List<Story>>
+    fun watchByCharacterIdOrderAsc(characterId: Long): LiveData<List<Story>>
 
     @Query(
         "SELECT * FROM Story WHERE characterId = :characterId " +
                 "ORDER BY CASE WHEN :isAsc = 1 THEN created END ASC, " +
                 "CASE WHEN :isAsc = 0 THEN created END DESC"
     )
-    fun findByTrackedCharacterIdOrderByCreated(
+    fun watchByCharacterIdOrderByCreated(
         characterId: Long,
         isAsc: Boolean
     ): LiveData<List<Story>>
@@ -51,9 +50,13 @@ interface StoryDao {
     @Transaction
     @Query(
         "SELECT * FROM Story " +
-                "WHERE characterId = :characterId"
+                "WHERE characterId = :characterId " +
+                "ORDER BY CASE WHEN :isAsc = 1 THEN created END ASC, " +
+                "CASE WHEN :isAsc = 0 THEN created END DESC"
     )
-    fun watchByCharacterIdStoryWithPictures(characterId: Long): LiveData<List<StoryWithPictures>>
+    fun watchByCharacterIdStoryWithPictures(
+        characterId: Long, isAsc: Boolean
+    ): LiveData<List<StoryWithPictures>>
 
     @Transaction
     @Query(

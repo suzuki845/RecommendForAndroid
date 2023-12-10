@@ -18,8 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStore;
 import androidx.lifecycle.ViewModelStoreOwner;
-
-import com.pin.recommend.model.viewmodel.AccountViewModel;
 import com.pin.recommend.util.PrefUtil;
 import com.pin.util.Reward;
 
@@ -72,10 +70,6 @@ public class MyApplication extends android.app.Application implements ViewModelS
     @Override
     public ViewModelStore getViewModelStore() {
         return viewModelStore;
-    }
-
-    public static AccountViewModel getAccountViewModel(AppCompatActivity activity){
-        return new ViewModelProvider((MyApplication)activity.getApplication(), activity.getDefaultViewModelProviderFactory()).get(AccountViewModel.class);
     }
 
 

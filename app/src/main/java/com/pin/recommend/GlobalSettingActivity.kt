@@ -22,7 +22,6 @@ import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.BackupExportModel
 import com.pin.recommend.model.BackupImportModel
 import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.util.PrefUtil
 import com.pin.util.Reward
 import com.pin.util.reward.RewardDialogFragment
@@ -33,8 +32,6 @@ import kotlinx.coroutines.launch
 class GlobalSettingActivity : AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
-
-    private lateinit var accountViewModel: AccountViewModel
 
     private lateinit var passCodeRock: Switch
 
@@ -66,10 +63,6 @@ class GlobalSettingActivity : AppCompatActivity() {
                 showReward.visibility = View.GONE
             }
         }
-
-        accountViewModel = MyApplication.getAccountViewModel(this)
-        val accountLiveData = accountViewModel.accountLiveData
-        accountLiveData.observe(this, Observer { account -> initializeToolbar(account) })
 
         passCodeRock = findViewById(R.id.passcode_rock)
     }

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,23 +16,21 @@ import com.pin.recommend.R
 import com.pin.recommend.StoryDetailActivity
 import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
-import com.pin.recommend.main.StoryListFragment
 import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.entity.Story
 import com.pin.recommend.model.entity.StoryPicture
-import com.pin.recommend.model.viewmodel.StoryPictureViewModel
-import com.pin.recommend.model.viewmodel.StoryViewModel
+import com.pin.recommend.model.entity.StoryWithPictures
+import com.pin.recommend.model.viewmodel.StoryDetailsViewModel
+import com.pin.recommend.model.viewmodel.StoryListViewModel
 import java.util.*
 
 class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharacter?) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var stories: List<Story> = ArrayList()
-    private val storyPictureViewModel: StoryPictureViewModel
-    private val storyViewModel: StoryViewModel
+    private var stories: List<StoryWithPictures> = ArrayList()
+    private val storyListViewModel: StoryListViewModel
     private val fragment: Fragment
     private var isEditMode = false
     private var character: RecommendCharacter?
-    fun setList(list: List<Story>) {
+    fun setList(list: List<StoryWithPictures>) {
         stories = list
         notifyDataSetChanged()
     }
@@ -61,11 +58,8 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
     private val now = Calendar.getInstance()
 
     init {
-        storyViewModel = ViewModelProvider(fragment.requireActivity()).get(
-            StoryViewModel::class.java
-        )
-        storyPictureViewModel = ViewModelProvider(fragment.requireActivity()).get(
-            StoryPictureViewModel::class.java
+        storyListViewModel = ViewModelProvider(fragment.requireActivity()).get(
+            StoryListViewModel::class.java
         )
         this.fragment = fragment
         this.character = character
@@ -75,14 +69,13 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
         val holder = h as HorizontalRecycleViewHolder
 
         val story = stories[position]
-        holder.createdView.text = story.formattedDate
+        holder.createdView.text = story.story.formattedDate
         holder.createdView.setTextColor(character?.homeTextColor ?: Color.parseColor("#444444"))
         character?.getHomeTextShadowColor()
             ?.let { holder.createdView.setShadowLayer(4f, 0f, 0f, it) }
-        val elapsedDay = story.getDiffDays(now)
+        val elapsedDay = story.story.getDiffDays(now)
         if (elapsedDay < 0) {
-            holder.elapsedTimeView
-                .setText((-elapsedDay).toString() + "日後")
+            holder.elapsedTimeView.text = (-elapsedDay).toString() + "日後"
         } else {
             if (elapsedDay == 0L) {
                 holder.elapsedTimeView.text = "今日"
@@ -93,7 +86,7 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
         holder.elapsedTimeView.setTextColor(character?.homeTextColor ?: Color.parseColor("#444444"))
         character?.getHomeTextShadowColor()
             ?.let { holder.elapsedTimeView.setShadowLayer(4f, 0f, 0f, it) }
-        holder.commentView.text = story.getShortComment(20)
+        holder.commentView.text = story.story.getShortComment(20)
         holder.commentView.setTextColor(character?.homeTextColor ?: Color.parseColor("#444444"))
         character?.getHomeTextShadowColor()
             ?.let { holder.commentView.setShadowLayer(4f, 0f, 0f, it) }
@@ -108,18 +101,21 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
                 val dialog =
                     DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
                         override fun onDecision(dialog: DeleteDialogFragment) {
-                            storyViewModel.deleteStory(story)
+                            storyListViewModel.deleteStory(story.story)
                             holder.bindViewHolder(story)
                         }
 
                         override fun onCancel() {}
                     })
-                dialog.show(fragment.requireActivity().supportFragmentManager, DeleteDialogFragment.Tag)
+                dialog.show(
+                    fragment.requireActivity().supportFragmentManager,
+                    DeleteDialogFragment.Tag
+                )
             }
         }
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, StoryDetailActivity::class.java)
-            intent.putExtra(StoryListFragment.INTENT_STORY, story)
+            intent.putExtra(StoryDetailActivity.INTENT_STORY, story?.id)
             holder.itemView.context.startActivity(intent)
         }
         holder.bindViewHolder(story)
@@ -146,28 +142,21 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
             mHorizontalRecyclerView.adapter = mHorizontalRecyclerViewAdapter
         }
 
-        fun bindViewHolder(story: Story) {
-            storyPictureViewModel.findByTrackedStoryId(story.id)
-                .observe(fragment
-                ) { storyPictures ->
-                    mHorizontalRecyclerViewAdapter.setList(storyPictures)
-                    mHorizontalRecyclerViewAdapter.setStory(story)
-                    mHorizontalRecyclerViewAdapter.notifyDataSetChanged()
-                }
+        fun bindViewHolder(story: StoryWithPictures) {
+            mHorizontalRecyclerViewAdapter.set(story)
+            mHorizontalRecyclerViewAdapter.notifyDataSetChanged()
         }
     }
 
     inner class HorizontalRecyclerViewAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private var pictures: List<StoryPicture> = ArrayList()
-        private var story: Story? = null
-        fun setStory(story: Story) {
+        private var story: StoryWithPictures? = null
+        fun set(story: StoryWithPictures) {
             this.story = story
-        }
-
-        fun setList(list: List<StoryPicture>) {
-            pictures = list
+            this.pictures = story.pictures
             notifyDataSetChanged()
         }
+
 
         override fun getItemCount(): Int {
             return pictures.size
@@ -180,18 +169,15 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val picture = pictures[position]
-            (holder as ViewItemHolder).picture.setImageBitmap(
-                picture.getBitmap(
-                    holder.context, 150, 150
-                )
-            )
-            holder.picture.setOnClickListener(
-                View.OnClickListener {
-                    val intent = Intent(holder.itemView.context, StoryDetailActivity::class.java)
-                    intent.putExtra(StoryListFragment.INTENT_STORY, story)
-                    holder.itemView.context.startActivity(intent)
-                })
+            val context = (holder as ViewItemHolder).context
+            val picture = pictures.getOrNull(position)
+            val bitmap = picture?.getBitmap(context, 150, 150)
+            holder.picture.setImageBitmap(bitmap)
+            holder.picture.setOnClickListener {
+                val intent = Intent(context, StoryDetailActivity::class.java)
+                intent.putExtra(StoryDetailActivity.INTENT_STORY, story?.id)
+                holder.itemView.context.startActivity(intent)
+            }
         }
 
         internal inner class ViewItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

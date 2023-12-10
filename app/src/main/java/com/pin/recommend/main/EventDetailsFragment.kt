@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,15 +15,12 @@ import com.pin.recommend.*
 import com.pin.recommend.R
 import com.pin.recommend.adapter.DateSeparatedEventAdapter
 import com.pin.recommend.databinding.FragmentEventDetailsBinding
-import com.pin.recommend.dialog.ColorPickerDialogFragment
 import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
-import com.pin.recommend.dialog.ToolbarSettingDialogFragment
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.model.viewmodel.EventDetailsViewModel
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.recommend.util.TimeUtil
 import com.prolificinteractive.materialcalendarview.*
 import com.prolificinteractive.materialcalendarview.spans.DotSpan
@@ -204,7 +200,6 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
         eventViewModel.isEditMode.observe(this, Observer<Boolean> { mode ->
             if (mode) {
                 editMode.title = "完了"

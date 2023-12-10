@@ -9,7 +9,6 @@
         <import type="com.pin.recommend.model.viewmodel.DateConverter"/>
         <variable name="activity" type="android.app.Activity"/>
         <variable name="vm" type="com.pin.recommend.model.viewmodel.WholePeriodPaymentViewModel"/>
-        <variable name="avm" type="com.pin.recommend.model.viewmodel.AccountViewModel"/>
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -33,9 +32,6 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:characterToolbar="@{vm.character}"
-                android:accountToolbar="@{avm.accountLiveData}"
-                android:activity="@{activity}"
                 app:theme="@style/ToolBarStyle"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
         </com.google.android.material.appbar.AppBarLayout>

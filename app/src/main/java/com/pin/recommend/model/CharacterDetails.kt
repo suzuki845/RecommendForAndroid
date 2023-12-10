@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import com.pin.recommend.model.dao.AccountDao
 import com.pin.recommend.model.dao.CustomAnniversaryDao
 import com.pin.recommend.model.dao.RecommendCharacterDao
+import com.pin.recommend.model.dao.StoryDao
 import com.pin.recommend.model.entity.*
 import com.pin.recommend.util.combine2
 import com.pin.recommend.util.combine3
@@ -18,8 +19,9 @@ import java.util.*
 
 class CharacterDetails(
     private val context: Context,
-    private val accountDao: AccountDao,
+    private val accountModel: AccountModel,
     private val characterDao: RecommendCharacterDao,
+    private val storyDao: StoryDao
 ) {
 
 
@@ -27,11 +29,22 @@ class CharacterDetails(
 
     private val _displayOnHomeAnniversaries = MutableLiveData<List<AnniversaryInterface>>(listOf())
 
-    val cwa = id.switchMap {
-        return@switchMap characterDao.watchByIdCharacterWithAnniversaries(it ?: -1)
+    val cwa = combine2(id, accountModel.entity) { id, account ->
+        return@combine2 characterDao.watchByIdCharacterWithAnniversaries(
+            (id ?: account?.fixedCharacterId) ?: -1
+        )
+    }.switchMap { it }
+
+    val character = cwa.map {
+        it?.character
     }
 
-    private val account = accountDao.findTrackedById(Account.ACCOUNT_ID.toLong())
+    val stories = character.switchMap {
+        if (it == null) return@switchMap MutableLiveData(listOf())
+        return@switchMap storyDao.watchByCharacterIdStoryWithPictures(it.id, it.storySortOrder == 1)
+    }
+
+    private val account = accountModel.entity
 
     private val displayOnHomeAnniversary = _displayOnHomeAnniversaries.map {
         val a = it.firstOrNull()
@@ -71,23 +84,20 @@ class CharacterDetails(
     }
 
     fun pinning() {
-        val account = accountDao.findById(Account.ACCOUNT_ID.toLong())
-        account.fixedCharacterId = id.value
-        AppDatabase.executor.execute { accountDao.updateAccount(account) }
+        id.value?.let {
+            accountModel.pinning(it)
+        }
     }
 
     fun unpinning() {
-        val account = accountDao.findById(Account.ACCOUNT_ID.toLong())
-        account.fixedCharacterId = null
-        AppDatabase.executor.execute { accountDao.updateAccount(account) }
+        accountModel.unpinning()
     }
 
     fun updateStorySortOrder(order: Int) {
         val character = cwa.value?.character
-        character?.storySortOrder = 0
+        character?.storySortOrder = order
         AppDatabase.executor.execute { characterDao.updateCharacter(character) }
     }
-
 
     data class State(
         val characterId: Long,
@@ -96,7 +106,7 @@ class CharacterDetails(
         val appearance: Appearance,
         val anniversary: Anniversary,
         val storySortOrder: Int,
-    ){
+    ) {
         fun toJson(): String {
             return Gson().toJson(this)
         }

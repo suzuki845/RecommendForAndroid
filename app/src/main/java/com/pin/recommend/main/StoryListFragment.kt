@@ -1,49 +1,34 @@
 package com.pin.recommend.main
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.pin.recommend.CharacterDetailActivity
 import com.pin.recommend.CreateStoryActivity
-import com.pin.recommend.MyApplication
 import com.pin.recommend.R
 import com.pin.recommend.adapter.VerticalRecyclerViewAdapter
-import com.pin.recommend.dialog.ColorPickerDialogFragment
-import com.pin.recommend.dialog.DialogActionListener
-import com.pin.recommend.dialog.ToolbarSettingDialogFragment
-import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.model.viewmodel.EditStateViewModel
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
-import com.pin.recommend.model.viewmodel.StoryViewModel
 
 class StoryListFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
     private lateinit var verticalRecyclerViewAdapter: VerticalRecyclerViewAdapter
     private lateinit var recyclerView: RecyclerView
-    private lateinit var storyViewModel: StoryViewModel
-    private lateinit var characterViewModel: RecommendCharacterViewModel
     private lateinit var editListViewModel: EditStateViewModel
     private lateinit var sortView: TextView
     private val detailsVM: CharacterDetailsViewModel by lazy {
-        ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
+        ViewModelProvider(requireActivity()).get(CharacterDetailsViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,12 +39,7 @@ class StoryListFragment : Fragment() {
             index = requireArguments().getInt(ARG_SECTION_NUMBER)
         }
         pageViewModel!!.setIndex(index)
-        storyViewModel = ViewModelProvider(requireActivity()).get(StoryViewModel::class.java)
-        characterViewModel =
-            ViewModelProvider(requireActivity()).get(RecommendCharacterViewModel::class.java)
         editListViewModel = ViewModelProvider(this).get(EditStateViewModel::class.java)
-        val characterId =
-            requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
 
         setHasOptionsMenu(true)
     }
@@ -69,8 +49,6 @@ class StoryListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_story_list, container, false)
-
-        val character = detailsVM.character.value
 
         sortView = root.findViewById(R.id.sort)
         sortView.setOnClickListener(View.OnClickListener {
@@ -83,6 +61,7 @@ class StoryListFragment : Fragment() {
                         detailsVM.updateStorySortOrder(0)
                         return@OnMenuItemClickListener true
                     }
+
                     R.id.order_asc -> {
                         detailsVM.updateStorySortOrder(1)
                         return@OnMenuItemClickListener true
@@ -92,11 +71,10 @@ class StoryListFragment : Fragment() {
             })
         })
 
-        verticalRecyclerViewAdapter = VerticalRecyclerViewAdapter(this, character)
-        val characterLiveData = characterViewModel.getCharacter(character?.id)
+        verticalRecyclerViewAdapter = VerticalRecyclerViewAdapter(this, null)
 
-        Transformations.switchMap(characterLiveData) {
-            if (it == null) return@switchMap MutableLiveData()
+        detailsVM.character.observe(requireActivity()) {
+            if (it == null) return@observe
             sortView.setTextColor(it.getHomeTextColor())
             val isAsc = it.storySortOrder == 1
             if (isAsc) {
@@ -104,35 +82,37 @@ class StoryListFragment : Fragment() {
             } else {
                 sortView.text = "並び順 : 登録日 新しい順"
             }
-
             initializeText(it)
+            verticalRecyclerViewAdapter.updateCharacter(it)
+        }
 
-            storyViewModel.findByTrackedCharacterIdOrderByCreated(it.id, isAsc)
-        }.observe(viewLifecycleOwner, Observer { stories ->
-            if (stories == null) return@Observer
-            verticalRecyclerViewAdapter.setList(stories)
-            verticalRecyclerViewAdapter.updateCharacter(character)
-        })
-
+        detailsVM.stories.observe(requireActivity()) {
+            verticalRecyclerViewAdapter.setList(it)
+        }
 
         recyclerView = root.findViewById(R.id.story_recycle_view)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
-        val dividerItemDecoration = DividerItemDecoration(
-            requireContext(),
-            LinearLayoutManager(requireContext()).orientation
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                requireContext(),
+                LinearLayoutManager(requireContext()).orientation
+            )
         )
-        recyclerView.addItemDecoration(dividerItemDecoration)
         recyclerView.layoutManager = layoutManager
         recyclerView.setHasFixedSize(false)
         recyclerView.adapter = verticalRecyclerViewAdapter
 
-        editListViewModel.editMode.observe(
-            viewLifecycleOwner,
-            Observer { aBoolean -> verticalRecyclerViewAdapter.setEditMode(aBoolean!!) })
+        editListViewModel.editMode.observe(viewLifecycleOwner) { aBoolean ->
+            verticalRecyclerViewAdapter.setEditMode(
+                aBoolean!!
+            )
+        }
+
         val fab: FloatingActionButton = root.findViewById(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(activity, CreateStoryActivity::class.java)
-            intent.putExtra(INTENT_CREATE_STORY, character)
+            val characterId = detailsVM.id.value
+            intent.putExtra(INTENT_CREATE_STORY, characterId)
             startActivity(intent)
         }
         return root
@@ -144,23 +124,16 @@ class StoryListFragment : Fragment() {
         verticalRecyclerViewAdapter.updateCharacter(character)
     }
 
-    private fun accountToolbarTextColor(account: Account?): Int {
-        return account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        //val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
-        //val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
         editListViewModel.editMode.observe(this, Observer { mode ->
             val s: SpannableString = if (mode) {
                 SpannableString("完了")
             } else {
                 SpannableString("編集")
             }
-            //s.setSpan(textColor?.let { ForegroundColorSpan(it) }, 0, s.length, 0)
             editMode.title = s
         })
     }

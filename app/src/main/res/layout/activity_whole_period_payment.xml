@@ -13,9 +13,6 @@
         <variable
             name="vm"
             type="com.pin.recommend.model.viewmodel.WholePeriodPaymentViewModel" />
-        <variable
-            name="avm"
-            type="com.pin.recommend.model.viewmodel.AccountViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -39,9 +36,6 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:accountToolbar="@{avm.accountLiveData}"
-                android:activity="@{activity}"
-                android:characterToolbar="@{vm.character}"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:theme="@style/ToolBarStyle" />
         </com.google.android.material.appbar.AppBarLayout>

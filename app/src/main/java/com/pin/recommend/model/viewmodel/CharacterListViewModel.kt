@@ -5,7 +5,6 @@ import androidx.arch.core.util.Function
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.dao.RecommendCharacterDao
 import com.pin.recommend.model.dao.StoryDao
@@ -13,11 +12,10 @@ import com.pin.recommend.model.dao.StoryPictureDao
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
 
-class RecommendCharacterViewModel(application: Application) : AndroidViewModel(application) {
+class CharacterListViewModel(application: Application) : AndroidViewModel(application) {
     private val characterDao: RecommendCharacterDao
     private val storyDao: StoryDao
     private val storyPictureDao: StoryPictureDao
-    private var character: LiveData<RecommendCharacter?>? = null
 
     init {
         characterDao = AppDatabase.getDatabase(application).recommendCharacterDao()
@@ -25,32 +23,7 @@ class RecommendCharacterViewModel(application: Application) : AndroidViewModel(a
         storyPictureDao = AppDatabase.getDatabase(application).storyPictureDao()
     }
 
-
-    fun getCharacters(accountLiveData: LiveData<Account>): LiveData<List<RecommendCharacter>> {
-        return Transformations.switchMap<Account, List<RecommendCharacter>>(
-            accountLiveData,
-            object : Function<Account?, LiveData<List<RecommendCharacter>>> {
-                override fun apply(input: Account?): LiveData<List<RecommendCharacter>> {
-                    if(input == null) return MutableLiveData(listOf())
-                    return characterDao.watchByAccountId(input.id)
-                }
-            })
-    }
-
-    fun getCharacter(characterId: Long?): LiveData<RecommendCharacter?> {
-        if (characterId != null) {
-            character = characterDao.watchById(characterId)
-        }
-        return MutableLiveData(null)
-    }
-
-    fun insert(character: RecommendCharacter?) {
-        AppDatabase.executor.execute { characterDao.insertCharacter(character) }
-    }
-
-    fun update(character: RecommendCharacter?) {
-        AppDatabase.executor.execute { characterDao.updateCharacter(character) }
-    }
+    val characters = characterDao.watch()
 
     fun delete(character: RecommendCharacter) {
         AppDatabase.executor.execute {

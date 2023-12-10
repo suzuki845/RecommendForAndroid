@@ -16,42 +16,39 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
 import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.adapter.PickStoryPictureAdapter
+import com.pin.recommend.databinding.ActivityCreateStoryBinding
+import com.pin.recommend.databinding.ActivityEditCharacterBinding
 import com.pin.recommend.main.StoryListFragment
-import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.entity.Story
 import com.pin.recommend.model.entity.StoryPicture
-import com.pin.recommend.model.viewmodel.AccountViewModel
-import com.pin.recommend.model.viewmodel.StoryPictureViewModel
-import com.pin.recommend.model.viewmodel.StoryViewModel
+import com.pin.recommend.model.viewmodel.*
 import com.pin.recommend.util.PermissionRequests
+import com.pin.recommend.util.Progress
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.PermissionChecker
 import com.pin.util.Reward.Companion.getInstance
-import com.pin.util.RuntimePermissionUtils.hasSelfPermissions
-import com.pin.util.RuntimePermissionUtils.shouldShowRequestPermissionRationale
-import com.pin.util.RuntimePermissionUtils.showAlertDialog
 import java.text.SimpleDateFormat
 import java.util.*
 
 class CreateStoryActivity : AppCompatActivity() {
-    private lateinit var pickImageView: ImageView
     private lateinit var pickStoryPictureAdapter: PickStoryPictureAdapter
     private lateinit var recyclerView: RecyclerView
-    private lateinit var editCommentView: EditText
-    private lateinit var createdView: TextView
-    private var created = Date()
-    private var character: RecommendCharacter? = null
-    private var storyViewModel: StoryViewModel? = null
-    private var storyPictureViewModel: StoryPictureViewModel? = null
+
+    private val storyEditorVM: StoryEditorViewModel by lazy {
+        ViewModelProvider(this).get(StoryEditorViewModel::class.java)
+    }
+    private lateinit var binding: ActivityCreateStoryBinding
+    private var characterId: Long? = null
+
     private lateinit var adMobManager: AdMobAdaptiveBannerManager
     private var adViewContainer: ViewGroup? = null
-    private var toolbar: Toolbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_story)
@@ -66,19 +63,21 @@ class CreateStoryActivity : AppCompatActivity() {
             adMobManager.setEnable(!isBetweenRewardTime!!)
             adMobManager.checkFirst()
         }
-        storyViewModel = ViewModelProvider(this).get(StoryViewModel::class.java)
-        storyPictureViewModel = ViewModelProvider(this).get(
-            StoryPictureViewModel::class.java
-        )
 
-        character = intent.getParcelableExtra(StoryListFragment.INTENT_CREATE_STORY)
-        createdView = findViewById(R.id.created)
-        editCommentView = findViewById(R.id.comment)
-        pickImageView = findViewById(R.id.pickImage)
-        pickImageView.setOnClickListener(View.OnClickListener { onPickImage(null) })
+        characterId = intent.getLongExtra(StoryListFragment.INTENT_CREATE_STORY, -1)
+        storyEditorVM.characterId.value = characterId
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_create_story)
+        binding.vm = storyEditorVM
+        binding.lifecycleOwner = this
+
         recyclerView = findViewById(R.id.recycler_view)
-        createdView.setText(FORMAT.format(created))
         pickStoryPictureAdapter = PickStoryPictureAdapter(this)
+        pickStoryPictureAdapter.setCanDelete(true)
+        pickStoryPictureAdapter.setOnRemoveListener {
+            storyEditorVM.removePicture(it)
+        }
+
         val flexboxLayoutManager = FlexboxLayoutManager(this)
         flexboxLayoutManager.flexDirection = FlexDirection.ROW
         flexboxLayoutManager.flexWrap = FlexWrap.WRAP
@@ -86,7 +85,6 @@ class CreateStoryActivity : AppCompatActivity() {
         flexboxLayoutManager.alignItems = AlignItems.FLEX_START
         recyclerView.setLayoutManager(flexboxLayoutManager)
         recyclerView.setAdapter(pickStoryPictureAdapter)
-        toolbar = findViewById(R.id.toolbar)
 
         initializeToolbar()
     }
@@ -97,7 +95,7 @@ class CreateStoryActivity : AppCompatActivity() {
     }
 
     private fun initializeToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
     }
 
     fun onPickImage(v: View?) {
@@ -130,30 +128,30 @@ class CreateStoryActivity : AppCompatActivity() {
                 val newCalender = Calendar.getInstance()
                 newCalender[year, month] = dayOfMonth
                 val date = newCalender.time
-                createdView!!.text = FORMAT.format(date)
-                created = date
+                storyEditorVM.created.value = date
             },
             year,
             month,
             dayOfMonth
         )
-        //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
         datePickerDialog.show()
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         if (requestCode == REQUEST_PICK_STORY_PICTURE && resultCode == RESULT_OK) {
-            var uri: Uri? = null
+            var uri: Uri?
             if (resultData != null) {
                 uri = resultData.data
                 val bitmap = BitmapUtility.decodeUri(this, uri, 500, 500)
-                val count = pickStoryPictureAdapter!!.itemCount
+                val count = pickStoryPictureAdapter.itemCount
                 if (count >= 3) {
                     Toast.makeText(this@CreateStoryActivity, "３つ以上は選択出来ません", Toast.LENGTH_SHORT)
                         .show()
                     return
                 }
-                pickStoryPictureAdapter!!.add(bitmap)
+                pickStoryPictureAdapter.add(bitmap)
+                val picture = StoryPicture.Draft(bitmap)
+                storyEditorVM.addPicture(picture)
             }
         }
         intent.putExtra(Constants.PICK_IMAGE, true)
@@ -166,21 +164,13 @@ class CreateStoryActivity : AppCompatActivity() {
     }
 
     private fun save() {
-        val comment = editCommentView!!.text.toString()
-        val story = Story()
-        story.characterId = character!!.id
-        story.comment = comment
-        story.created = created
-        storyViewModel!!.insertStoryWithPicture(story) { insertId ->
-            val pictures = pickStoryPictureAdapter!!.list
-            for (bitmap in pictures) {
-                val storyPicture = StoryPicture()
-                storyPicture.storyId = insertId
-                storyPicture.saveImage(this@CreateStoryActivity, bitmap)
-                storyPictureViewModel!!.insert(storyPicture)
-            }
-        }
-        finish()
+        storyEditorVM.save(Progress({
+
+        },{
+            finish()
+        }, {
+            Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+        }))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

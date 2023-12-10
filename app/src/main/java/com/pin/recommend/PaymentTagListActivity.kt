@@ -20,7 +20,6 @@ import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.PaymentTag
-import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.PaymentTagViewModel
 import java.util.*
 
@@ -32,9 +31,7 @@ class PaymentTagListActivity: AppCompatActivity() {
     }
 
     private lateinit var toolbar: Toolbar
-    private val accountViewModel: AccountViewModel by lazy {
-        MyApplication.getAccountViewModel(this)
-    }
+
     private val viewModel by lazy {
         ViewModelProvider(this).get(PaymentTagViewModel::class.java)
     }
@@ -79,9 +76,6 @@ class PaymentTagListActivity: AppCompatActivity() {
             })
 
         }
-
-        val accountLiveData = accountViewModel.accountLiveData
-        accountLiveData.observe(this, Observer { account -> initializeToolbar(account) })
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener(View.OnClickListener {

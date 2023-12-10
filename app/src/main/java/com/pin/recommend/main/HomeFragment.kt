@@ -1,34 +1,16 @@
 package com.pin.recommend.main
 
-import android.app.Activity
-import android.widget.TextView
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
-import com.pin.recommend.model.viewmodel.EditStateViewModel
-import com.pin.recommend.model.entity.RecommendCharacter
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProviders
-import com.pin.recommend.main.HomeFragment
-import android.graphics.Typeface
-import androidx.appcompat.app.AppCompatActivity
 import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.content.Intent
-import android.graphics.Color
 import android.view.*
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.*
-import com.pin.recommend.databinding.ActivityEditAnniversaryBinding
 import com.pin.recommend.databinding.FragmentCharacterDetailBinding
-import com.pin.recommend.model.CharacterDetails
-import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
-import de.hdodenhof.circleimageview.CircleImageView
-import java.lang.RuntimeException
 import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * A placeholder fragment containing a simple view.

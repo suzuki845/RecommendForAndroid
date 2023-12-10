@@ -27,7 +27,7 @@ public interface AccountDao {
     public void deleteAll();
 
     @Query("SELECT * FROM Account WHERE id = :id")
-    public LiveData<Account> findTrackedById(long id);
+    public LiveData<Account> watchById(long id);
 
     @Query("SELECT * FROM Account WHERE id = :id")
     public Account findById(long id);

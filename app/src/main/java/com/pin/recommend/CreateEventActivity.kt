@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.adapter.PaymentTagAdapter
 import com.pin.recommend.databinding.ActivityCreateEventBinding
 import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.CreateEventViewModel
 import com.pin.recommend.model.viewmodel.CreatePaymentViewModel
 import com.pin.recommend.util.TimeUtil

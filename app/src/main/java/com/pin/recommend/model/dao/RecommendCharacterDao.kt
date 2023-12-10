@@ -22,6 +22,9 @@ interface RecommendCharacterDao {
     @Query("SELECT * FROM RecommendCharacter")
     fun findAll(): List<RecommendCharacter>
 
+    @Query("SELECT * FROM RecommendCharacter")
+    fun watch(): LiveData<List<RecommendCharacter>>
+
     @Query("SELECT * FROM RecommendCharacter WHERE id = :id")
     fun findById(id: Long): RecommendCharacter?
 

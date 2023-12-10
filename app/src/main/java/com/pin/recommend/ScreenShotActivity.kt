@@ -19,9 +19,6 @@ import com.pin.imageutil.insertImage
 import com.pin.recommend.databinding.ActivityEditAnniversaryBinding
 import com.pin.recommend.databinding.ActivityScreenShotBinding
 import com.pin.recommend.model.CharacterDetails
-import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.viewmodel.AccountViewModel
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.util.Interstitial
 import com.pin.util.Reward
 import com.pin.util.RuntimePermissionUtils

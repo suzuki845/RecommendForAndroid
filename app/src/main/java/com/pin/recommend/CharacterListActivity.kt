@@ -17,22 +17,18 @@ import com.pin.recommend.CreateCharacterActivity
 import com.pin.recommend.adapter.CharactersAdapter
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.model.viewmodel.EditStateViewModel
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
+import com.pin.recommend.model.viewmodel.CharacterListViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.Reward.Companion.getInstance
 
 class CharacterListActivity : AppCompatActivity() {
     private val charactersAdapter: CharactersAdapter by lazy {
-        CharactersAdapter(this, characterViewModel)
+        CharactersAdapter(this, characterListViewModel)
     }
-    private val characterViewModel: RecommendCharacterViewModel by lazy {
-        ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
-    }
-    private val accountViewModel: AccountViewModel by lazy {
-        ViewModelProvider(this).get(AccountViewModel::class.java)
+    private val characterListViewModel: CharacterListViewModel by lazy {
+        ViewModelProvider(this).get(CharacterListViewModel::class.java)
     }
     private val editListViewModel: EditStateViewModel by lazy {
         ViewModelProvider(this).get(EditStateViewModel::class.java)
@@ -59,8 +55,11 @@ class CharacterListActivity : AppCompatActivity() {
         }
 
         charactersListView = findViewById(R.id.characters_listview)
-        val fab = findViewById<FloatingActionButton>(R.id.fab)
-        charactersListView.setAdapter(charactersAdapter)
+        charactersListView.adapter = charactersAdapter
+        characterListViewModel.characters.observe(this){
+            charactersAdapter.setList(it)
+        }
+
         charactersListView.onItemClickListener =
             AdapterView.OnItemClickListener { _, view, position, id ->
                 val intent = Intent(this@CharacterListActivity, CharacterDetailActivity::class.java)
@@ -72,14 +71,10 @@ class CharacterListActivity : AppCompatActivity() {
             }
 
         toolbar = findViewById(R.id.toolbar)
-        val accountLiveData = accountViewModel.accountLiveData
-        accountLiveData.observe(this
-        ) { account -> initializeToolbar(account) }
-        val characters = characterViewModel.getCharacters(accountLiveData)
-        characters.observe(this
-        ) { recommendCharacters -> charactersAdapter!!.setList(recommendCharacters) }
         editListViewModel.editMode.observe(this
         ) { aBoolean -> charactersAdapter.setEditMode(aBoolean) }
+
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this@CharacterListActivity, CreateCharacterActivity::class.java)
             startActivity(intent)

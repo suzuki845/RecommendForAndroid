@@ -14,7 +14,7 @@ import com.pin.recommend.R;
 import com.pin.recommend.dialog.DeleteDialogFragment;
 import com.pin.recommend.dialog.DialogActionListener;
 import com.pin.recommend.model.entity.RecommendCharacter;
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel;
+import com.pin.recommend.model.viewmodel.CharacterListViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,9 +32,9 @@ public class CharactersAdapter extends BaseAdapter {
 
     private boolean isEditMode = false;
 
-    private RecommendCharacterViewModel characterViewModel;
+    private CharacterListViewModel characterViewModel;
 
-    public CharactersAdapter(AppCompatActivity context, RecommendCharacterViewModel characterViewModel){
+    public CharactersAdapter(AppCompatActivity context, CharacterListViewModel characterViewModel){
         this.context = context;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.characters = new ArrayList<>();

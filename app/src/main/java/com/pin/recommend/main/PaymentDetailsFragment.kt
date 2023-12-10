@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,15 +13,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pin.recommend.*
 import com.pin.recommend.adapter.DateSeparatedPaymentAdapter
 import com.pin.recommend.databinding.FragmentPaymentDetailsBinding
-import com.pin.recommend.dialog.ColorPickerDialogFragment
 import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
-import com.pin.recommend.dialog.ToolbarSettingDialogFragment
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.model.viewmodel.PaymentDetailsViewModel
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import java.util.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -131,8 +127,6 @@ class PaymentDetailsFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
-        //val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
         paymentViewModel.isEditMode.observe(this, Observer<Boolean> { mode ->
             if (mode) {
                 editMode.title = "完了"

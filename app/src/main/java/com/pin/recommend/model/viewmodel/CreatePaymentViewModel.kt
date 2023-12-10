@@ -7,7 +7,6 @@ import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.databinding.InverseMethod
 import androidx.lifecycle.*
-import androidx.lifecycle.Transformations.switchMap
 import com.pin.recommend.R
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.dao.PaymentDao
@@ -21,14 +20,13 @@ import java.util.*
 
 class CreatePaymentViewModel(application: Application) : AndroidViewModel(application)  {
 
-    private val characterDao: RecommendCharacterDao = AppDatabase.getDatabase(application).recommendCharacterDao()
     private val paymentDao: PaymentDao = AppDatabase.getDatabase(application).paymentDao()
     private val tagDao: PaymentTagDao = AppDatabase.getDatabase(application).paymentTagDao()
 
     private val _tags = tagDao.findTrackedAll()
 
     val tags
-        get() = switchMap(type) { payType ->
+        get() = (type).switchMap { payType ->
             _tags.map { paymentTags ->
                 paymentTags.filter {
                     it.type == payType

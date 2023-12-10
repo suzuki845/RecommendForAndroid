@@ -12,14 +12,11 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.adapter.PaymentTagAdapter
 import com.pin.recommend.databinding.ActivityEditPaymentBinding
-import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.EditPaymentViewModel
 import com.pin.recommend.util.TimeUtil
 import java.util.*
@@ -36,10 +33,6 @@ class EditPaymentActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditPaymentBinding
 
-    private lateinit var toolbar: Toolbar
-
-    private lateinit var accountViewModel: AccountViewModel
-
     private lateinit var tagAdapter: PaymentTagAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,16 +46,13 @@ class EditPaymentActivity : AppCompatActivity() {
         binding.vm = viewModel
         binding.lifecycleOwner = this
 
-        toolbar = findViewById(R.id.toolbar)
-
         tagAdapter = PaymentTagAdapter(this, onDelete = {})
         viewModel.tags.observe(this@EditPaymentActivity, Observer {
             tagAdapter.setList(it)
         })
 
-        accountViewModel = MyApplication.getAccountViewModel(this)
-        val accountLiveData = accountViewModel.accountLiveData
-        accountLiveData.observe(this, Observer { account -> initializeToolbar(account) })
+        binding.toolbar.title = "Pay & 貯金の編集"
+        setSupportActionBar(binding.toolbar)
     }
 
     fun onPayType(view: View){
@@ -125,11 +115,6 @@ class EditPaymentActivity : AppCompatActivity() {
         }, year, month, dayOfMonth)
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
-    }
-
-    private fun initializeToolbar(account: Account?) {
-        toolbar.title = "Pay & 貯金の編集"
-        setSupportActionBar(toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
