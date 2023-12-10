@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModelProvider
 import com.daimajia.slider.library.SliderLayout
 import com.pin.recommend.model.entity.StoryWithPictures
-import com.pin.recommend.model.viewmodel.StoryPictureViewModel
 import com.pin.recommend.view.SlideShowItemView
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.Reward.Companion.getInstance
@@ -17,7 +15,6 @@ class SlideShowActivity : AppCompatActivity() {
     private lateinit var sliderView: SliderLayout
     private lateinit var story: StoryWithPictures
     private var initPosition = 0
-    private lateinit var storyPictureViewModel: StoryPictureViewModel
     private var adMobManager: AdMobAdaptiveBannerManager? = null
     private var adViewContainer: ViewGroup? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,9 +32,6 @@ class SlideShowActivity : AppCompatActivity() {
             adMobManager!!.checkFirst()
         }
         toolbar = findViewById(R.id.toolbar)
-        storyPictureViewModel = ViewModelProvider(this).get(
-            StoryPictureViewModel::class.java
-        )
 
         val json = intent.getStringExtra(StoryDetailActivity.INTENT_SLIDE_SHOW) ?: ""
         story = StoryWithPictures.fromJson(json)

@@ -20,17 +20,16 @@ import java.util.*
 class CharacterDetails(
     private val context: Context,
     private val accountModel: AccountModel,
-    private val characterDao: RecommendCharacterDao,
-    private val storyDao: StoryDao
 ) {
 
+    private val db = AppDatabase.getDatabase(context)
 
     val id = MutableLiveData<Long?>()
 
     private val _displayOnHomeAnniversaries = MutableLiveData<List<AnniversaryInterface>>(listOf())
 
     val cwa = combine2(id, accountModel.entity) { id, account ->
-        return@combine2 characterDao.watchByIdCharacterWithAnniversaries(
+        return@combine2 db.recommendCharacterDao().watchByIdCharacterWithAnniversaries(
             (id ?: account?.fixedCharacterId) ?: -1
         )
     }.switchMap { it }
@@ -41,7 +40,7 @@ class CharacterDetails(
 
     val stories = character.switchMap {
         if (it == null) return@switchMap MutableLiveData(listOf())
-        return@switchMap storyDao.watchByCharacterIdStoryWithPictures(it.id, it.storySortOrder == 1)
+        return@switchMap db.storyDao().watchByCharacterIdStoryWithPictures(it.id, it.storySortOrder == 1)
     }
 
     private val account = accountModel.entity
@@ -57,21 +56,6 @@ class CharacterDetails(
         )
     }
 
-    fun changeDisplayOnHomeAnniversary() {
-        val current = LinkedList<AnniversaryInterface>()
-        _displayOnHomeAnniversaries.value?.forEach {
-            current.add(it)
-        }
-        current.addFirst(current.removeLast())
-        _displayOnHomeAnniversaries.value = current
-    }
-
-    fun initialize() {
-        cwa.observeForever {
-            _displayOnHomeAnniversaries.value = it?.anniversaries()
-        }
-    }
-
     val state = combine3(account, cwa, displayOnHomeAnniversary) { a, b, c ->
         return@combine3 State(
             b?.id ?: -1,
@@ -81,6 +65,31 @@ class CharacterDetails(
             c ?: Anniversary(),
             b?.character?.storySortOrder ?: 0
         )
+    }
+
+    fun initialize() {
+        cwa.observeForever {
+            _displayOnHomeAnniversaries.value = it?.anniversaries()
+        }
+    }
+
+    fun changeDisplayOnHomeAnniversary() {
+        val current = LinkedList<AnniversaryInterface>()
+        _displayOnHomeAnniversaries.value?.forEach {
+            current.add(it)
+        }
+        current.addFirst(current.removeLast())
+        _displayOnHomeAnniversaries.value = current
+    }
+
+    fun deleteStory(story: Story) {
+        AppDatabase.executor.execute {
+            val storyPictures: List<StoryPicture> = db.storyPictureDao().findByStoryId(story.id)
+            for (storyPicture in storyPictures) {
+                storyPicture.deleteImage(context)
+            }
+            db.storyDao().deleteStory(story)
+        }
     }
 
     fun pinning() {
@@ -96,7 +105,7 @@ class CharacterDetails(
     fun updateStorySortOrder(order: Int) {
         val character = cwa.value?.character
         character?.storySortOrder = order
-        AppDatabase.executor.execute { characterDao.updateCharacter(character) }
+        AppDatabase.executor.execute { db.recommendCharacterDao().updateCharacter(character) }
     }
 
     data class State(

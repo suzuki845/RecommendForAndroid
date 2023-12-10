@@ -19,14 +19,13 @@ import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.entity.StoryPicture
 import com.pin.recommend.model.entity.StoryWithPictures
-import com.pin.recommend.model.viewmodel.StoryDetailsViewModel
-import com.pin.recommend.model.viewmodel.StoryListViewModel
+import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import java.util.*
 
 class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharacter?) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var stories: List<StoryWithPictures> = ArrayList()
-    private val storyListViewModel: StoryListViewModel
+    private val detailsVM: CharacterDetailsViewModel
     private val fragment: Fragment
     private var isEditMode = false
     private var character: RecommendCharacter?
@@ -58,8 +57,8 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
     private val now = Calendar.getInstance()
 
     init {
-        storyListViewModel = ViewModelProvider(fragment.requireActivity()).get(
-            StoryListViewModel::class.java
+        detailsVM = ViewModelProvider(fragment.requireActivity()).get(
+            CharacterDetailsViewModel::class.java
         )
         this.fragment = fragment
         this.character = character
@@ -101,7 +100,7 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
                 val dialog =
                     DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
                         override fun onDecision(dialog: DeleteDialogFragment) {
-                            storyListViewModel.deleteStory(story.story)
+                            detailsVM.deleteStory(story.story)
                             holder.bindViewHolder(story)
                         }
 

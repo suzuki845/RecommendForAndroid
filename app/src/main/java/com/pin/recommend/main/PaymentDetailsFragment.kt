@@ -116,13 +116,6 @@ class PaymentDetailsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun initializeText(character: RecommendCharacter){
-    }
-
-    private fun accountToolbarTextColor(account: Account?): Int {
-        return account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)

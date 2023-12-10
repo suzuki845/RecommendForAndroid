@@ -11,6 +11,7 @@ import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.CharacterDetails
 import com.pin.recommend.model.dao.AccountDao
 import com.pin.recommend.model.entity.Account
+import com.pin.recommend.model.entity.Story
 import java.util.*
 
 class CharacterDetailsViewModel(application: Application) : AndroidViewModel(application) {
@@ -19,9 +20,7 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
     private val accountModel = AccountModel(application)
 
     init{
-        val characterDao = AppDatabase.getDatabase(application).recommendCharacterDao()
-        val storyDao = AppDatabase.getDatabase(application).storyDao()
-        characterDetails = CharacterDetails(application, accountModel, characterDao, storyDao)
+        characterDetails = CharacterDetails(application, accountModel)
         characterDetails.initialize()
     }
 
@@ -34,6 +33,10 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
     val id = characterDetails.id
 
     val account = accountModel.entity
+
+    fun deleteStory(story: Story) {
+        characterDetails.deleteStory(story)
+    }
 
     fun changeAnniversary(){
         characterDetails.changeDisplayOnHomeAnniversary()
