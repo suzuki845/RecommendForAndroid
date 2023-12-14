@@ -73,6 +73,7 @@ class CharacterEditor(val context: Context) {
     val typeface = fontFamily.map {
         if(it == null) return@map null
         if(it == "Default") return@map null
+        if(it == "default") return@map null
         if(it == "デフォルト") return@map  null
         return@map Typeface.createFromAsset(context.assets, "fonts/" + it + ".ttf")
     }
