@@ -32,8 +32,6 @@ class EditEventActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditEventBinding
 
-    private lateinit var toolbar: Toolbar
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,17 +46,12 @@ class EditEventActivity : AppCompatActivity() {
         binding.vm = viewModel
         binding.lifecycleOwner = this
 
-        toolbar = findViewById(R.id.toolbar)
-
-    }
-
-    private fun initializeToolbar(account: Account?) {
-        toolbar.title = "イベントの編集"
-        setSupportActionBar(toolbar)
+        binding.toolbar.title = "イベントの編集"
+        setSupportActionBar(binding.toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_create_event, menu)
+        menuInflater.inflate(R.menu.activity_edit_event, menu)
         return true
     }
 

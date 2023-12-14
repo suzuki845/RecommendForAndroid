@@ -85,14 +85,6 @@ class PaymentDetailsFragment : Fragment() {
             })
         }
 
-        val fab: FloatingActionButton = binding.root.findViewById(R.id.fab)
-        fab.setOnClickListener {
-            val intent = Intent(activity, CreatePaymentActivity::class.java)
-            val characterId = requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
-            intent.putExtra(CreatePaymentActivity.INTENT_CREATE_PAYMENT, characterId)
-            startActivity(intent)
-        }
-
         return binding.root
     }
 
@@ -127,6 +119,7 @@ class PaymentDetailsFragment : Fragment() {
                 editMode.title = "編集"
             }
         })
+        inflater.inflate(R.menu.create, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -134,6 +127,12 @@ class PaymentDetailsFragment : Fragment() {
             R.id.edit_mode -> {
                 paymentViewModel.isEditMode.value = paymentViewModel.isEditMode.value != true
                 return true
+            }
+            R.id.create -> {
+                val intent = Intent(activity, CreatePaymentActivity::class.java)
+                val characterId = requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+                intent.putExtra(CreatePaymentActivity.INTENT_CREATE_PAYMENT, characterId)
+                startActivity(intent)
             }
         }
         return true

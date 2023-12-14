@@ -108,13 +108,6 @@ class StoryListFragment : Fragment() {
             )
         }
 
-        val fab: FloatingActionButton = root.findViewById(R.id.fab)
-        fab.setOnClickListener {
-            val intent = Intent(activity, CreateStoryActivity::class.java)
-            val characterId = detailsVM.id.value
-            intent.putExtra(INTENT_CREATE_STORY, characterId)
-            startActivity(intent)
-        }
         return root
     }
 
@@ -136,6 +129,8 @@ class StoryListFragment : Fragment() {
             }
             editMode.title = s
         })
+
+        inflater.inflate(R.menu.create, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -147,6 +142,12 @@ class StoryListFragment : Fragment() {
                     editListViewModel.setEditMode(true)
                 }
                 return true
+            }
+            R.id.create -> {
+                val intent = Intent(activity, CreateStoryActivity::class.java)
+                val characterId = detailsVM.id.value
+                intent.putExtra(INTENT_CREATE_STORY, characterId)
+                startActivity(intent)
             }
         }
         return true

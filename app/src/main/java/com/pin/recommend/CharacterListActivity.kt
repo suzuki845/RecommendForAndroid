@@ -48,7 +48,8 @@ class CharacterListActivity : AppCompatActivity() {
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
         val reward = getInstance(this)
-        reward.isBetweenRewardTime.observe(this
+        reward.isBetweenRewardTime.observe(
+            this
         ) { isBetweenRewardTime ->
             adMobManager.setEnable(!isBetweenRewardTime)
             adMobManager.checkFirst()
@@ -56,7 +57,7 @@ class CharacterListActivity : AppCompatActivity() {
 
         charactersListView = findViewById(R.id.characters_listview)
         charactersListView.adapter = charactersAdapter
-        characterListViewModel.characters.observe(this){
+        characterListViewModel.characters.observe(this) {
             charactersAdapter.setList(it)
         }
 
@@ -71,14 +72,14 @@ class CharacterListActivity : AppCompatActivity() {
             }
 
         toolbar = findViewById(R.id.toolbar)
-        editListViewModel.editMode.observe(this
+
+        toolbar.title = "推しリスト"
+        setSupportActionBar(toolbar)
+
+        editListViewModel.editMode.observe(
+            this
         ) { aBoolean -> charactersAdapter.setEditMode(aBoolean) }
 
-        val fab = findViewById<FloatingActionButton>(R.id.fab)
-        fab.setOnClickListener {
-            val intent = Intent(this@CharacterListActivity, CreateCharacterActivity::class.java)
-            startActivity(intent)
-        }
     }
 
     override fun onResume() {
@@ -86,15 +87,11 @@ class CharacterListActivity : AppCompatActivity() {
         adMobManager!!.checkAndLoad()
     }
 
-    private fun initializeToolbar(account: Account) {
-        toolbar!!.title = "推しリスト"
-        setSupportActionBar(toolbar)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.general, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        editListViewModel!!.editMode.observe(this
+        editListViewModel!!.editMode.observe(
+            this
         ) { mode ->
             if (mode) {
                 editMode.title = "完了"
@@ -115,10 +112,18 @@ class CharacterListActivity : AppCompatActivity() {
                 }
                 true
             }
+
+            R.id.create -> {
+                val intent = Intent(this@CharacterListActivity, CreateCharacterActivity::class.java)
+                startActivity(intent)
+                true
+            }
+
             R.id.setting -> {
                 startActivity(Intent(this, GlobalSettingActivity::class.java))
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

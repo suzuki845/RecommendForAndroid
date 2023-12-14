@@ -53,6 +53,8 @@ class GlobalSettingActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         toolbar = findViewById(R.id.toolbar)
+        toolbar.title = "設定"
+        setSupportActionBar(toolbar)
 
         val showReward = findViewById<ViewGroup>(R.id.show_reward)
         val reward = Reward.getInstance(this)
@@ -158,13 +160,14 @@ class GlobalSettingActivity : AppCompatActivity() {
         startActivity(intent);
     }
 
-    private fun initializeToolbar(account: Account?) {
-        toolbar.title = "設定"
-        setSupportActionBar(toolbar)
-    }
-
     fun onShowRewardDialog(v: View){
         RewardDialogFragment(onOk = {it.dismiss()}, onCancel = {it.dismiss()}, onStop = {}).show(supportFragmentManager, RewardDialogFragment.TAG)
+    }
+
+    fun onClickOshiTimer(v: View){
+        val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.oshitimer");
+        intent = Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
     }
 
     fun onClickEmotionDiary(v: View){
