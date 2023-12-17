@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -46,6 +47,10 @@ class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
     }
 
     private fun save() {
+        binding.root.requestFocus()
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
+
         anniversaryVm.save({
             val resultIntent = Intent()
             resultIntent.putExtra(INTENT_CREATE_ANNIVERSARY, it.toJson())
@@ -54,6 +59,7 @@ class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
         }, {
             Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_LONG).show()
         })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -67,6 +73,7 @@ class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
                 save()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -76,7 +83,8 @@ class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
         val year = calendar[Calendar.YEAR]
         val month = calendar[Calendar.MONTH]
         val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-        val datePickerDialog = DatePickerDialog(this,
+        val datePickerDialog = DatePickerDialog(
+            this,
             DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
                     !dialog.isShown

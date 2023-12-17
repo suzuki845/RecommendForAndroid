@@ -12,7 +12,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.ListView
+import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -65,6 +67,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditCharacterBinding
     private lateinit var listView: RecyclerView
+    private lateinit var scrollView: ScrollView
 
     private lateinit var adMobManager: AdMobAdaptiveBannerManager
     private lateinit var adViewContainer: ViewGroup
@@ -173,6 +176,8 @@ class EditCharacterActivity : AppCompatActivity() {
             }
             dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
         }
+
+        scrollView = binding.scrollView
 
         listView = binding.anniversaries
         val adapter = AnniversariesDraftAdapter(this)
@@ -355,6 +360,12 @@ class EditCharacterActivity : AppCompatActivity() {
                 it.getStringExtra(INTENT_CREATE_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
                     characterVM.addAnniversary(anniversary)
+                    scrollView.post{
+                        scrollView.fullScroll(View.FOCUS_DOWN)
+                    }
+                    binding.root.requestFocus()
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
                 }
             }
         }

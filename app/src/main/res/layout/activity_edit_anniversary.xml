@@ -67,6 +67,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:minHeight="46dp"
+                            android:hint="誕生日"
                             android:text="@={vm.name}" />
                     </LinearLayout>
 
@@ -119,6 +120,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:minHeight="46dp"
+                            android:hint="生まれて"
                             android:text="@={vm.topText}" />
                     </LinearLayout>
 
@@ -143,6 +145,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:minHeight="46dp"
+                            android:hint="になりました"
                             android:text="@={vm.bottomText}" />
                     </LinearLayout>
 

@@ -46,7 +46,7 @@ class UserDefinedAnniversary : AnniversaryInterface {
 
     override fun getElapsedDays(current: Date): Long {
         val now = Calendar.getInstance().apply { time = TimeUtil.resetDate(current) }
-        val anniversary = Calendar.getInstance().apply { time = getDate() }
+        val anniversary = Calendar.getInstance().apply { time = date }
         return TimeUtil.getDiffDays(now, anniversary)
     }
 
@@ -78,7 +78,7 @@ class UserDefinedAnniversary : AnniversaryInterface {
 
     override fun getMessage(current: Date): String {
         if (isAnniversary(current)) {
-            return getName() + "記念になりました！"
+            return getName() + "になりました！"
         }
 
         val remaining = getRemainingDays(current)

@@ -10,11 +10,23 @@ class AccountModel(
 ) {
     private val db = AppDatabase.getDatabase(context)
 
-    val entity = db.accountDao().watchById(Account.ACCOUNT_ID.toLong()).map {
+    val entity = db.accountDao().watchById(Account.ACCOUNT_ID).map {
         if (it == null) {
-            return@map Account()
+            val a = Account()
+            AppDatabase.executor.execute { db.accountDao().insertAccount(a) }
+            return@map a
         }
         return@map it
+    }
+
+    fun getAccount() : Account{
+        val account = db.accountDao().findById(Account.ACCOUNT_ID)
+        if (account == null) {
+            val a = Account()
+            AppDatabase.executor.execute { db.accountDao().insertAccount(a) }
+            return a
+        }
+        return account
     }
 
     fun pinning(id: Long) {

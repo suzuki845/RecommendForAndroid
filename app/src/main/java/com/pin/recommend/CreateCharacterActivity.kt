@@ -11,7 +11,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.ListView
+import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -42,8 +44,6 @@ import java.util.*
 class CreateCharacterActivity : AppCompatActivity() {
     companion object {
         @JvmField
-        val INTENT_CREATE_CHARACTER =
-            "com.pin.recommend.EditCharacterActivity.INTENT_CREATE_CHARACTER"
         val REQUEST_CODE_CREATE_ANNIVERSARY = 2983179
         val REQUEST_CODE_EDIT_ANNIVERSARY = 3982432
     }
@@ -60,6 +60,7 @@ class CreateCharacterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateCharacterBinding
     private lateinit var listView: RecyclerView
+    private lateinit var scrollView: ScrollView
 
     private lateinit var adMobManager: AdMobAdaptiveBannerManager
     private lateinit var adViewContainer: ViewGroup
@@ -166,6 +167,8 @@ class CreateCharacterActivity : AppCompatActivity() {
             }
             dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
         }
+
+        scrollView = binding.scrollView
 
         listView = binding.anniversaries
         val adapter = AnniversariesDraftAdapter(this)
@@ -344,6 +347,12 @@ class CreateCharacterActivity : AppCompatActivity() {
                 it.getStringExtra(CreateAnniversaryActivity.INTENT_CREATE_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
                     characterVM.addAnniversary(anniversary)
+                    scrollView.post{
+                        scrollView.fullScroll(View.FOCUS_DOWN)
+                    }
+                    binding.root.requestFocus()
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
                 }
             }
         }

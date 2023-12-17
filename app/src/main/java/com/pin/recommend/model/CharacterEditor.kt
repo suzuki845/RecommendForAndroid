@@ -143,9 +143,10 @@ class CharacterEditor(val context: Context) {
             p.onStart()
 
             db.runInTransaction {
+                val account = AccountModel(context).getAccount()
                 val entity = RecommendCharacter()
                 entity.id = id.value ?: 0
-                entity.accountId = Account.ACCOUNT_ID.toLong()
+                entity.accountId = account.id
                 entity.name = name.value
                 entity.created = created.value ?: throw Exception("Date is null")
                 entity.aboveText = aboveText.value

@@ -193,7 +193,7 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
     }
 
     private fun accountToolbarTextColor(account: Account?): Int {
-        return account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
+        return account?.toolbarTextColor ?: Color.parseColor("#ffffff")
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
