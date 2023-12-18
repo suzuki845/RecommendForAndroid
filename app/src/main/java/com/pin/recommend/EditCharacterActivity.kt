@@ -239,6 +239,11 @@ class EditCharacterActivity : AppCompatActivity() {
     }
 
     fun onAddAnniversary(v: View) {
+        if((characterVM.anniversaries.value?.size ?: 0) >= 2){
+            Toast.makeText(this, "記念日は2個以上設定できません。", Toast.LENGTH_LONG).show()
+            return
+        }
+
         val intent = Intent(this, CreateAnniversaryActivity::class.java)
         intent.putExtra(CreateAnniversaryActivity.INTENT_CHARACTER_ID, id)
         startActivityForResult(intent, REQUEST_CODE_CREATE_ANNIVERSARY)
