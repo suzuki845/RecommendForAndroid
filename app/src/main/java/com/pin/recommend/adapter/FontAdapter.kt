@@ -52,13 +52,19 @@ class FontAdapter : BaseAdapter {
 
         val textView = v.findViewById<TextView>(R.id.font_item)
         textView.text = font.name
-        if (!font.name.equals("Default")) {
+
+        if (font.name != null && font.name != "Default" &&
+            font.name != "default" &&
+            font.name != "デフォルト"
+        ) {
             try {
-                val type = Typeface.createFromAsset(context.getAssets(), "fonts/" + font + ".ttf")
+                val type = Typeface.createFromAsset(context.assets, "fonts/${font.name}.ttf")
                 textView.typeface = type
             } catch (e: RuntimeException) {
-                println("font missing " + font)
+                println("font missing ${font.name}")
+                //throw e
             }
+
         }
 
         return v

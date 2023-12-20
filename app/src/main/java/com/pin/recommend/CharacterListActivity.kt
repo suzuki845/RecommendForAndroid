@@ -4,20 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.pin.recommend.CharacterDetailActivity
-import com.pin.recommend.CreateCharacterActivity
 import com.pin.recommend.adapter.CharactersAdapter
-import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.model.viewmodel.EditStateViewModel
 import com.pin.recommend.model.viewmodel.CharacterListViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
@@ -87,8 +81,12 @@ class CharacterListActivity : AppCompatActivity() {
         adMobManager!!.checkAndLoad()
     }
 
+    fun destinationSetting(v: View){
+        startActivity(Intent(this, GlobalSettingActivity::class.java))
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.general, menu)
+        menuInflater.inflate(R.menu.activity_character_list, menu)
         val editMode = menu.findItem(R.id.edit_mode)
         editListViewModel!!.editMode.observe(
             this
@@ -118,12 +116,12 @@ class CharacterListActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
-
+/*
             R.id.setting -> {
                 startActivity(Intent(this, GlobalSettingActivity::class.java))
                 true
             }
-
+*/
             else -> super.onOptionsItemSelected(item)
         }
     }

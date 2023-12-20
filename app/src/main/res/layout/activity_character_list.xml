@@ -13,12 +13,25 @@
         android:background="@drawable/bar"
         app:elevation="0dp">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:theme="@style/ToolBarStyle"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="wrap_content" >
+            <TextView
+                android:onClick="destinationSetting"
+                android:layout_gravity="center"
+                android:paddingLeft="6dp"
+                android:textSize="15sp"
+                android:text="設定"
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"></TextView>
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:theme="@style/ToolBarStyle"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+        </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
