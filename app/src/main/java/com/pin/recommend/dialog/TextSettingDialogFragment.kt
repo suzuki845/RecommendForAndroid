@@ -47,7 +47,7 @@ class TextSettingDialogFragment(private val actionListener: DialogActionListener
 
         textColorView.setImageBitmap(colorToBitmap(30, 30, textColor))
         textColorView.setOnClickListener(View.OnClickListener {
-            val dialog = ColorPickerDialogFragment(object : DialogActionListener<ColorPickerDialogFragment?> {
+            val dialog = ColorPickerDialogFragment(object : DialogActionListener<ColorPickerDialogFragment> {
                 override fun onCancel() {}
                 override fun onDecision(dialog: ColorPickerDialogFragment?) {
                     dialog?.let {
@@ -62,7 +62,7 @@ class TextSettingDialogFragment(private val actionListener: DialogActionListener
 
         textShadowColorView.setImageBitmap(colorToBitmap(30, 30, textShadowColor))
         textShadowColorView.setOnClickListener(View.OnClickListener {
-            val dialog = ColorPickerDialogFragment(object : DialogActionListener<ColorPickerDialogFragment?> {
+            val dialog = ColorPickerDialogFragment(object : DialogActionListener<ColorPickerDialogFragment> {
                 override fun onCancel() {}
                 override fun onDecision(dialog: ColorPickerDialogFragment?) {
                     dialog?.let {

@@ -137,7 +137,7 @@ class CreateCharacterActivity : AppCompatActivity() {
 
         binding.previewTextColor.setOnClickListener {
             val dialog = ColorPickerDialogFragment(object :
-                DialogActionListener<ColorPickerDialogFragment?> {
+                DialogActionListener<ColorPickerDialogFragment> {
                 override fun onCancel() {}
                 override fun onDecision(dialog: ColorPickerDialogFragment?) {
                     dialog?.let {
@@ -154,7 +154,7 @@ class CreateCharacterActivity : AppCompatActivity() {
 
         binding.previewTextShadow.setOnClickListener {
             val dialog = ColorPickerDialogFragment(object :
-                DialogActionListener<ColorPickerDialogFragment?> {
+                DialogActionListener<ColorPickerDialogFragment> {
                 override fun onCancel() {}
                 override fun onDecision(dialog: ColorPickerDialogFragment?) {
                     dialog?.let {
