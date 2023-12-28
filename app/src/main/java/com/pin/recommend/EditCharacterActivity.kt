@@ -33,6 +33,7 @@ import com.pin.recommend.adapter.FontAdapter
 import com.pin.recommend.databinding.ActivityEditCharacterBinding
 import com.pin.recommend.dialog.ColorPickerDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
+import com.pin.recommend.model.CharacterEditor
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
 import com.pin.recommend.util.PermissionRequests
@@ -59,7 +60,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
     private val FORMAT = SimpleDateFormat("yyyy年MM月dd日")
 
-    private val characterVM: CharacterEditorViewModel by lazy {
+    private val vm: CharacterEditorViewModel by lazy {
         ViewModelProvider(this).get(CharacterEditorViewModel::class.java)
     }
 
@@ -92,20 +93,20 @@ class EditCharacterActivity : AppCompatActivity() {
         }
 
         id = intent.getLongExtra(INTENT_EDIT_CHARACTER, -1)
-        characterVM.initialize(id)
+        vm.initialize(id)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_character)
-        binding.vm = characterVM
+        binding.vm = vm
         binding.lifecycleOwner = this
 
         binding.imageOpacity.max = 100
-        binding.imageOpacity.progress = 100
+        binding.imageOpacity.progress = (vm.backgroundImageOpacity.value?.toInt() ?: 1) * 100
         binding.imageOpacity.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar, progress: Int, fromUser: Boolean
             ) {
                 val o = progress * 0.01f
-                characterVM.backgroundImageOpacity.value = o
+                vm.backgroundImageOpacity.value = o
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
@@ -113,68 +114,19 @@ class EditCharacterActivity : AppCompatActivity() {
         })
 
         binding.previewBackgroundImage.setOnLongClickListener {
-            val popup = PopupMenu(this, binding.previewBackgroundImage)
-            val inflater = popup.menuInflater
-            inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.remove -> {
-                        characterVM.backgroundImage.value = null
-                    }
-                }
-                false
-            }
-            popup.show()
-            return@setOnLongClickListener true
+            setOnBackgroundClear(it)
         }
 
         binding.previewBackgroundColor.setOnLongClickListener {
-            val popup = PopupMenu(this, binding.previewBackgroundColor)
-            val inflater = popup.menuInflater
-            inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.remove -> {
-                        characterVM.backgroundColor.value = Color.WHITE
-                    }
-                }
-                false
-            }
-            popup.show()
-            return@setOnLongClickListener true
+            setOnBackgroundColorClear(it)
         }
 
         binding.previewTextColor.setOnClickListener {
-            val dialog = ColorPickerDialogFragment(object :
-                DialogActionListener<ColorPickerDialogFragment> {
-                override fun onCancel() {}
-                override fun onDecision(dialog: ColorPickerDialogFragment?) {
-                    dialog?.let {
-                        characterVM.homeTextColor.value = it.color
-                    }
-                }
-            })
-            characterVM.homeTextColor.value?.let {
-                dialog.setDefaultColor(it)
-            }
-            dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
+            setOnTextColor(it)
         }
 
-
         binding.previewTextShadow.setOnClickListener {
-            val dialog = ColorPickerDialogFragment(object :
-                DialogActionListener<ColorPickerDialogFragment> {
-                override fun onCancel() {}
-                override fun onDecision(dialog: ColorPickerDialogFragment?) {
-                    dialog?.let {
-                        characterVM.homeTextShadowColor.value = it.color
-                    }
-                }
-            })
-            characterVM.homeTextShadowColor.value?.let {
-                dialog.setDefaultColor(it)
-            }
-            dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
+            setOnTextShadowColor(it)
         }
 
         scrollView = binding.scrollView
@@ -187,7 +139,7 @@ class EditCharacterActivity : AppCompatActivity() {
             intent.putExtra(INTENT_EDIT_ANNIVERSARY, it.toJson())
             startActivityForResult(intent, REQUEST_CODE_EDIT_ANNIVERSARY)
         }
-        characterVM.anniversaries.observeForever {
+        vm.anniversaries.observeForever {
             adapter.setItems(it)
         }
         listView.layoutManager = LinearLayoutManager(this)
@@ -207,7 +159,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
                 val position = viewHolder.adapterPosition
-                characterVM.removeAnniversary(position)
+                vm.removeAnniversary(position)
                 adapter.notifyDataSetChanged()
             }
         }
@@ -229,7 +181,7 @@ class EditCharacterActivity : AppCompatActivity() {
     }
 
     fun save() {
-        characterVM.save(Progress({
+        vm.save(Progress({
 
         }, {
             finish()
@@ -238,8 +190,85 @@ class EditCharacterActivity : AppCompatActivity() {
         }))
     }
 
+    fun onSetBackgroundColor(v: View?) {
+        val dialog =
+            ColorPickerDialogFragment(object :
+                DialogActionListener<ColorPickerDialogFragment> {
+                override fun onDecision(dialog: ColorPickerDialogFragment) {
+                    vm.backgroundColor.value = dialog.color
+                }
+
+                override fun onCancel() {}
+            })
+
+        dialog.setDefaultColor(vm.backgroundColor.value ?: CharacterEditor.defaultBackgroundColor)
+        dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
+    }
+
+    fun setOnBackgroundClear(v: View): Boolean{
+        val popup = PopupMenu(this, binding.previewBackgroundImage)
+        val inflater = popup.menuInflater
+        inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.remove -> {
+                    vm.backgroundImage.value = null
+                }
+            }
+            false
+        }
+        popup.show()
+        return true
+    }
+
+    fun setOnBackgroundColorClear(v: View): Boolean{
+        val popup = PopupMenu(this, binding.previewBackgroundColor)
+        val inflater = popup.menuInflater
+        inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.remove -> {
+                    vm.backgroundColor.value = Color.WHITE
+                }
+            }
+            false
+        }
+        popup.show()
+        return true
+    }
+
+    fun setOnTextColor(v: View){
+        val dialog = ColorPickerDialogFragment(object :
+            DialogActionListener<ColorPickerDialogFragment> {
+            override fun onCancel() {}
+            override fun onDecision(dialog: ColorPickerDialogFragment?) {
+                dialog?.let {
+                    vm.homeTextColor.value = it.color
+                }
+            }
+        })
+        dialog.setDefaultColor(vm.homeTextColor.value ?: CharacterEditor.defaultTextColor)
+        dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
+    }
+
+    fun setOnTextShadowColor(v: View){
+        val dialog = ColorPickerDialogFragment(object :
+            DialogActionListener<ColorPickerDialogFragment> {
+            override fun onCancel() {}
+            override fun onDecision(dialog: ColorPickerDialogFragment?) {
+                dialog?.let {
+                    vm.homeTextShadowColor.value = it.color
+                }
+            }
+        })
+        vm.homeTextShadowColor.value?.let {
+            dialog.setDefaultColor(it)
+        }
+        dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
+    }
+
     fun onAddAnniversary(v: View) {
-        if((characterVM.anniversaries.value?.size ?: 0) >= 2){
+        if((vm.anniversaries.value?.size ?: 0) >= 2){
             Toast.makeText(this, "記念日は2個以上設定できません。", Toast.LENGTH_LONG).show()
             return
         }
@@ -261,7 +290,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
         val dialog = builder.create()
         listView.setOnItemClickListener { parent, view, pos, id ->
-            characterVM.fontFamily.value = adapter.getItem(pos).name
+            vm.fontFamily.value = adapter.getItem(pos).name
             dialog.cancel()
         }
 
@@ -282,7 +311,7 @@ class EditCharacterActivity : AppCompatActivity() {
                 val newCalender = Calendar.getInstance()
                 newCalender[year, month] = dayOfMonth
                 val date = newCalender.time
-                characterVM.created.value = date
+                vm.created.value = date
             }, year, month, dayOfMonth)
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
@@ -317,22 +346,6 @@ class EditCharacterActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_PICK_BACKGROUND)
     }
 
-    fun onSetBackgroundColor(v: View?) {
-        val dialog =
-            ColorPickerDialogFragment(object :
-                DialogActionListener<ColorPickerDialogFragment> {
-                override fun onDecision(dialog: ColorPickerDialogFragment) {
-                    characterVM.backgroundColor.value = dialog.color
-                }
-
-                override fun onCancel() {}
-            })
-        characterVM.backgroundColor.value?.let {
-            dialog.setDefaultColor(it)
-        }
-        dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
-    }
-
     private
     var pickMode = 0
     override fun onActivityResult(
@@ -364,7 +377,7 @@ class EditCharacterActivity : AppCompatActivity() {
             result?.let {
                 it.getStringExtra(INTENT_CREATE_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
-                    characterVM.addAnniversary(anniversary)
+                    vm.addAnniversary(anniversary)
                     scrollView.post{
                         scrollView.fullScroll(View.FOCUS_DOWN)
                     }
@@ -379,7 +392,7 @@ class EditCharacterActivity : AppCompatActivity() {
             result?.let {
                 it.getStringExtra(INTENT_EDIT_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
-                    characterVM.replaceAnniversary(anniversary)
+                    vm.replaceAnniversary(anniversary)
                 }
             }
         }
@@ -398,7 +411,7 @@ class EditCharacterActivity : AppCompatActivity() {
             val bitmap = BitmapUtility.decodeUri(
                 this, uri, 500, 500
             )
-            characterVM.iconImage.value = bitmap
+            vm.iconImage.value = bitmap
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT)
                 .show()
@@ -417,7 +430,7 @@ class EditCharacterActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK) {
             val uri = Crop.getOutput(result)
             val bitmap = BitmapUtility.decodeUri(this, uri)
-            characterVM.backgroundImage.value = bitmap
+            vm.backgroundImage.value = bitmap
             println("test!!! handleCropBackground")
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT)

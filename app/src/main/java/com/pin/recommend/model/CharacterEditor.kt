@@ -19,6 +19,13 @@ import java.util.*
 
 class CharacterEditor(val context: Context) {
 
+    companion object {
+        val defaultBackgroundColor = Color.parseColor("#77ffffff")
+        val defaultBackgroundImageOpacity = 1f
+        val defaultTextColor = Color.parseColor("#ff000000")
+        val defaultTextShadowColor = Color.parseColor("#00000000")
+    }
+
     private val db = AppDatabase.getDatabase(context)
 
     private val id = MutableLiveData<Long>(0)
@@ -40,21 +47,23 @@ class CharacterEditor(val context: Context) {
 
     val backgroundImage = MutableLiveData<Bitmap?>()
 
+    val backgroundImageOpacity = MutableLiveData(defaultBackgroundImageOpacity)
+
     private val beforeBackgroundImageUri = MutableLiveData<String?>()
 
-    val backgroundColor = MutableLiveData<Int?>(Color.parseColor("#ffffff"))
+    val backgroundColor = MutableLiveData(defaultBackgroundColor)
 
     val backgroundColorToBitmap = backgroundColor.map {
         colorIntToBitmap(it)
     }
 
-    val homeTextColor = MutableLiveData<Int?>(Color.parseColor("#444444"))
+    val homeTextColor = MutableLiveData(defaultTextColor)
 
     val homeTextColorToBitmap = homeTextColor.map {
         colorIntToBitmap(it)
     }
 
-    val homeTextShadowColor = MutableLiveData<Int?>()
+    val homeTextShadowColor = MutableLiveData(defaultTextShadowColor)
 
     val homeTextShadowColorToBitmap = homeTextShadowColor.map {
         colorIntToBitmap(it)
@@ -77,8 +86,6 @@ class CharacterEditor(val context: Context) {
         if(it == "デフォルト") return@map  null
         return@map Typeface.createFromAsset(context.assets, "fonts/" + it + ".ttf")
     }
-
-    val backgroundImageOpacity = MutableLiveData(1f)
 
     val anniversaries = MutableLiveData<MutableList<CustomAnniversary.Draft>>(mutableListOf())
 
@@ -143,7 +150,7 @@ class CharacterEditor(val context: Context) {
             p.onStart()
 
             db.runInTransaction {
-                val account = AccountModel(context).getAccount()
+                val account = AccountModel(context).initialize()
                 val entity = RecommendCharacter()
                 entity.id = id.value ?: 0
                 entity.accountId = account.id
@@ -153,8 +160,8 @@ class CharacterEditor(val context: Context) {
                 entity.belowText = belowText.value
                 entity.homeTextColor = homeTextColor.value
                 entity.homeTextShadowColor = homeTextShadowColor.value
-                entity.backgroundColor = backgroundColor.value
-                entity.backgroundImageOpacity = backgroundImageOpacity.value ?: 1f
+                entity.backgroundColor = backgroundColor.value ?: defaultBackgroundColor
+                entity.backgroundImageOpacity = backgroundImageOpacity.value ?: defaultBackgroundImageOpacity
                 entity.isZeroDayStart = isZeroDayStart.value ?: false
                 entity.fontFamily = fontFamily.value
 

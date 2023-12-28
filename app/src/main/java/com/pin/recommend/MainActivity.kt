@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.switchMap
 import com.pin.recommend.Constants.PREF_KEY_IS_LOCKED
+import com.pin.recommend.model.AccountModel
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.util.PrefUtil

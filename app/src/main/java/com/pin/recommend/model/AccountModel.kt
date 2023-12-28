@@ -19,7 +19,7 @@ class AccountModel(
         return@map it
     }
 
-    fun getAccount() : Account{
+    fun initialize() : Account{
         val account = db.accountDao().findById(Account.ACCOUNT_ID)
         if (account == null) {
             val a = Account()

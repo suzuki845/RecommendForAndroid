@@ -11,7 +11,7 @@ import com.pin.recommend.R
 
 class ColorPickerDialogFragment(private val actionListener: DialogActionListener<ColorPickerDialogFragment>) :
     DialogFragment() {
-    private var defaultColor = Color.parseColor("#77000000")
+    private var defaultColor = Color.parseColor("#ff000000")
     fun setDefaultColor(color: Int) {
         defaultColor = color
     }

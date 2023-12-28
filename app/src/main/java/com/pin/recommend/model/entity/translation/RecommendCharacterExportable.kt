@@ -87,7 +87,7 @@ class RecommendCharacterExportable {
         character.fontFamily = fontType
         character.backgroundImageUri = backgroundImageSrc
         character.iconImageUri = iconImageSrc
-        character.created = created
+        character.created = created  ?: Date()
         character.isZeroDayStart = isZeroDayStart
         character.elapsedDateFormat = elapsedDateType
         character.name = name
