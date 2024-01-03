@@ -34,7 +34,9 @@ import com.pin.recommend.databinding.ActivityEditCharacterBinding
 import com.pin.recommend.dialog.ColorPickerDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.model.CharacterEditor
+import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.CustomAnniversary
+import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
@@ -42,6 +44,7 @@ import com.pin.util.*
 import com.pin.util.Reward.Companion.getInstance
 import com.soundcloud.android.crop.Crop
 import java.io.File
+import java.lang.reflect.RecordComponent
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -92,15 +95,19 @@ class EditCharacterActivity : AppCompatActivity() {
             adMobManager.checkFirst()
         }
 
-        id = intent.getLongExtra(INTENT_EDIT_CHARACTER, -1)
-        vm.initialize(id)
+        val json = intent.getStringExtra(INTENT_EDIT_CHARACTER) ?: ""
+        val cwa =
+            CharacterWithAnniversaries.fromJson(json)
+
+        id = cwa.id
+        vm.initialize(cwa)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_character)
         binding.vm = vm
         binding.lifecycleOwner = this
 
         binding.imageOpacity.max = 100
-        binding.imageOpacity.progress = (vm.backgroundImageOpacity.value?.toInt() ?: 1) * 100
+        binding.imageOpacity.progress = (cwa.character.backgroundImageOpacity * 100 ).toInt()
         binding.imageOpacity.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar, progress: Int, fromUser: Boolean
@@ -205,7 +212,7 @@ class EditCharacterActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
     }
 
-    fun setOnBackgroundClear(v: View): Boolean{
+    fun setOnBackgroundClear(v: View): Boolean {
         val popup = PopupMenu(this, binding.previewBackgroundImage)
         val inflater = popup.menuInflater
         inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
@@ -221,7 +228,7 @@ class EditCharacterActivity : AppCompatActivity() {
         return true
     }
 
-    fun setOnBackgroundColorClear(v: View): Boolean{
+    fun setOnBackgroundColorClear(v: View): Boolean {
         val popup = PopupMenu(this, binding.previewBackgroundColor)
         val inflater = popup.menuInflater
         inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
@@ -237,7 +244,7 @@ class EditCharacterActivity : AppCompatActivity() {
         return true
     }
 
-    fun setOnTextColor(v: View){
+    fun setOnTextColor(v: View) {
         val dialog = ColorPickerDialogFragment(object :
             DialogActionListener<ColorPickerDialogFragment> {
             override fun onCancel() {}
@@ -251,7 +258,7 @@ class EditCharacterActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
     }
 
-    fun setOnTextShadowColor(v: View){
+    fun setOnTextShadowColor(v: View) {
         val dialog = ColorPickerDialogFragment(object :
             DialogActionListener<ColorPickerDialogFragment> {
             override fun onCancel() {}
@@ -268,7 +275,7 @@ class EditCharacterActivity : AppCompatActivity() {
     }
 
     fun onAddAnniversary(v: View) {
-        if((vm.anniversaries.value?.size ?: 0) >= 2){
+        if ((vm.anniversaries.value?.size ?: 0) >= 2) {
             Toast.makeText(this, "記念日は2個以上設定できません。", Toast.LENGTH_LONG).show()
             return
         }
@@ -378,7 +385,7 @@ class EditCharacterActivity : AppCompatActivity() {
                 it.getStringExtra(INTENT_CREATE_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
                     vm.addAnniversary(anniversary)
-                    scrollView.post{
+                    scrollView.post {
                         scrollView.fullScroll(View.FOCUS_DOWN)
                     }
                     binding.root.requestFocus()
@@ -449,6 +456,7 @@ class EditCharacterActivity : AppCompatActivity() {
                 save()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

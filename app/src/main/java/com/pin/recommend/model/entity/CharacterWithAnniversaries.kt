@@ -6,6 +6,8 @@ import android.graphics.Typeface
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
+import com.google.gson.Gson
+import com.pin.recommend.CharacterDetailActivity
 
 data class CharacterWithAnniversaries(
     @Embedded val character: RecommendCharacter,
@@ -29,7 +31,7 @@ data class CharacterWithAnniversaries(
         val typeface = character.fontFamily?.let {
             if (it == null) return@let null
             if (it == "Default") return@let null
-            if(it == "default") return@let null
+            if (it == "default") return@let null
             if (it == "デフォルト") return@let null
             Typeface.createFromAsset(context.assets, "fonts/$it.ttf")
         }
@@ -44,5 +46,15 @@ data class CharacterWithAnniversaries(
             typeface,
             character.backgroundImageOpacity
         )
+    }
+
+    fun toJson(): String {
+        return Gson().toJson(this)
+    }
+
+    companion object {
+        fun fromJson(json: String): CharacterWithAnniversaries {
+            return Gson().fromJson(json, CharacterWithAnniversaries::class.java)
+        }
     }
 }

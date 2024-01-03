@@ -20,7 +20,7 @@ class HomeFragment : Fragment() {
     private val detailsVM: CharacterDetailsViewModel by lazy {
         ViewModelProvider(requireActivity()).get(CharacterDetailsViewModel::class.java)
     }
-    private lateinit var  binding: FragmentCharacterDetailBinding
+    private lateinit var binding: FragmentCharacterDetailBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +46,10 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    private fun textShadow(){
-        detailsVM.state.observe(requireActivity()){ it ->
+    private fun textShadow() {
+        detailsVM.state.observe(requireActivity()) { it ->
             val c = it.appearance.homeTextShadowColor
-            c?.let {s->
+            c?.let { s ->
                 binding.characterName.setShadowLayer(3f, 0f, 0f, s)
                 binding.topText.setShadowLayer(3f, 0f, 0f, s)
                 binding.bottomText.setShadowLayer(3f, 0f, 0f, s)
@@ -59,7 +59,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    fun onDestinationScreenshotActivity(view: View){
+    fun onDestinationScreenshotActivity(view: View) {
         val intent = Intent(requireActivity(), ScreenShotActivity::class.java);
         intent.putExtra(
             ScreenShotActivity.INTENT_SCREEN_SHOT,
@@ -84,13 +84,16 @@ class HomeFragment : Fragment() {
         when (item.itemId) {
             R.id.edit_mode -> {
                 val intent = Intent(context, EditCharacterActivity::class.java)
+                val json = detailsVM.cwa.value?.toJson()
                 intent.putExtra(
                     EditCharacterActivity.INTENT_EDIT_CHARACTER,
-                    detailsVM.state.value?.characterId
+                    json
                 )
+
                 startActivity(intent)
                 return true
             }
+
             R.id.change_anniversary -> {
                 detailsVM.changeAnniversary()
 

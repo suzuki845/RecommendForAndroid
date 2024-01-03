@@ -26,6 +26,8 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
 
     val state = characterDetails.state
 
+    val cwa = characterDetails.cwa
+
     val character = characterDetails.character
 
     val stories = characterDetails.stories
