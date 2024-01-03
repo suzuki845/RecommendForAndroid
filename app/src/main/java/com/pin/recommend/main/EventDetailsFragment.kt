@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,14 +15,12 @@ import com.pin.recommend.*
 import com.pin.recommend.R
 import com.pin.recommend.adapter.DateSeparatedEventAdapter
 import com.pin.recommend.databinding.FragmentEventDetailsBinding
-import com.pin.recommend.dialog.ColorPickerDialogFragment
 import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
-import com.pin.recommend.dialog.ToolbarSettingDialogFragment
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
+import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.model.viewmodel.EventDetailsViewModel
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import com.pin.recommend.util.TimeUtil
 import com.prolificinteractive.materialcalendarview.*
 import com.prolificinteractive.materialcalendarview.spans.DotSpan
@@ -37,11 +34,9 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         ViewModelProvider(this).get(EventDetailsViewModel::class.java)
     }
 
-    private val characterViewModel: RecommendCharacterViewModel by lazy {
-        ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
+    private val detailsVM: CharacterDetailsViewModel by lazy {
+        ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
     }
-
-    private lateinit var character: RecommendCharacter
 
     private lateinit var  binding: FragmentEventDetailsBinding
 
@@ -53,12 +48,8 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-        }
-        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
-        if(character != null){
-            eventViewModel.setCharacter(character)
-        }
+        val characterId = requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+        eventViewModel.setCharacter(characterId)
         eventViewModel.setCurrentDate(Date())
         adapter = DateSeparatedEventAdapter(this, onDelete = {
             val dialog = DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
@@ -132,8 +123,8 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
                 eventViewModel.setCurrentDate(it)
 
                 val intent = Intent(activity, CreateEventActivity::class.java)
-                val character = requireActivity().intent.getParcelableExtra<RecommendCharacter>(CharacterDetailActivity.INTENT_CHARACTER)
-                intent.putExtra(CreateEventActivity.INTENT_CREATE_EVENT_CHARACTER, character?.id)
+                val characterId = requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+                intent.putExtra(CreateEventActivity.INTENT_CREATE_EVENT_CHARACTER, characterId)
                 intent.putExtra(CreateEventActivity.INTENT_CREATE_EVENT_DATE, it.time)
                 startActivity(intent)
             }
@@ -202,15 +193,13 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
     }
 
     private fun accountToolbarTextColor(account: Account?): Int {
-        return account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
+        return account?.toolbarTextColor ?: Color.parseColor("#ffffff")
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
-        val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
         eventViewModel.isEditMode.observe(this, Observer<Boolean> { mode ->
             if (mode) {
                 editMode.title = "完了"
@@ -222,19 +211,6 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.change_body_text_color -> {
-                val bodyTextPickerDialogFragment = ColorPickerDialogFragment(object : DialogActionListener<ColorPickerDialogFragment?> {
-                    override fun onDecision(dialog: ColorPickerDialogFragment?) {
-                        character.homeTextColor = dialog?.color
-                        characterViewModel.update(character)
-                    }
-
-                    override fun onCancel() {}
-                })
-                bodyTextPickerDialogFragment.setDefaultColor(character.getHomeTextColor())
-                bodyTextPickerDialogFragment.show(requireActivity().supportFragmentManager, ToolbarSettingDialogFragment.TAG)
-                return true
-            }
             R.id.edit_mode -> {
                 eventViewModel.isEditMode.value = eventViewModel.isEditMode.value != true
                 return true

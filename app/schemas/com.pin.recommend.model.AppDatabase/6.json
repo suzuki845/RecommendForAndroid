@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "b80abce3dfc97119adaff6be9ca51062",
+    "identityHash": "775d3969201df510964a0a44fcf7e9df",
     "entities": [
       {
         "tableName": "Account",
@@ -360,7 +360,16 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Payment_characterId",
+            "unique": false,
+            "columnNames": [
+              "characterId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Payment_characterId` ON `${TABLE_NAME}` (`characterId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "RecommendCharacter",
@@ -461,7 +470,16 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Event_characterId",
+            "unique": false,
+            "columnNames": [
+              "characterId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Event_characterId` ON `${TABLE_NAME}` (`characterId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "RecommendCharacter",
@@ -480,7 +498,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b80abce3dfc97119adaff6be9ca51062')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '775d3969201df510964a0a44fcf7e9df')"
     ]
   }
 }

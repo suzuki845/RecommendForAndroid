@@ -1,12 +1,23 @@
 package com.pin.recommend.util
 
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 
 class TimeUtil {
     companion object {
-        private val MILLIS_OF_DAY = 1000 * 60 * 60 * 24
+        private const val MILLIS_OF_DAY = 1000 * 60 * 60 * 24
+
+        fun duration(c1: Calendar, c2: Calendar): Duration {
+            val i1 = Instant.ofEpochMilli(c1.timeInMillis)
+            val i2 = Instant.ofEpochMilli(c2.timeInMillis)
+            return Duration.between(i1, i2)
+        }
+
         @JvmStatic
         fun getDiffDays(calendar1: Calendar, calendar2: Calendar): Long {
+            resetTime(calendar1)
+            resetTime(calendar2)
             val diffTime = calendar1.timeInMillis - calendar2.timeInMillis
             return diffTime / MILLIS_OF_DAY
         }

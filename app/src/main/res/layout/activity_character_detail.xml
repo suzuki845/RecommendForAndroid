@@ -9,12 +9,12 @@
     <ImageView
         android:id="@+id/backgroundImage"
         android:elevation="-1dp"
+        android:scaleType="centerCrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <FrameLayout
         android:id="@+id/backgroundColor"
-        android:alpha="0.7"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

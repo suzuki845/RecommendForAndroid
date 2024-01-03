@@ -37,6 +37,11 @@ interface EventDao {
 
     @Transaction
     @Query("SELECT * FROM Event WHERE characterId = :characterId AND (date >= :start AND date <= :end) ORDER BY date ASC")
-    fun findByTrackedCharacterIdEventInDate(characterId: Long, start: Date, end: Date): LiveData<List<Event>>
+    fun findByCharacterIdEventInDate(characterId: Long, start: Date, end: Date): List<Event>
+
+    @Transaction
+    @Query("SELECT * FROM Event WHERE characterId = :characterId AND (date >= :start AND date <= :end) ORDER BY date ASC")
+    fun watchByCharacterIdEventInDate(characterId: Long, start: Date, end: Date): LiveData<List<Event>>
+
 
 }

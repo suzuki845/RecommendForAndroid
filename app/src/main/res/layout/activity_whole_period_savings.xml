@@ -9,7 +9,6 @@
         <import type="com.pin.recommend.model.viewmodel.DateConverter"/>
         <variable name="activity" type="android.app.Activity"/>
         <variable name="vm" type="com.pin.recommend.model.viewmodel.WholePeriodPaymentViewModel"/>
-        <variable name="avm" type="com.pin.recommend.model.viewmodel.AccountViewModel"/>
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -33,14 +32,72 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:characterToolbar="@{vm.character}"
-                android:accountToolbar="@{avm.accountLiveData}"
-                android:activity="@{activity}"
                 app:theme="@style/ToolBarStyle"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <include android:id="@+id/content" layout="@layout/content_whole_period_savings" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/character_icon"
+                android:layout_gravity="center"
+                android:layout_marginTop="-140dp"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/icon_background"
+                android:characterIcon='@{vm.character}'
+                app:civ_border_width="2dp"
+                app:civ_border_color="#eeeeee" />
+
+            <LinearLayout
+                android:layout_marginTop="208dp"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+                <TextView
+                    android:id="@+id/character_name"
+                    android:homeText="@{vm.character}"
+                    android:text='@{vm.character.name}'
+                    android:textSize="26sp"
+                    android:padding="4dp"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/first_text"
+                    android:homeText="@{vm.character}"
+                    android:textSize="20sp"
+                    android:text="推し貯金して"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/amount"
+                    android:padding="4dp"
+                    android:textSize="34sp"
+                    android:text='@{IntConverter.toString(vm.wholePeriodSavingsAmount) + "円"}'
+                    android:homeText="@{vm.character}"
+                    android:shadowRadius="4"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/created"
+                    android:homeText="@{vm.character}"
+                    android:text="になりました"
+                    android:padding="4dp"
+                    android:textSize="20sp"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

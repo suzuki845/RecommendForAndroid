@@ -101,17 +101,6 @@
 
         </LinearLayout>
 
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
-            android:tint="#ffffff"
-            app:srcCompat="@drawable/ic_add_24dp" />
-
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

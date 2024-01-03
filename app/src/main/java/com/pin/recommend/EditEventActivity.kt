@@ -16,9 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityCreateEventBinding
 import com.pin.recommend.databinding.ActivityEditEventBinding
 import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.entity.Event
-import com.pin.recommend.model.viewmodel.AccountViewModel
-import com.pin.recommend.model.viewmodel.CreateEventViewModel
 import com.pin.recommend.model.viewmodel.EditEventViewModel
 import com.pin.recommend.util.TimeUtil
 import java.util.*
@@ -35,9 +32,6 @@ class EditEventActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditEventBinding
 
-    private lateinit var toolbar: Toolbar
-
-    private lateinit var accountViewModel: AccountViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,23 +43,15 @@ class EditEventActivity : AppCompatActivity() {
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_event)
-        binding.content.vm = viewModel
+        binding.vm = viewModel
         binding.lifecycleOwner = this
 
-        toolbar = findViewById(R.id.toolbar)
-
-        accountViewModel = MyApplication.getAccountViewModel(this)
-        val accountLiveData = accountViewModel.accountLiveData
-        accountLiveData.observe(this, Observer { account -> initializeToolbar(account) })
-    }
-
-    private fun initializeToolbar(account: Account?) {
-        toolbar.title = "イベントの編集"
-        setSupportActionBar(toolbar)
+        binding.toolbar.title = "イベントの編集"
+        setSupportActionBar(binding.toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_create_event, menu)
+        menuInflater.inflate(R.menu.activity_edit_event, menu)
         return true
     }
 

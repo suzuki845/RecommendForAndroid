@@ -4,11 +4,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.pin.recommend.databinding.ActivityWholePeriodPaymentBinding
 import com.pin.recommend.databinding.ActivityWholePeriodSavingsBinding
 import com.pin.recommend.model.viewmodel.WholePeriodPaymentViewModel
 
@@ -22,10 +19,6 @@ class WholePeriodSavingsActivity : AppCompatActivity() {
         ViewModelProvider(this).get(WholePeriodPaymentViewModel::class.java)
     }
 
-    private val accountViewModel by  lazy {
-        MyApplication.getAccountViewModel(this)
-    }
-
     private lateinit var binding: ActivityWholePeriodSavingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,8 +30,6 @@ class WholePeriodSavingsActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.activity = this
         binding.vm = viewModel
-        binding.avm = accountViewModel
-        binding.content.vm = viewModel
 
         initializeToolbar()
     }

@@ -20,14 +20,14 @@ class EventBetweenDatesModel(private val eventDao: EventDao, private val charact
     val characterId = MutableLiveData<Long?>()
 
     val character = characterId.switchMap {
-        characterDao.findTrackedById(it ?: -1)
+        characterDao.watchById(it ?: -1)
     }
 
     val section = MutableLiveData<Section<Date>>(Section(Date(), Date()))
 
     val groupingByDate = characterId.switchMap { characterId ->
         section.switchMap { dates ->
-            eventDao.findByTrackedCharacterIdEventInDate(characterId ?: -1, dates.startDate, dates.endDate).map {
+            eventDao.watchByCharacterIdEventInDate(characterId ?: -1, dates.startDate, dates.endDate).map {
                 it.groupBy {
                      TimeUtil.resetDate(it.date)
                 }
@@ -47,6 +47,10 @@ class CharacterMonthlyEventModel(private val eventDao: EventDao, private val cha
     val character = eventBetweenDatesModel.character
     fun setCharacter(character: RecommendCharacter){
         eventBetweenDatesModel.characterId.value = character.id
+    }
+
+    fun setCharacter(id: Long){
+        eventBetweenDatesModel.characterId.value = id
     }
 
     private var _currentDate: MutableLiveData<Date>  = MutableLiveData(Date())

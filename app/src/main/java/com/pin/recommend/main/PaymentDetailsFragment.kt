@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,14 +13,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pin.recommend.*
 import com.pin.recommend.adapter.DateSeparatedPaymentAdapter
 import com.pin.recommend.databinding.FragmentPaymentDetailsBinding
-import com.pin.recommend.dialog.ColorPickerDialogFragment
 import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
-import com.pin.recommend.dialog.ToolbarSettingDialogFragment
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
+import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.model.viewmodel.PaymentDetailsViewModel
-import com.pin.recommend.model.viewmodel.RecommendCharacterViewModel
 import java.util.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -41,11 +38,9 @@ class PaymentDetailsFragment : Fragment() {
         ViewModelProvider(this).get(PaymentDetailsViewModel::class.java)
     }
 
-    private val characterViewModel: RecommendCharacterViewModel by lazy {
-        ViewModelProvider(this).get(RecommendCharacterViewModel::class.java)
+    private val detailsVM: CharacterDetailsViewModel by lazy {
+        ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
     }
-
-    private lateinit var character: RecommendCharacter
 
     private lateinit var  binding: FragmentPaymentDetailsBinding
 
@@ -53,13 +48,8 @@ class PaymentDetailsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-        }
-        character = requireActivity().intent.getParcelableExtra(CharacterDetailActivity.INTENT_CHARACTER)!!
-        if(character != null){
-            //paymentViewModel.characterId.value = character.id
-            paymentViewModel.setCharacterId(character.id)
-        }
+        val characterId = requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+        paymentViewModel.setCharacterId(characterId)
         paymentViewModel.setCurrentDate(Date())
         adapter = DateSeparatedPaymentAdapter(this, onDelete = {
             val dialog = DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
@@ -86,24 +76,13 @@ class PaymentDetailsFragment : Fragment() {
             paymentViewModel.monthlyPayment.observe(viewLifecycleOwner, Observer {
                 adapter.setList(it)
                 val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
-                //val dividerItemDecoration = DividerItemDecoration(requireContext(), LinearLayoutManager(requireContext()).orientation)
-                //paymentRecycleView.addItemDecoration(dividerItemDecoration)
                 paymentRecycleView.layoutManager = layoutManager
-                //paymentRecycleView.setHasFixedSize(false)
                 paymentRecycleView.adapter = adapter
             })
 
             paymentViewModel.isEditMode.observe(viewLifecycleOwner, Observer {
                 adapter.isEditMode = it
             })
-        }
-
-        val fab: FloatingActionButton = binding.root.findViewById(R.id.fab)
-        fab.setOnClickListener {
-            val intent = Intent(activity, CreatePaymentActivity::class.java)
-            val character = requireActivity().intent.getParcelableExtra<RecommendCharacter>(CharacterDetailActivity.INTENT_CHARACTER)
-            intent.putExtra(CreatePaymentActivity.INTENT_CREATE_PAYMENT, character?.id)
-            startActivity(intent)
         }
 
         return binding.root
@@ -129,19 +108,10 @@ class PaymentDetailsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun initializeText(character: RecommendCharacter){
-    }
-
-    private fun accountToolbarTextColor(account: Account?): Int {
-        return account?.getToolbarTextColor() ?: Color.parseColor("#ffffff")
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        val account = MyApplication.getAccountViewModel(activity as AppCompatActivity?).accountLiveData.value
-        //val textColor = character.getToolbarTextColor(context, accountToolbarTextColor(account))
         paymentViewModel.isEditMode.observe(this, Observer<Boolean> { mode ->
             if (mode) {
                 editMode.title = "完了"
@@ -149,26 +119,20 @@ class PaymentDetailsFragment : Fragment() {
                 editMode.title = "編集"
             }
         })
+        inflater.inflate(R.menu.create, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.change_body_text_color -> {
-                val bodyTextPickerDialogFragment = ColorPickerDialogFragment(object : DialogActionListener<ColorPickerDialogFragment?> {
-                    override fun onDecision(dialog: ColorPickerDialogFragment?) {
-                        character.homeTextColor = dialog?.color
-                        characterViewModel.update(character)
-                    }
-
-                    override fun onCancel() {}
-                })
-                bodyTextPickerDialogFragment.setDefaultColor(character.getHomeTextColor())
-                bodyTextPickerDialogFragment.show(requireActivity().supportFragmentManager, ToolbarSettingDialogFragment.TAG)
-                return true
-            }
             R.id.edit_mode -> {
                 paymentViewModel.isEditMode.value = paymentViewModel.isEditMode.value != true
                 return true
+            }
+            R.id.create -> {
+                val intent = Intent(activity, CreatePaymentActivity::class.java)
+                val characterId = requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+                intent.putExtra(CreatePaymentActivity.INTENT_CREATE_PAYMENT, characterId)
+                startActivity(intent)
             }
         }
         return true

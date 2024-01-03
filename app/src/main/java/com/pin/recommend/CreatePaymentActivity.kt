@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.adapter.PaymentTagAdapter
 import com.pin.recommend.databinding.ActivityCreatePaymentBinding
 import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.model.viewmodel.CreatePaymentViewModel
 import com.pin.recommend.util.TimeUtil
 import java.util.*
@@ -38,10 +37,6 @@ class CreatePaymentActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreatePaymentBinding
 
-    private lateinit var toolbar: Toolbar
-
-    private lateinit var accountViewModel: AccountViewModel
-
     private lateinit var tagAdapter: PaymentTagAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,19 +49,16 @@ class CreatePaymentActivity : AppCompatActivity() {
         }
 
         binding  = DataBindingUtil.setContentView(this, R.layout.activity_create_payment)
-        binding.content.vm = viewModel
+        binding.vm = viewModel
         binding.lifecycleOwner = this
-
-        toolbar = findViewById(R.id.toolbar)
 
         tagAdapter = PaymentTagAdapter(this, onDelete = {})
         viewModel.tags.observe(this@CreatePaymentActivity, Observer {
             tagAdapter.setList(it)
         })
 
-        accountViewModel = MyApplication.getAccountViewModel(this)
-        val accountLiveData = accountViewModel.accountLiveData
-        accountLiveData.observe(this, Observer { account -> initializeToolbar(account) })
+        binding.toolbar.title = "Pay & 貯金の追加"
+        setSupportActionBar(binding.toolbar)
     }
 
     fun onPayType(view: View){
@@ -124,26 +116,9 @@ class CreatePaymentActivity : AppCompatActivity() {
         datePickerDialog.show()
     }
 
-    private fun initializeToolbar(account: Account?) {
-        toolbar.title = "Pay & 貯金の追加"
-        setSupportActionBar(toolbar)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_create_payment, menu)
-        setAllMenuItemIconTint(menu)
         return true
-    }
-
-    private fun setAllMenuItemIconTint(menu: Menu) {
-        for (i in 0 until menu.size()) {
-            val item = menu.getItem(i)
-            var drawable = item.icon
-            if (drawable != null) {
-                drawable = DrawableCompat.wrap(drawable)
-                DrawableCompat.setTint(drawable, accountViewModel.accountLiveData.value!!.getToolbarTextColor())
-            }
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

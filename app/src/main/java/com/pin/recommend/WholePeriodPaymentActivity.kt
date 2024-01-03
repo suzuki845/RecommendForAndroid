@@ -12,9 +12,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityWholePeriodPaymentBinding
-import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.viewmodel.AccountViewModel
-import com.pin.recommend.model.viewmodel.PaymentTagViewModel
 import com.pin.recommend.model.viewmodel.WholePeriodPaymentViewModel
 
 class WholePeriodPaymentActivity : AppCompatActivity() {
@@ -26,11 +23,6 @@ class WholePeriodPaymentActivity : AppCompatActivity() {
     private val viewModel by lazy {
         ViewModelProvider(this).get(WholePeriodPaymentViewModel::class.java)
     }
-
-    private val accountViewModel by  lazy {
-        MyApplication.getAccountViewModel(this)
-    }
-
 
     private lateinit var binding: ActivityWholePeriodPaymentBinding
 
@@ -44,8 +36,6 @@ class WholePeriodPaymentActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.activity = this
         binding.vm = viewModel
-        binding.avm = accountViewModel
-        binding.content.vm = viewModel
 
         initializeToolbar()
     }

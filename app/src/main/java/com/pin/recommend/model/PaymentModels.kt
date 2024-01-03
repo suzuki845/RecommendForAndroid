@@ -14,7 +14,7 @@ class PaymentBetweenCharacterDatesModel(private val paymentDao: PaymentDao, priv
     val characterId = MutableLiveData<Long?>()
 
     val character = characterId.switchMap {
-        characterDao.findTrackedById(it ?: -1)
+        characterDao.watchById(it ?: -1)
     }
 
     val section = MutableLiveData<Section>(Section(Date(), Date()))

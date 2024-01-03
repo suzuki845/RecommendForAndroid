@@ -28,7 +28,7 @@ public interface StoryPictureDao {
     public int updateStoryPicture(StoryPicture storyPicture);
 
     @Delete
-    public void deleteStoryPicture(StoryPicture storyPicture);
+    public int deleteStoryPicture(StoryPicture storyPicture);
 
     @Query("DELETE FROM StoryPicture")
     public void deleteAll();

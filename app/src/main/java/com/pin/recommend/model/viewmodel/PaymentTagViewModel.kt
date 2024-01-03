@@ -1,16 +1,11 @@
 package com.pin.recommend.model.viewmodel
 
 import android.app.Application
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
-import com.pin.recommend.R
 import com.pin.recommend.model.AppDatabase
-import com.pin.recommend.model.dao.PaymentDao
 import com.pin.recommend.model.dao.PaymentTagDao
-import com.pin.recommend.model.dao.RecommendCharacterDao
 import com.pin.recommend.model.entity.PaymentTag
 import kotlinx.coroutines.launch
-import java.util.*
 
 class PaymentTagViewModel(application: Application) : AndroidViewModel(application)  {
 
@@ -21,7 +16,7 @@ class PaymentTagViewModel(application: Application) : AndroidViewModel(applicati
     private val allTags = _tags
 
     val currentTags
-        get() = Transformations.switchMap(type) { payType ->
+        get() = type.switchMap { payType ->
             _tags.map { paymentTags ->
                 paymentTags.filter {
                     it.type == payType

@@ -22,9 +22,7 @@ import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.BackupExportModel
 import com.pin.recommend.model.BackupImportModel
 import com.pin.recommend.model.entity.Account
-import com.pin.recommend.model.viewmodel.AccountViewModel
 import com.pin.recommend.util.PrefUtil
-import com.pin.recommend.util.ShowToast
 import com.pin.util.Reward
 import com.pin.util.reward.RewardDialogFragment
 import kotlinx.coroutines.GlobalScope
@@ -34,8 +32,6 @@ import kotlinx.coroutines.launch
 class GlobalSettingActivity : AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
-
-    private lateinit var accountViewModel: AccountViewModel
 
     private lateinit var passCodeRock: Switch
 
@@ -57,6 +53,8 @@ class GlobalSettingActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         toolbar = findViewById(R.id.toolbar)
+        toolbar.title = "設定"
+        setSupportActionBar(toolbar)
 
         val showReward = findViewById<ViewGroup>(R.id.show_reward)
         val reward = Reward.getInstance(this)
@@ -67,10 +65,6 @@ class GlobalSettingActivity : AppCompatActivity() {
                 showReward.visibility = View.GONE
             }
         }
-
-        accountViewModel = MyApplication.getAccountViewModel(this)
-        val accountLiveData = accountViewModel.accountLiveData
-        accountLiveData.observe(this, Observer { account -> initializeToolbar(account) })
 
         passCodeRock = findViewById(R.id.passcode_rock)
     }
@@ -84,7 +78,7 @@ class GlobalSettingActivity : AppCompatActivity() {
             } else {
                 PrefUtil.putBoolean(Constants.PREF_KEY_IS_LOCKED, false);
                 PrefUtil.putInt(Constants.PREF_KEY_PASSWORD, 0);
-                ShowToast.show("ロックを解除しました。", this);
+                Toast.makeText(this, "ロックを解除しました。", Toast.LENGTH_SHORT).show();
             }
         })
     }
@@ -166,13 +160,14 @@ class GlobalSettingActivity : AppCompatActivity() {
         startActivity(intent);
     }
 
-    private fun initializeToolbar(account: Account?) {
-        toolbar.title = "設定"
-        setSupportActionBar(toolbar)
-    }
-
     fun onShowRewardDialog(v: View){
         RewardDialogFragment(onOk = {it.dismiss()}, onCancel = {it.dismiss()}, onStop = {}).show(supportFragmentManager, RewardDialogFragment.TAG)
+    }
+
+    fun onClickOshiTimer(v: View){
+        val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.oshitimer");
+        intent = Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
     }
 
     fun onClickEmotionDiary(v: View){
