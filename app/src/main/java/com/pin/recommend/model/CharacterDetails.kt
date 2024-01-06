@@ -1,17 +1,11 @@
 package com.pin.recommend.model
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Color
-import androidx.lifecycle.LiveData
+import androidx.annotation.Keep
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.google.gson.Gson
-import com.pin.recommend.model.dao.AccountDao
-import com.pin.recommend.model.dao.CustomAnniversaryDao
-import com.pin.recommend.model.dao.RecommendCharacterDao
-import com.pin.recommend.model.dao.StoryDao
 import com.pin.recommend.model.entity.*
 import com.pin.recommend.util.combine2
 import com.pin.recommend.util.combine3
