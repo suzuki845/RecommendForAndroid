@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.l4digital.fastscroll.FastScrollRecyclerView
 import com.pin.recommend.CreateStoryActivity
 import com.pin.recommend.R
 import com.pin.recommend.adapter.VerticalRecyclerViewAdapter
@@ -24,7 +25,7 @@ import com.pin.recommend.model.viewmodel.EditStateViewModel
 class StoryListFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
     private lateinit var verticalRecyclerViewAdapter: VerticalRecyclerViewAdapter
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerView: FastScrollRecyclerView
     private lateinit var editListViewModel: EditStateViewModel
     private lateinit var sortView: TextView
     private val detailsVM: CharacterDetailsViewModel by lazy {
@@ -38,7 +39,7 @@ class StoryListFragment : Fragment() {
         if (arguments != null) {
             index = requireArguments().getInt(ARG_SECTION_NUMBER)
         }
-        pageViewModel!!.setIndex(index)
+        pageViewModel?.setIndex(index)
         editListViewModel = ViewModelProvider(this).get(EditStateViewModel::class.java)
 
         setHasOptionsMenu(true)
