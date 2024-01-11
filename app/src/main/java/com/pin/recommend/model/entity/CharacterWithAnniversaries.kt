@@ -39,9 +39,9 @@ data class CharacterWithAnniversaries(
         return Appearance(
             character.getIconImage(context, 500, 500),
             character.getBackgroundBitmap(context, 1000, 2000),
-            character.backgroundColor ?: Color.parseColor("#ffffff"),
-            character.homeTextColor ?: Color.parseColor("#444444"),
-            character.homeTextShadowColor,
+            character.backgroundColor ?: Color.parseColor("#77ffffff"),
+            character.homeTextColor ?: Color.parseColor("#ff000000"),
+            character.homeTextShadowColor ?: Color.parseColor("#00000000"),
             character.elapsedDateFormat,
             typeface,
             character.backgroundImageOpacity

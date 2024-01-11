@@ -20,7 +20,7 @@ import java.util.*
 class CharacterEditor(val context: Context) {
 
     companion object {
-        val defaultBackgroundColor = Color.parseColor("#77ffffff")
+        val defaultBackgroundColor = Color.parseColor("#00ffffff")
         val defaultBackgroundImageOpacity = 1f
         val defaultTextColor = Color.parseColor("#ff000000")
         val defaultTextShadowColor = Color.parseColor("#00000000")

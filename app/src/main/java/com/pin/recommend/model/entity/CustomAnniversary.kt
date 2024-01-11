@@ -18,8 +18,8 @@ import java.util.*
 )
 class CustomAnniversary(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val characterId: Long,
+    var id: Long,
+    var characterId: Long,
     val date: Date,
     val uuid: String,
     val name: String,

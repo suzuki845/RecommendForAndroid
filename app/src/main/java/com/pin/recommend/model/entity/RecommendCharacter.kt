@@ -40,6 +40,9 @@ class RecommendCharacter {
     @Ignore
     var stories: List<Story>? = null
 
+    @Ignore
+    var anniversaries: List<CustomAnniversary>? = null
+
     //ここまで
     @JvmField
     @PrimaryKey(autoGenerate = true)
@@ -62,7 +65,8 @@ class RecommendCharacter {
     var backgroundImageUri: String? = null
 
     @JvmField
-    var backgroundColor: Int? = Color.WHITE
+    var backgroundColor: Int? = Color.parseColor("#00ffffff")
+    //var backgroundColor: Int? = Color.WHITE
 
     @JvmField
     var toolbarBackgroundColor: Int? = null
@@ -71,7 +75,8 @@ class RecommendCharacter {
     var toolbarTextColor: Int? = null
 
     @JvmField
-    var homeTextColor: Int? = Color.parseColor("#444444")
+    var homeTextColor: Int? = Color.parseColor("#ff000000")
+    //var homeTextColor: Int? = Color.parseColor("#444444")
 
     //v2
     @JvmField

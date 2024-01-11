@@ -17,107 +17,109 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class BackupExportModel(
-        private val db: AppDatabase
-){
+    private val db: AppDatabase
+) {
 
     val onCreate = MutableLiveData(false)
 
     private fun serializableEntity(): AccountExportable? {
-        val account = db.accountDao().findById(Account.ACCOUNT_ID.toLong())
-        val characters =  db.recommendCharacterDao().findAll().map{ character ->
-            val stories = db.storyDao().findByCharacterId(character.id).map{ story ->
+        val account = db.accountDao().findById(Account.ACCOUNT_ID)
+        val characters = db.recommendCharacterDao().findAll().map { character ->
+            val stories = db.storyDao().findByCharacterId(character.id).map { story ->
                 val pictures = db.storyPictureDao().findByStoryId(story.id).map {
                     StoryPictureExportable(it)
                 }
-                StoryExportable(story).apply { this.pictures = pictures  }
+                StoryExportable(story).apply { this.pictures = pictures }
             }
 
-            val payments = db.paymentDao().findByCharacterId(character.id).map{ payment ->
-                val tag = payment.paymentTagId?.let { db.paymentTagDao().findById(it)?.let { it1 -> PaymentTagExportable(it1) } }
+            val payments = db.paymentDao().findByCharacterId(character.id).map { payment ->
+                val tag = payment.paymentTagId?.let {
+                    db.paymentTagDao().findById(it)?.let { it1 -> PaymentTagExportable(it1) }
+                }
                 PaymentExportable(payment).apply { this.tag = tag }
             }
 
             val events = db.eventDao().findByCharacterId(character.id).map { EventExportable(it) }
 
+            val anniversaries = db.customAnniversaryDao().findByCharacterId(character.id)
+                .map { CustomAnniversaryExportable(it) }
+
             RecommendCharacterExportable(character).apply {
                 this.stories = stories
                 this.payments = payments
                 this.events = events
+                this.anniversaries = anniversaries
             }
         }
-        return  AccountExportable(account).apply { this.characters = characters }
+        return AccountExportable(account).apply { this.characters = characters }
     }
 
-    suspend fun export(context: Context, external: DocumentFile)  = suspendCoroutine<String>{ continuation ->
-        val account = serializableEntity()
-        val jsonString = kotlin.runCatching {
-            GsonBuilder()
+    suspend fun export(context: Context, external: DocumentFile) =
+        suspendCoroutine { continuation ->
+            val account = serializableEntity()
+            val jsonString = kotlin.runCatching {
+                GsonBuilder()
                     .setDateFormat("yyyy-MM-dd HH:mm:ss Z")
                     .create()
                     .toJson(account)
-        }.fold(
-                onSuccess = {it},
-                onFailure = {return@suspendCoroutine continuation.resumeWithException( Exception("serialize error"))}
-        )
+            }.fold(
+                onSuccess = { it },
+                onFailure = { return@suspendCoroutine continuation.resumeWithException(Exception("serialize error")) }
+            )
+            val backupDirName = "oshi_backup${SimpleDateFormat("yyyy_MM_dd").format(Date())}"
+            val backupDir = external.createDirectory(backupDirName)!!
+            val dataFile = backupDir.createFile("application/json", "data.json")
+            val resolver = context.contentResolver;
 
-        val backupDirName = "oshi_backup${SimpleDateFormat("yyyy_MM_dd").format(Date())}"
-        val backupDir = external.createDirectory(backupDirName)!!
-        val dataFile = backupDir.createFile("application/json", "data.json")
-        val resolver = context.contentResolver;
-
-        try {
-            resolver.openOutputStream(dataFile!!.uri).use { outputStream ->
-                outputStream?.write(jsonString.toByteArray())
-            }
-        } catch (e: Exception) {
-            return@suspendCoroutine continuation.resumeWithException(Exception("json output error"))
-        }
-
-        account?.characters?.forEach{ character ->
-            character.iconImageSrc?.let{ uri ->
-                val iconFile = backupDir.createFile("image/*", uri)
-                iconFile?.uri?.let { exportUri ->
-                    resolver.openOutputStream(exportUri).use { outputStream ->
-                        val input = context.openFileInput(uri)
-                        val buffer = ByteArray(1024)
-                        var read = 0
-                        while (input.read(buffer).also { read = it } !== -1) {
-                            outputStream?.write(buffer, 0, read)
-                        }
-                        input.close()
-                        outputStream?.close()
-                    }
+            try {
+                resolver.openOutputStream(dataFile!!.uri).use { outputStream ->
+                    outputStream?.write(jsonString.toByteArray())
                 }
+            } catch (e: Exception) {
+                return@suspendCoroutine continuation.resumeWithException(Exception("json output error"))
             }
-            character.backgroundImageSrc?.let { uri ->
-                val backgroundFile = backupDir.createFile("image/*", uri)
-                backgroundFile?.uri?.let {exportUri ->
-                    resolver.openOutputStream(exportUri).use { outputStream ->
-                        val input = context.openFileInput(uri)
-                        val buffer = ByteArray(1024)
-                        var read = 0
-                        while (input.read(buffer).also { read = it } !== -1) {
-                            outputStream?.write(buffer, 0, read)
-                        }
-                        input.close()
-                        outputStream?.close()
-                    }
-                }
-            }
-            character.stories?.forEach{ story ->
-                story.pictures?.forEach{ picture ->
-                    picture.src?.let { uri ->
-                        val imageFile = backupDir.createFile("image/*", uri)
-                        imageFile?.uri?.let {exportUri ->
-                            resolver.openOutputStream(exportUri).use { outputStream ->
-                                val input = context.openFileInput(uri)
+
+            account?.characters?.forEach { character ->
+                character.iconImageSrc?.let { uri ->
+                    backupDir.createFile("image/*", uri)?.uri?.let { exportUri ->
+                        resolver.openOutputStream(exportUri).use { output ->
+                            context.openFileInput(uri).use { input ->
                                 val buffer = ByteArray(1024)
-                                var read = 0
+                                var read: Int
                                 while (input.read(buffer).also { read = it } !== -1) {
-                                    outputStream?.write(buffer, 0, read)
+                                    output?.write(buffer, 0, read)
                                 }
-                                input.close()
-                                outputStream?.close()
+                            }
+                        }
+                    }
+                }
+                character.backgroundImageSrc?.let { uri ->
+                    backupDir.createFile("image/*", uri)?.uri?.let { exportUri ->
+                        resolver.openOutputStream(exportUri).use { output ->
+                            context.openFileInput(uri).use { input ->
+                                val buffer = ByteArray(1024)
+                                var read: Int
+                                while (input.read(buffer).also { read = it } !== -1) {
+                                    output?.write(buffer, 0, read)
+                                }
+                            }
+                        }
+                    }
+                }
+                character.stories?.forEach { story ->
+                    story.pictures?.forEach { picture ->
+                        picture.src?.let { uri ->
+                            backupDir.createFile("image/*", uri)?.uri?.let { exportUri ->
+                                resolver.openOutputStream(exportUri).use { output ->
+                                    context.openFileInput(uri).use { input ->
+                                        val buffer = ByteArray(1024)
+                                        var read: Int
+                                        while (input.read(buffer).also { read = it } !== -1) {
+                                            output?.write(buffer, 0, read)
+                                        }
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -127,107 +129,114 @@ class BackupExportModel(
             return@suspendCoroutine continuation.resume("")
         }
 
-    }
-
 }
 
 
 class BackupImportModel(
-        private val db: AppDatabase
+    private val db: AppDatabase
 ) {
 
-    suspend fun import(context: Context, external: DocumentFile) = suspendCoroutine<String>{ continuation ->
-        if (!external.isDirectory) {
-            return@suspendCoroutine continuation.resumeWithException( Exception("is not directory"))
-        }
-        val data = external.listFiles().firstOrNull { it.name == "data.json" }
+    suspend fun import(context: Context, external: DocumentFile) =
+        suspendCoroutine { continuation ->
+            if (!external.isDirectory) {
+                return@suspendCoroutine continuation.resumeWithException(Exception("is not directory"))
+            }
+            val data = external.listFiles().firstOrNull { it.name == "data.json" }
                 ?: return@suspendCoroutine continuation.resumeWithException(Exception("missing backup data file"))
-        external.listFiles().dropWhile { it.name == "data.json" }
-        val resolver = context.contentResolver;
-        val dataString = resolver.openInputStream(data.uri!!).use { input ->
-            input?.bufferedReader().use { it?.readText() }  // defaults to UTF-8
-        }
+            external.listFiles().dropWhile { it.name == "data.json" }
+            val resolver = context.contentResolver;
+            val dataString = resolver.openInputStream(data.uri).use { input ->
+                input?.bufferedReader().use { it?.readText() }  // defaults to UTF-8
+            }
 
-        val accountExportable = kotlin.runCatching {
-            GsonBuilder()
+            val accountExportable = kotlin.runCatching {
+                GsonBuilder()
                     .setDateFormat("yyyy-MM-dd HH:mm:ss Z")
                     .create()
                     .fromJson(dataString, AccountExportable::class.java)
-        }.fold(
-                onSuccess = {it},
-                onFailure = {return@suspendCoroutine continuation.resumeWithException( Exception("deserialize error"))}
-        )
+            }.fold(
+                onSuccess = { it },
+                onFailure = { return@suspendCoroutine continuation.resumeWithException(Exception("deserialize error")) }
+            )
 
-        try{
-            db.runInTransaction {
-                db.accountDao().deleteAll()
-                db.recommendCharacterDao().deleteAll()
-                db.eventDao().deleteAll()
-                db.storyDao().deleteAll()
-                db.paymentDao().deleteAll()
-                db.storyPictureDao().deleteAll()
-                db.paymentTagDao().deleteAll()
+            try {
+                db.runInTransaction {
+                    db.accountDao().deleteAll()
+                    db.recommendCharacterDao().deleteAll()
+                    db.eventDao().deleteAll()
+                    db.storyDao().deleteAll()
+                    db.paymentDao().deleteAll()
+                    db.storyPictureDao().deleteAll()
+                    db.paymentTagDao().deleteAll()
+                    db.customAnniversaryDao().deleteAll()
 
-                val account = accountExportable.importable()
-                db.accountDao().insertAccount(account)
+                    val account = accountExportable.importable()
+                    db.accountDao().insertAccount(account)
 
-                account.characters.forEach { character ->
-                    character.accountId = account.id
-                    character.id = db.recommendCharacterDao().insertCharacter(character)
+                    account.characters.forEach { character ->
+                        character.accountId = account.id
+                        character.id = db.recommendCharacterDao().insertCharacter(character)
 
-                    character.stories?.forEach { story ->
-                        story.characterId = character.id
-                        story.id = db.storyDao().insertStory(story)
-                        story.pictures?.forEach { picture ->
-                            picture.storyId = story.id
-                            picture.id = db.storyPictureDao().insertStoryPicture(picture)
+                        character.stories?.forEach { story ->
+                            story.characterId = character.id
+                            story.id = db.storyDao().insertStory(story)
+                            story.pictures?.forEach { picture ->
+                                picture.storyId = story.id
+                                picture.id = db.storyPictureDao().insertStoryPicture(picture)
+                            }
+                        }
+
+                        character.payments?.forEach { payment ->
+                            payment.characterId = character.id
+                            payment.paymentTag?.let { tag ->
+                                tag.id = db.paymentTagDao().insertPaymentTag(tag)
+                                payment.paymentTagId = tag.id
+                            }
+                            payment.id = db.paymentDao().insertPayment(payment)
+                        }
+
+                        character.events?.forEach { event ->
+                            event.characterId = character.id
+                            event.id = db.eventDao().insertEvent(event)
+                        }
+
+                        character.anniversaries?.forEach { a ->
+                            a.characterId = character.id
+                            a.id = db.customAnniversaryDao().insertAnniversary(a)
                         }
                     }
+                }
+            } catch (e: Exception) {
+                return@suspendCoroutine continuation.resumeWithException(Exception("database error"))
+            }
 
-                    character.payments?.forEach { payment ->
-                        payment.characterId = character.id
-                        payment.paymentTag?.let { tag ->
-                            tag.id = db.paymentTagDao().insertPaymentTag(tag)
-                            payment.paymentTagId = tag.id
+            val privateDir = context.filesDir
+            privateDir.delete()
+
+            external.listFiles().forEach {
+                if (it.isFile) {
+                    val outputStream = context.openFileOutput(it.name, Context.MODE_PRIVATE)
+                    val inputStream = context.contentResolver.openInputStream(it.uri)
+                    val buffer = ByteArray(1024)
+                    var read = 0
+                    inputStream?.let { input ->
+                        while (input.read(buffer).also { read = it } !== -1) {
+                            outputStream?.write(buffer, 0, read)
                         }
-                        payment.id = db.paymentDao().insertPayment(payment)
+                        input.close()
+                        read = 0
                     }
-
-                    character.events?.forEach { event ->
-                        event.characterId = character.id
-                        event.id = db.eventDao().insertEvent(event)
-                    }
+                    outputStream?.close()
                 }
             }
-        }catch(e: Exception){
-            return@suspendCoroutine continuation.resumeWithException(Exception("database error"))
+
+            continuation.resume("")
         }
 
-        val privateDir = context.filesDir
-        privateDir.delete()
+    private fun debug(account: AccountExportable) {
 
-        external.listFiles().forEach {
-            if(it.isFile){
-                val outputStream = context.openFileOutput(it.name, Context.MODE_PRIVATE)
-                val inputStream = context.contentResolver.openInputStream(it.uri)
-                val buffer = ByteArray(1024)
-                var read = 0
-                inputStream?.let { input ->
-                    while (input.read(buffer).also { read = it } !== -1) {
-                        outputStream?.write(buffer, 0, read)
-                    }
-                    input.close()
-                }
-                outputStream?.close()
-            }
-        }
-        continuation.resume("")
-    }
-
-    private fun debug(account: AccountExportable){
-
-        account.characters.forEach{ character ->
-            println("---- name" + character.name)
+        account.characters.forEach { character ->
+            println("exportable-----" + character.name)
 
             character.stories?.forEach { story ->
                 println("-- " + story.comment)
@@ -236,12 +245,16 @@ class BackupImportModel(
                 }
             }
 
-            character.payments?.forEach{ payment ->
+            character.payments?.forEach { payment ->
                 println("-- " + payment.amount)
             }
 
-            character.events?.forEach{ event ->
+            character.events?.forEach { event ->
                 println("-- " + event.title)
+            }
+
+            character.anniversaries?.forEach { a ->
+                println("-- " + a.name)
             }
         }
 

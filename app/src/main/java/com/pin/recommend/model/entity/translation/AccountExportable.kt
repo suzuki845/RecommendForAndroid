@@ -23,7 +23,7 @@ class AccountExportable{
 
     fun importable(): Account{
         val account = Account()
-        account.id = Account.ACCOUNT_ID.toLong()
+        account.id = Account.ACCOUNT_ID
         toolbarTextColor?.let {
             try{
                 account.toolbarTextColor = Color.parseColor(it)

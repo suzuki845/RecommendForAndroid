@@ -15,6 +15,8 @@ class RecommendCharacterExportable {
 
     var stories: List<StoryExportable> = mutableListOf()
 
+    var anniversaries: List<CustomAnniversaryExportable> = mutableListOf()
+
     var name: String? = null
 
     var created: Date? = null
@@ -119,6 +121,7 @@ class RecommendCharacterExportable {
         character.stories = stories.map { it.importable() }
         character.events = events.map { it.importable() }
         character.payments = payments.map { it.importable() }
+        character.anniversaries = anniversaries.map { it.importable() }
 
         return character
     }
