@@ -40,8 +40,9 @@ class ScreenShotActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val json = intent.getStringExtra(INTENT_SCREEN_SHOT) ?: "";
         val state = CharacterDetails.State.fromJson(json)
-
+        val typeface = state.appearance.typeFace(this)
         binding.state = state
+        binding.typeface = typeface
         textShadow(state)
 
         setSupportActionBar(binding.toolbar)

@@ -42,19 +42,26 @@ class HomeFragment : Fragment() {
         binding.lifecycleOwner = requireActivity()
         binding.vm = detailsVM
         binding.fragment = this
-        textShadow()
+        otherInit()
         return binding.root
     }
 
-    private fun textShadow() {
+    private fun otherInit() {
         detailsVM.state.observe(requireActivity()) { it ->
-            val c = it.appearance.homeTextShadowColor
-            c?.let { s ->
+            val a = it.appearance
+            a.homeTextShadowColor?.let { s ->
                 binding.characterName.setShadowLayer(3f, 0f, 0f, s)
                 binding.topText.setShadowLayer(3f, 0f, 0f, s)
                 binding.bottomText.setShadowLayer(3f, 0f, 0f, s)
                 binding.anniversary.setShadowLayer(3f, 0f, 0f, s)
                 binding.elapsedTime.setShadowLayer(3f, 0f, 0f, s)
+            }
+            a.typeFace(requireActivity())?.let {
+                binding.characterName.typeface = it
+                binding.topText.typeface = it
+                binding.bottomText.typeface = it
+                binding.anniversary.typeface = it
+                binding.elapsedTime.typeface = it
             }
         }
     }

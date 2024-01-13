@@ -28,14 +28,6 @@ data class CharacterWithAnniversaries(
     }
 
     fun appearance(context: Context): Appearance {
-        val typeface = character.fontFamily?.let {
-            if (it == null) return@let null
-            if (it == "Default") return@let null
-            if (it == "default") return@let null
-            if (it == "デフォルト") return@let null
-            Typeface.createFromAsset(context.assets, "fonts/$it.ttf")
-        }
-
         return Appearance(
             character.getIconImage(context, 500, 500),
             character.getBackgroundBitmap(context, 1000, 2000),
@@ -43,7 +35,7 @@ data class CharacterWithAnniversaries(
             character.homeTextColor ?: Color.parseColor("#ff000000"),
             character.homeTextShadowColor ?: Color.parseColor("#00000000"),
             character.elapsedDateFormat,
-            typeface,
+            character.fontFamily,
             character.backgroundImageOpacity
         )
     }
