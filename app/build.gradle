@@ -4,6 +4,8 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    namespace 'com.pin.recommend'
+
     signingConfigs {
         debug {
             storeFile file('/Users/turuwo/Documents/android/Memo.jks')
@@ -64,7 +66,6 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-
 dependencies {
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
@@ -103,7 +104,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.4'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
-    //implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.1"
 
     implementation "io.github.l4digital:fastscroll:2.1.0"
     implementation 'androidx.appcompat:appcompat:1.1.0'
