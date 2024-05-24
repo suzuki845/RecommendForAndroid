@@ -1,15 +1,19 @@
 package com.pin.recommend.model
 
 import android.content.Context
-import androidx.annotation.Keep
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.google.gson.Gson
-import com.pin.recommend.model.entity.*
+import com.pin.recommend.model.entity.Anniversary
+import com.pin.recommend.model.entity.AnniversaryInterface
+import com.pin.recommend.model.entity.Appearance
+import com.pin.recommend.model.entity.Story
+import com.pin.recommend.model.entity.StoryPicture
 import com.pin.recommend.util.combine2
 import com.pin.recommend.util.combine3
-import java.util.*
+import java.util.Date
+import java.util.LinkedList
 
 class CharacterDetails(
     private val context: Context,
@@ -34,7 +38,8 @@ class CharacterDetails(
 
     val stories = character.switchMap {
         if (it == null) return@switchMap MutableLiveData(listOf())
-        return@switchMap db.storyDao().watchByCharacterIdStoryWithPictures(it.id, it.storySortOrder == 1)
+        return@switchMap db.storyDao()
+            .watchByCharacterIdStoryWithPictures(it.id, it.storySortOrder == 1)
     }
 
     private val account = accountModel.entity
@@ -46,7 +51,9 @@ class CharacterDetails(
             a?.getTopText() ?: "",
             a?.getBottomText() ?: "",
             a?.getElapsedDays(Date())?.let { d -> "${d}日" } ?: "",
-            a?.getMessage(Date()) ?: ""
+            a?.getRemainingDays(Date())?.let { d -> "${d}日" } ?: "",
+            a?.getMessage(Date()) ?: "",
+            a?.isAnniversary(Date()) ?: false
         )
     }
 

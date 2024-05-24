@@ -96,6 +96,7 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
         }
 
         private var app: MyApplication? = null
+
         @JvmStatic
         val instance: MyApplication?
             get() {

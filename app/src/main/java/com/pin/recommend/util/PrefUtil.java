@@ -16,12 +16,14 @@ public class PrefUtil {
     }
 
     private static SharedPreferences getSharedPreferences() {
-        if (shPref == null) shPref = MyApplication.getInstance().getSharedPreferences(MyApplication.getInstance().getPackageName(), Context.MODE_PRIVATE);
+        if (shPref == null)
+            shPref = MyApplication.getInstance().getSharedPreferences(MyApplication.getInstance().getPackageName(), Context.MODE_PRIVATE);
         return shPref;
     }
 
     public static void setSharedPreferences(Context context) {
-        if (shPref == null) shPref = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        if (shPref == null)
+            shPref = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
     }
 
     /**
@@ -73,7 +75,11 @@ public class PrefUtil {
         return getString(key).equals("");
     }
 
-    public static synchronized void removeValue(String key) {
+    public static synchronized void remove(String key) {
         getEditor().remove(key).apply();
+    }
+
+    public static synchronized void clear() {
+        getEditor().clear().apply();
     }
 }

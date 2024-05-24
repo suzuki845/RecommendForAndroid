@@ -1,24 +1,22 @@
 <resources>
-    <!-- admob -->
+    <!-- admob
     <string name="ad_unit_id">ca-app-pub-6083382584515170/4632968983</string>
-
-    <!-- admob test
+-->
+    <!-- admob test -->
     <string name="ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
--->
 
-    <!-- admob -->
+    <!-- admob
     <string name="ad_unit_id_for_interstitial">ca-app-pub-6083382584515170/9613311737</string>
-
-    <!-- admob test
+-->
+    <!-- admob test -->
     <string name="ad_unit_id_for_interstitial">ca-app-pub-3940256099942544/1033173712</string>
--->
 
-    <!-- admob -->
+    <!-- admob
     <string name="ad_unit_id_for_reward">ca-app-pub-6083382584515170/2706336964</string>
-
-    <!-- admob test
-    <string name="ad_unit_id_for_reward">ca-app-pub-3940256099942544/5224354917</string>
 -->
+    <!-- admob test -->
+    <string name="ad_unit_id_for_reward">ca-app-pub-3940256099942544/5224354917</string>
+
 
     <string name="admob_app_id">ca-app-pub-6083382584515170~8391014938</string>
 
@@ -57,5 +55,8 @@
     <string name="title_activity_global_setting">GlobalSettingActivity</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">記念日までの日数を表示します。</string>
 
 </resources>

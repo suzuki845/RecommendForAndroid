@@ -21,4 +21,5 @@
 #-renamesourcefileattribute SourceFile
 
 -keepnames class com.pin.recommend.model.** { *; }
+-keepnames class com.pin.recommend.widget.** { *; }
 

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:id="@+id/container"
+    android:theme="@style/AppTheme.AppWidgetContainer">
+
+    <ImageView
+        android:id="@+id/background_image"
+        android:elevation="-1dp"
+        android:scaleType="centerCrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/background_color"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/character_name_container"
+            android:background="@drawable/shape_rounded_corners_10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/character_name_background"
+                android:scaleType="fitXY"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/character_name"
+                android:padding="4dp"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:shadowRadius="3"
+                android:textColor="#000000"
+                android:shadowColor="#00000000"
+                android:text="XXX"
+                android:textSize="18sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/anniversary_background"
+                android:scaleType="fitXY"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center" />
+
+            <LinearLayout
+                android:id="@+id/anniversary_container"
+                android:padding="4dp"
+                android:background="@drawable/shape_rounded_corners_10dp"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <!--
+                                <TextView
+                                    android:id="@+id/anniversary_name"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:shadowRadius="3"
+                                    android:textColor="#000000"
+                                    android:shadowColor="#00000000"
+                                    android:text="XXX"
+                                    android:textSize="18sp" />
+                -->
+                <TextView
+                    android:id="@+id/remaining_days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:shadowRadius="3"
+                    android:textColor="#000000"
+                    android:shadowColor="#00000000"
+                    android:text="XXX"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/unpinning_background"
+                android:scaleType="fitXY"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center" />
+
+            <ImageView
+                android:layout_gravity="center"
+                android:id="@+id/unpinning"
+                android:layout_width="26dp"
+                android:layout_height="26dp" />
+        </FrameLayout>
+    </RelativeLayout>
+
+</FrameLayout>
+

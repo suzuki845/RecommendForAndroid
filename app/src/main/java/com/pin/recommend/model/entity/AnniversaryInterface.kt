@@ -11,6 +11,18 @@ interface AnniversaryInterface {
     fun getElapsedDays(current: Date): Long
     fun isAnniversary(current: Date): Boolean
     fun getMessage(current: Date): String
+
+    fun toData(date: Date): Anniversary {
+        return Anniversary(
+            getName(),
+            getTopText(),
+            getBottomText(),
+            getElapsedDays(date).let { d -> "${d}日" },
+            getRemainingDays(date).let { d -> "${d}日" },
+            getMessage(date),
+            isAnniversary(date)
+        )
+    }
 }
 
 data class Anniversary(
@@ -18,5 +30,7 @@ data class Anniversary(
     val topText: String = "",
     val bottomText: String = "",
     val elapsedDays: String = "",
-    val message: String = ""
+    val getRemainingDays: String = "",
+    val message: String = "",
+    val isAnniversary: Boolean = false
 )

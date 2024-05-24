@@ -23,4 +23,10 @@
     <dimen name="text_size_huge">26sp</dimen>
     <dimen name="text_size_extra_huge">36sp</dimen>
 
+    <!--
+Refer to App Widget Documentation for margin information
+http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
+    -->
+    <dimen name="widget_margin">0dp</dimen>
+
 </resources>
