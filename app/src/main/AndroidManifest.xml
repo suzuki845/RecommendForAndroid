@@ -20,6 +20,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
                 <action android:name="com.pin.recommend.AnniversaryWidgetProvider.ACTION_UPDATE" />
                 <action android:name="com.pin.recommend.AnniversaryWidgetProvider.ACTION_ITEM_CLICK" />
                 <action android:name="com.pin.recommend.AnniversaryWidgetProvider.ACTION_UNPINNING" />

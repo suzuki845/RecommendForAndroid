@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.google.gson.Gson
 import com.pin.recommend.model.entity.Anniversary
+import com.pin.recommend.model.entity.AnniversaryId
 import com.pin.recommend.model.entity.SerializableAppearance
 
 data class AnniversaryWidgetItem(
@@ -11,6 +12,10 @@ data class AnniversaryWidgetItem(
     val anniversary: Anniversary,
     val appearance: SerializableAppearance
 ) {
+
+    fun getId(): AnniversaryId {
+        return anniversary.id
+    }
 
     fun getIconImage(context: Context, w: Int, h: Int): Bitmap? {
         return appearance.getIconImage(context, w, h)

@@ -36,17 +36,17 @@ import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.model.CharacterEditor
 import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.CustomAnniversary
-import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
-import com.pin.util.*
+import com.pin.util.AdMobAdaptiveBannerManager
+import com.pin.util.DisplaySizeCheck
+import com.pin.util.PermissionChecker
 import com.pin.util.Reward.Companion.getInstance
 import com.soundcloud.android.crop.Crop
 import java.io.File
-import java.lang.reflect.RecordComponent
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
 
 
 class EditCharacterActivity : AppCompatActivity() {
@@ -107,7 +107,7 @@ class EditCharacterActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
         binding.imageOpacity.max = 100
-        binding.imageOpacity.progress = (cwa.character.backgroundImageOpacity * 100 ).toInt()
+        binding.imageOpacity.progress = (cwa.character.backgroundImageOpacity * 100).toInt()
         binding.imageOpacity.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar, progress: Int, fromUser: Boolean
@@ -189,7 +189,8 @@ class EditCharacterActivity : AppCompatActivity() {
 
     fun save() {
         vm.save(Progress({
-
+            val updateWidgetRequest = Intent("android.appwidget.action.APPWIDGET_UPDATE")
+            sendBroadcast(updateWidgetRequest)
         }, {
             finish()
         }, { e ->

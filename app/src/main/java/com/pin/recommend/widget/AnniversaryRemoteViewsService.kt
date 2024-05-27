@@ -8,6 +8,8 @@ import android.widget.RemoteViewsService
 import android.widget.RemoteViewsService.RemoteViewsFactory
 import com.pin.recommend.R
 import com.pin.recommend.widget.AnniversaryWidgetProvider.Companion.ACTION_ITEM_CLICK
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.Date
 
 
@@ -31,6 +33,23 @@ class AnniversaryRemoteViewsFactory(context: Context, intent: Intent) : RemoteVi
     val anniversaries = mutableListOf<AnniversaryWidgetItem>()
 
     override fun onCreate() {
+        GlobalScope.launch {
+            val entries = db.unsafeCharacters().flatMap { cwa ->
+                cwa.anniversaries().map { anniversary ->
+                    return@map AnniversaryWidgetItem(
+                        cwa.character.name ?: "",
+                        anniversary.toData(Date()),
+                        cwa.serializableAppearance()
+                    )
+                }
+            }
+            anniversaries.clear()
+            anniversaries.addAll(entries)
+            onDataSetChanged()
+            //println("test!!$entries")
+        }
+
+        /*
         db.characters().observeForever {
             val entries = it.flatMap { cwa ->
                 cwa.anniversaries().map { anniversary ->
@@ -46,8 +65,7 @@ class AnniversaryRemoteViewsFactory(context: Context, intent: Intent) : RemoteVi
             anniversaries.addAll(entries)
             onDataSetChanged()
         }
-
-        onDataSetChanged()
+         */
     }
 
     override fun onDataSetChanged() {

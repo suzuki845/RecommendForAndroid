@@ -6,6 +6,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.google.gson.Gson
 import com.pin.recommend.model.entity.Anniversary
+import com.pin.recommend.model.entity.AnniversaryId
 import com.pin.recommend.model.entity.AnniversaryInterface
 import com.pin.recommend.model.entity.Appearance
 import com.pin.recommend.model.entity.Story
@@ -47,6 +48,7 @@ class CharacterDetails(
     private val displayOnHomeAnniversary = _displayOnHomeAnniversaries.map {
         val a = it.firstOrNull()
         Anniversary(
+            a?.getId() ?: AnniversaryId.getEmpty(),
             a?.getName() ?: "",
             a?.getTopText() ?: "",
             a?.getBottomText() ?: "",

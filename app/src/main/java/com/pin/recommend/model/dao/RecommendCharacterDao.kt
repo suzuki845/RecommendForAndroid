@@ -42,6 +42,12 @@ interface RecommendCharacterDao {
 
     @Transaction
     @Query(
+        "SELECT * FROM RecommendCharacter"
+    )
+    fun findCharacterWithAnniversaries(): List<CharacterWithAnniversaries>
+
+    @Transaction
+    @Query(
         "SELECT * FROM RecommendCharacter " +
                 "WHERE id = :id"
     )

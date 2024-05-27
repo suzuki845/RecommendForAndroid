@@ -35,12 +35,14 @@ import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
-import com.pin.util.*
+import com.pin.util.AdMobAdaptiveBannerManager
+import com.pin.util.DisplaySizeCheck
+import com.pin.util.PermissionChecker
 import com.pin.util.Reward.Companion.getInstance
 import com.soundcloud.android.crop.Crop
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
 
 class CreateCharacterActivity : AppCompatActivity() {
     companion object {
@@ -92,14 +94,15 @@ class CreateCharacterActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
         binding.imageOpacity.max = 100
-        binding.imageOpacity.progress=100
+        binding.imageOpacity.progress = 100
         binding.imageOpacity.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar, progress: Int, fromUser: Boolean
             ) {
                 val o = progress * 0.01f
-                vm.backgroundImageOpacity.value  = o
+                vm.backgroundImageOpacity.value = o
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
@@ -168,7 +171,8 @@ class CreateCharacterActivity : AppCompatActivity() {
 
     fun save() {
         vm.save(Progress({
-
+            val updateWidgetRequest = Intent("android.appwidget.action.APPWIDGET_UPDATE")
+            sendBroadcast(updateWidgetRequest)
         }, {
             finish()
         }, { e ->
@@ -177,7 +181,7 @@ class CreateCharacterActivity : AppCompatActivity() {
     }
 
     fun onAddAnniversary(v: View) {
-        if((vm.anniversaries.value?.size ?: 0) >= 2){
+        if ((vm.anniversaries.value?.size ?: 0) >= 2) {
             Toast.makeText(this, "記念日は2個以上設定できません。", Toast.LENGTH_LONG).show()
             return
         }
@@ -211,7 +215,8 @@ class CreateCharacterActivity : AppCompatActivity() {
         val month = calendar[Calendar.MONTH]
         val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
         val datePickerDialog =
-            DatePickerDialog(this,
+            DatePickerDialog(
+                this,
                 DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT && !dialog.isShown) {
                         return@OnDateSetListener
@@ -247,7 +252,7 @@ class CreateCharacterActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_PICK_ICON)
     }
 
-    fun setOnBackgroundRemove(v: View?): Boolean{
+    fun setOnBackgroundRemove(v: View?): Boolean {
         val popup = PopupMenu(this, binding.previewBackgroundImage)
         val inflater = popup.menuInflater
         inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
@@ -277,7 +282,7 @@ class CreateCharacterActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_PICK_BACKGROUND)
     }
 
-    fun onSetTextColor(v: View){
+    fun onSetTextColor(v: View) {
         val dialog = ColorPickerDialogFragment(object :
             DialogActionListener<ColorPickerDialogFragment> {
             override fun onCancel() {}
@@ -304,7 +309,7 @@ class CreateCharacterActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
     }
 
-    private fun onClearBackgroundColor(v: View?): Boolean{
+    private fun onClearBackgroundColor(v: View?): Boolean {
         val popup = PopupMenu(this, binding.previewBackgroundColor)
         val inflater = popup.menuInflater
         inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
@@ -320,7 +325,7 @@ class CreateCharacterActivity : AppCompatActivity() {
         return true
     }
 
-    fun onSetTextShadowColor(v: View){
+    fun onSetTextShadowColor(v: View) {
         val dialog = ColorPickerDialogFragment(object :
             DialogActionListener<ColorPickerDialogFragment> {
             override fun onCancel() {}
@@ -361,7 +366,7 @@ class CreateCharacterActivity : AppCompatActivity() {
                 it.getStringExtra(CreateAnniversaryActivity.INTENT_CREATE_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
                     vm.addAnniversary(anniversary)
-                    scrollView.post{
+                    scrollView.post {
                         scrollView.fullScroll(View.FOCUS_DOWN)
                     }
                     binding.root.requestFocus()
@@ -428,6 +433,7 @@ class CreateCharacterActivity : AppCompatActivity() {
                 save()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

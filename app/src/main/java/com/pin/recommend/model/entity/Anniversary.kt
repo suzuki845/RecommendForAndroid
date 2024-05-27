@@ -2,11 +2,12 @@ package com.pin.recommend.model.entity
 
 import com.pin.recommend.model.value.PeriodType
 import com.pin.recommend.util.TimeUtil
-import java.time.Year
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 
 class UserDefinedAnniversary : AnniversaryInterface {
+    private val id: AnniversaryId
     private val name: String
     private val date: Date
     private val isZeroDayStart: Boolean
@@ -14,18 +15,24 @@ class UserDefinedAnniversary : AnniversaryInterface {
     private val bottomText: String
 
     constructor(
+        id: AnniversaryId,
         name: String,
         date: Date,
         isZeroDayStart: Boolean,
         topText: String = "",
         bottomText: String = ""
     ) {
+        this.id = id
         this.name = name
         this.isZeroDayStart = isZeroDayStart
         this.date = date
         TimeUtil.resetDate(this.date)
         this.topText = topText
         this.bottomText = bottomText
+    }
+
+    override fun getId(): AnniversaryId {
+        return id
     }
 
     override fun getName(): String {
@@ -62,7 +69,7 @@ class UserDefinedAnniversary : AnniversaryInterface {
         TimeUtil.resetTime(anniversary)
 
         val duration = TimeUtil.duration(now, anniversary)
-        if(duration.isNegative){
+        if (duration.isNegative) {
             return 365 + duration.toDays()
         }
         return duration.toDays()
@@ -92,6 +99,7 @@ class UserDefinedAnniversary : AnniversaryInterface {
 
 class SystemDefinedAnniversary : AnniversaryInterface {
 
+    private val id: AnniversaryId
     private val name: String
     private val startDate = Calendar.getInstance()
     private val farInAdvance: Int
@@ -101,6 +109,7 @@ class SystemDefinedAnniversary : AnniversaryInterface {
     private val bottomText: String
 
     constructor(
+        id: AnniversaryId,
         name: String,
         startDate: Date,
         periodType: PeriodType,
@@ -109,6 +118,7 @@ class SystemDefinedAnniversary : AnniversaryInterface {
         topText: String,
         bottomText: String
     ) {
+        this.id = id
         this.name = name
         this.startDate.time = startDate
         this.periodType = periodType
@@ -117,6 +127,10 @@ class SystemDefinedAnniversary : AnniversaryInterface {
         TimeUtil.resetTime(this.startDate)
         this.topText = topText
         this.bottomText = bottomText
+    }
+
+    override fun getId(): AnniversaryId {
+        return id
     }
 
     override fun getName(): String {
@@ -141,9 +155,11 @@ class SystemDefinedAnniversary : AnniversaryInterface {
             PeriodType.Year -> {
                 anniversary.add(Calendar.YEAR, farInAdvance)
             }
+
             PeriodType.Month -> {
                 anniversary.add(Calendar.MONTH, farInAdvance)
             }
+
             PeriodType.Days -> {
                 anniversary.add(Calendar.DAY_OF_MONTH, farInAdvance)
             }
@@ -183,12 +199,19 @@ class SystemDefinedAnniversary : AnniversaryInterface {
 
 class SystemDefinedAnniversaries : AnniversaryInterface {
 
+    private val id: AnniversaryId
+
     private var character: RecommendCharacter
 
     private val anniversaries: MutableList<SystemDefinedAnniversary> = mutableListOf()
 
     constructor(character: RecommendCharacter) {
         this.character = character
+        this.id = AnniversaryId(character.id, "SystemDefinedAnniversaries")
+    }
+
+    override fun getId(): AnniversaryId {
+        return id
     }
 
     fun initialize() {
@@ -200,7 +223,8 @@ class SystemDefinedAnniversaries : AnniversaryInterface {
             val unit = i * 100
             anniversaries.add(
                 SystemDefinedAnniversary(
-                    "${unit}日",
+                    id = AnniversaryId(character.id, "${unit}日"),
+                    name = "${unit}日",
                     startDate = created.time,
                     periodType = PeriodType.Days,
                     farInAdvance = unit,
@@ -214,7 +238,8 @@ class SystemDefinedAnniversaries : AnniversaryInterface {
             val unit = i
             anniversaries.add(
                 SystemDefinedAnniversary(
-                    "${unit}周年",
+                    id = AnniversaryId(character.id, "${unit}日"),
+                    name = "${unit}周年",
                     startDate = created.time,
                     periodType = PeriodType.Year,
                     farInAdvance = unit,

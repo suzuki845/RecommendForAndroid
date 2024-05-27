@@ -12,8 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.adapter.CharactersAdapter
-import com.pin.recommend.model.viewmodel.EditStateViewModel
 import com.pin.recommend.model.viewmodel.CharacterListViewModel
+import com.pin.recommend.model.viewmodel.EditStateViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.Reward.Companion.getInstance
 
@@ -81,7 +81,7 @@ class CharacterListActivity : AppCompatActivity() {
         adMobManager!!.checkAndLoad()
     }
 
-    fun destinationSetting(v: View){
+    fun destinationSetting(v: View) {
         startActivity(Intent(this, GlobalSettingActivity::class.java))
     }
 
@@ -116,12 +116,7 @@ class CharacterListActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
-/*
-            R.id.setting -> {
-                startActivity(Intent(this, GlobalSettingActivity::class.java))
-                true
-            }
-*/
+
             else -> super.onOptionsItemSelected(item)
         }
     }

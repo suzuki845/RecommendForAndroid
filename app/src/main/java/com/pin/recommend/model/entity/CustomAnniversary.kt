@@ -1,9 +1,11 @@
 package com.pin.recommend.model.entity
 
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.google.gson.Gson
-import com.pin.recommend.util.TimeUtil
-import java.util.*
+import java.util.Date
 
 
 @Entity(
@@ -28,7 +30,14 @@ class CustomAnniversary(
 ) {
 
     fun toUserDefinedAnniversary(isZeroDayStart: Boolean): UserDefinedAnniversary {
-        return UserDefinedAnniversary(name, date, isZeroDayStart, topText ?: "", bottomText ?: "")
+        return UserDefinedAnniversary(
+            AnniversaryId(characterId, id.toString()),
+            name,
+            date,
+            isZeroDayStart,
+            topText ?: "",
+            bottomText ?: ""
+        )
     }
 
     fun toDraft(): Draft {

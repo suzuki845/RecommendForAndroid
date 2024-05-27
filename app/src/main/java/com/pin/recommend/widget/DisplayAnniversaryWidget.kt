@@ -4,55 +4,51 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.google.gson.Gson
 import com.pin.recommend.model.entity.AnniversaryId
+import com.pin.recommend.model.entity.AnniversaryInterface
 import com.pin.recommend.model.entity.SerializableAppearance
+import java.util.Date
 
-data class PinnedAnniversaryWidget(
-    val widgetId: Int,
-    val anniversary: AnniversaryWidgetItem,
+class DisplayAnniversaryWidget(
+    val appWidgetId: Int,
+    val characterName: String,
+    val anniversary: AnniversaryInterface,
+    val appearance: SerializableAppearance
 ) {
 
     fun getId(): AnniversaryId {
         return anniversary.getId()
     }
-
-    fun getCharacterName(): String {
-        return anniversary.characterName
-    }
-
+    
     fun getAnniversaryName(): String {
-        return anniversary.anniversary.name
+        return anniversary.getName()
     }
 
-    fun getRemainingDays(): String {
-        return anniversary.anniversary.getRemainingDays
+    fun getRemainingDays(date: Date): Long? {
+        return anniversary.getRemainingDays(date)
     }
 
-    fun getMessage(): String {
-        return anniversary.anniversary.message
+    fun getMessage(date: Date): String {
+        return anniversary.getMessage(date)
     }
 
     fun getBackgroundColor(): Int {
-        return anniversary.appearance.backgroundColor
+        return appearance.backgroundColor
     }
 
     fun getTextColor(): Int {
-        return anniversary.appearance.homeTextColor
+        return appearance.homeTextColor
     }
 
     fun getTextShadowColor(): Int? {
-        return anniversary.appearance.homeTextShadowColor
+        return appearance.homeTextShadowColor
     }
 
     fun getIconImage(context: Context, w: Int, h: Int): Bitmap? {
-        return anniversary.getIconImage(context, w, h)
+        return appearance.getIconImage(context, w, h)
     }
 
     fun getBackgroundImage(context: Context, w: Int, h: Int): Bitmap? {
-        return anniversary.getBackgroundImage(context, w, h)
-    }
-
-    fun getAppearance(): SerializableAppearance {
-        return anniversary.appearance
+        return appearance.getBackgroundBitmap(context, w, h)
     }
 
 
@@ -65,5 +61,6 @@ data class PinnedAnniversaryWidget(
             return Gson().fromJson(json, PinnedAnniversaryWidget::class.java)
         }
     }
+
 
 }

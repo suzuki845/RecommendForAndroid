@@ -4,6 +4,7 @@ import java.util.Date
 
 interface AnniversaryInterface {
 
+    fun getId(): AnniversaryId
     fun getName(): String
     fun getTopText(): String
     fun getBottomText(): String
@@ -14,6 +15,7 @@ interface AnniversaryInterface {
 
     fun toData(date: Date): Anniversary {
         return Anniversary(
+            getId(),
             getName(),
             getTopText(),
             getBottomText(),
@@ -25,7 +27,28 @@ interface AnniversaryInterface {
     }
 }
 
+data class AnniversaryId(private val characterId: Long, private val anniversaryId: String) {
+    fun getId(): String {
+        return "anniversaries/characterId/$characterId/anniversaryId/$anniversaryId"
+    }
+
+    fun getCharacterId(): Long {
+        return characterId
+    }
+
+    fun getAnniversaryId(): String {
+        return anniversaryId
+    }
+
+    companion object {
+        fun getEmpty(): AnniversaryId {
+            return AnniversaryId(-1, "null")
+        }
+    }
+}
+
 data class Anniversary(
+    val id: AnniversaryId = AnniversaryId.getEmpty(),
     val name: String = "",
     val topText: String = "",
     val bottomText: String = "",
