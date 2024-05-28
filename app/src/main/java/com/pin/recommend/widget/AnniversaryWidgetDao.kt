@@ -78,5 +78,26 @@ class AnniversaryWidgetDao(context: Context) {
         }
         return@withContext null
     }
+
+    fun unsafeGet(widgetId: Int): DisplayAnniversaryWidget? {
+        val pinned = getPinned(widgetId) ?: return null
+        val cwa = db.recommendCharacterDao()
+            .findByIdCharacterWithAnniversaries(
+                pinned.anniversary.getId().getCharacterId()
+            )
+        val a = cwa?.anniversaries()?.firstOrNull {
+            pinned.getId().getId() == it.getId().getId()
+        }
+        println("widget!! ${cwa?.id}")
+        if (a != null) {
+            return DisplayAnniversaryWidget(
+                pinned.widgetId,
+                cwa.character.name ?: "",
+                a,
+                cwa.serializableAppearance()
+            )
+        }
+        return null
+    }
 }
 
