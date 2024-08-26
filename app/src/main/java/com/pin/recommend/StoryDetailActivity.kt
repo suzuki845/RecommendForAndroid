@@ -10,11 +10,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.*
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import com.pin.recommend.adapter.PickStoryPictureAdapter
-import com.pin.recommend.model.entity.StoryWithPictures
 import com.pin.recommend.model.viewmodel.StoryDetailsViewModel
-import com.pin.recommend.model.viewmodel.StoryEditorViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.Reward.Companion.getInstance
 
@@ -38,7 +40,7 @@ class StoryDetailActivity : AppCompatActivity() {
         adMobManager = AdMobAdaptiveBannerManager(
             this,
             adViewContainer,
-            resources.getString(R.string.ad_unit_id)
+            resources.getString(R.string.banner_id)
         )
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
@@ -68,11 +70,11 @@ class StoryDetailActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        vm.story.observe(this){ it ->
+        vm.story.observe(this) { it ->
             print("id!!!!!${it}")
             comment = findViewById(R.id.comment)
             comment.text = it?.story?.comment
-            val images = it?.pictures?.mapNotNull{ it.getBitmap(this,500, 500) }?.toMutableList()
+            val images = it?.pictures?.mapNotNull { it.getBitmap(this, 500, 500) }?.toMutableList()
             viewStoryPictureAdapter.setList(images ?: mutableListOf())
         }
 

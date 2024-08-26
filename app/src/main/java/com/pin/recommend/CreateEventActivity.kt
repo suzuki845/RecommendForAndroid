@@ -1,34 +1,32 @@
 package com.pin.recommend
 
-import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.content.Intent
+import android.app.ProgressDialog
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.pin.recommend.adapter.PaymentTagAdapter
 import com.pin.recommend.databinding.ActivityCreateEventBinding
-import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.viewmodel.CreateEventViewModel
-import com.pin.recommend.model.viewmodel.CreatePaymentViewModel
 import com.pin.recommend.util.TimeUtil
-import java.util.*
+import com.pin.util.AdLoadingProgress
+import com.pin.util.LoadThenShowInterstitial
+import com.pin.util.OnAdShowed
+import java.util.Calendar
+import java.util.Date
 
 class CreateEventActivity : AppCompatActivity() {
 
     companion object {
-        const val INTENT_CREATE_EVENT_CHARACTER = "com.pin.recommend.CreateEventActivity.INTENT_CREATE_EVENT_CHARACTER"
-        const val INTENT_CREATE_EVENT_DATE = "com.pin.recommend.CreateEventActivity.INTENT_CREATE_EVENT_DATE"
+        const val INTENT_CREATE_EVENT_CHARACTER =
+            "com.pin.recommend.CreateEventActivity.INTENT_CREATE_EVENT_CHARACTER"
+        const val INTENT_CREATE_EVENT_DATE =
+            "com.pin.recommend.CreateEventActivity.INTENT_CREATE_EVENT_DATE"
     }
 
     private val viewModel: CreateEventViewModel by lazy {
@@ -41,15 +39,15 @@ class CreateEventActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         var characterId = intent.getLongExtra(INTENT_CREATE_EVENT_CHARACTER, -1);
-        if(characterId != -1L){
+        if (characterId != -1L) {
             viewModel.characterId.value = characterId
         }
         val date = intent.getLongExtra(INTENT_CREATE_EVENT_DATE, -1L);
-        if(date != -1L){
+        if (date != -1L) {
             viewModel.date.value = Date().apply { time = date }
         }
 
-        binding  = DataBindingUtil.setContentView(this, R.layout.activity_create_event)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_create_event)
         binding.vm = viewModel
         binding.lifecycleOwner = this
         binding.toolbar.title = "イベントの追加"
@@ -62,19 +60,26 @@ class CreateEventActivity : AppCompatActivity() {
         val year = calendar[Calendar.YEAR]
         val month = calendar[Calendar.MONTH]
         val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-        val datePickerDialog = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
-                    !dialog.isShown) {
-                return@OnDateSetListener
-                //api19はクリックするとonDateSetが２回呼ばれるため
-            }
-            val newCalender = Calendar.getInstance()
-            newCalender[year, month] = dayOfMonth
-            TimeUtil.resetTime(newCalender)
-            val date = newCalender.time
-            viewModel.date.value = date
+        val datePickerDialog = DatePickerDialog(
+            this,
+            DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
+                    !dialog.isShown
+                ) {
+                    return@OnDateSetListener
+                    //api19はクリックするとonDateSetが２回呼ばれるため
+                }
+                val newCalender = Calendar.getInstance()
+                newCalender[year, month] = dayOfMonth
+                TimeUtil.resetTime(newCalender)
+                val date = newCalender.time
+                viewModel.date.value = date
 
-        }, year, month, dayOfMonth)
+            },
+            year,
+            month,
+            dayOfMonth
+        )
         datePickerDialog.show()
     }
 
@@ -83,21 +88,47 @@ class CreateEventActivity : AppCompatActivity() {
         return true
     }
 
+    private fun save() {
+        val ad = LoadThenShowInterstitial(resources.getString(R.string.interstitial_f_id))
+        val progress = ProgressDialog(this).apply {
+            setTitle("少々お待ちください...")
+            setCancelable(false)
+        }
+        ad.show(this, AdLoadingProgress({
+            progress.show()
+        }, {
+            progress.dismiss()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }), OnAdShowed({
+            saveInner()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }))
+    }
+
+    private fun saveInner() {
+        if (!viewModel.createEvent()) {
+            Toast.makeText(this, "保存できませんでした。", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            finish()
+        }
+        true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.save -> {
-                if(!viewModel.createEvent()){
-                    Toast.makeText(this, "保存できませんでした。", Toast.LENGTH_SHORT)
-                            .show()
-                }else{
-                    finish()
-                }
+                save()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 
 
 }

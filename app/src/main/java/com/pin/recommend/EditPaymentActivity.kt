@@ -2,6 +2,7 @@ package com.pin.recommend
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -11,7 +12,6 @@ import android.view.View
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -19,7 +19,11 @@ import com.pin.recommend.adapter.PaymentTagAdapter
 import com.pin.recommend.databinding.ActivityEditPaymentBinding
 import com.pin.recommend.model.viewmodel.EditPaymentViewModel
 import com.pin.recommend.util.TimeUtil
-import java.util.*
+import com.pin.util.AdLoadingProgress
+import com.pin.util.LoadThenShowInterstitial
+import com.pin.util.OnAdShowed
+import java.util.Calendar
+import java.util.Date
 
 class EditPaymentActivity : AppCompatActivity() {
 
@@ -42,7 +46,7 @@ class EditPaymentActivity : AppCompatActivity() {
         var id = intent.getLongExtra(INTENT_EDIT_PAYMENT, -1);
         viewModel.load(id)
 
-        binding  = DataBindingUtil.setContentView(this, R.layout.activity_edit_payment)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_payment)
         binding.vm = viewModel
         binding.lifecycleOwner = this
 
@@ -55,32 +59,35 @@ class EditPaymentActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
     }
 
-    fun onPayType(view: View){
-        var type =  if(view.id == R.id.pay) 0 else 1
+    fun onPayType(view: View) {
+        var type = if (view.id == R.id.pay) 0 else 1
         val paymentAndTag = viewModel.paymentAndTag.value
         paymentAndTag?.payment?.type = type
         viewModel.paymentAndTag.value = paymentAndTag
     }
 
-    fun toTagListActivity(view: View?){
+    fun toTagListActivity(view: View?) {
         val intent = Intent(this, PaymentTagListActivity::class.java);
-        intent.putExtra(PaymentTagListActivity.INTENT_PAYMENT_TYPE, viewModel.paymentAndTag.value?.payment?.type ?: 0)
+        intent.putExtra(
+            PaymentTagListActivity.INTENT_PAYMENT_TYPE,
+            viewModel.paymentAndTag.value?.payment?.type ?: 0
+        )
         startActivity(intent)
     }
 
-    fun onShowTagDialog(view: View?){
+    fun onShowTagDialog(view: View?) {
         val listView = ListView(this)
         listView.adapter = tagAdapter
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                .setTitle("選択してくだい。")
-                .setView(listView)
+            .setTitle("選択してくだい。")
+            .setView(listView)
         builder.setNegativeButton("キャンセル") { d, _ ->
             d.cancel()
         }
 
         val dialog = builder.create()
-        listView.setOnItemClickListener{ parent, view, pos, id ->
+        listView.setOnItemClickListener { parent, view, pos, id ->
             val tag = tagAdapter.getItem(pos)
             val paymentAndTag = viewModel.paymentAndTag.value
             paymentAndTag?.tag = tag
@@ -99,20 +106,27 @@ class EditPaymentActivity : AppCompatActivity() {
         val year = calendar[Calendar.YEAR]
         val month = calendar[Calendar.MONTH]
         val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-        val datePickerDialog = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
-                    !dialog.isShown) {
-                return@OnDateSetListener
-                //api19はクリックするとonDateSetが２回呼ばれるため
-            }
-            val newCalender = Calendar.getInstance()
-            newCalender[year, month] = dayOfMonth
-            TimeUtil.resetTime(newCalender)
-            val date = newCalender.time
-            paymentAndTag?.payment?.updatedAt = date
+        val datePickerDialog = DatePickerDialog(
+            this,
+            DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
+                    !dialog.isShown
+                ) {
+                    return@OnDateSetListener
+                    //api19はクリックするとonDateSetが２回呼ばれるため
+                }
+                val newCalender = Calendar.getInstance()
+                newCalender[year, month] = dayOfMonth
+                TimeUtil.resetTime(newCalender)
+                val date = newCalender.time
+                paymentAndTag?.payment?.updatedAt = date
 
-            viewModel.paymentAndTag.value = paymentAndTag
-        }, year, month, dayOfMonth)
+                viewModel.paymentAndTag.value = paymentAndTag
+            },
+            year,
+            month,
+            dayOfMonth
+        )
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
@@ -122,21 +136,46 @@ class EditPaymentActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.save -> {
-                if(!viewModel.updatePayment()){
-                    Toast.makeText(this, "保存できませんでした。", Toast.LENGTH_SHORT)
-                            .show()
-                }else{
-                    finish()
-                }
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    private fun save() {
+        val ad = LoadThenShowInterstitial(resources.getString(R.string.interstitial_f_id))
+        val progress = ProgressDialog(this).apply {
+            setTitle("少々お待ちください...")
+            setCancelable(false)
+        }
+        ad.show(this, AdLoadingProgress({
+            progress.show()
+        }, {
+            progress.dismiss()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }), OnAdShowed({
+            saveInner()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }))
+    }
+
+    private fun saveInner() {
+        if (!viewModel.updatePayment()) {
+            Toast.makeText(this, "保存できませんでした。", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            finish()
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.save -> {
+                save()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
 
 }

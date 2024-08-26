@@ -38,7 +38,7 @@ class CharacterListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_character_list)
         adViewContainer = findViewById(R.id.ad_container)
         adMobManager =
-            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id))
+            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.banner_id))
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
         val reward = getInstance(this)

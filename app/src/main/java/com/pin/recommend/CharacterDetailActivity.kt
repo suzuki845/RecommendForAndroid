@@ -38,7 +38,11 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         setContentView(R.layout.activity_character_detail)
         adViewContainer = findViewById(R.id.ad_container)
         adMobManager =
-            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id))
+            AdMobAdaptiveBannerManager(
+                this,
+                adViewContainer,
+                getString(R.string.banner_id)
+            )
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)

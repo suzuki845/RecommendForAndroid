@@ -26,7 +26,7 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
         PrefUtil.setSharedPreferences(applicationContext)
         registerActivityLifecycleCallbacks(this as ActivityLifecycleCallbacks)
         val reward = getInstance(this)
-        reward.setAdUnitId(resources.getString(R.string.ad_unit_id_for_reward))
+        reward.setAdUnitId(resources.getString(R.string.reward_id))
         var appStartCount = PrefUtil.getInt(Constants.APP_START_COUNT)
         PrefUtil.putInt(Constants.APP_START_COUNT, ++appStartCount)
     }

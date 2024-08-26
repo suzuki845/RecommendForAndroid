@@ -1,29 +1,24 @@
 package com.pin.recommend
 
-import android.app.DatePickerDialog
-import android.os.Build
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.pin.recommend.databinding.ActivityCreateEventBinding
 import com.pin.recommend.databinding.ActivityEditEventBinding
-import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.viewmodel.EditEventViewModel
-import com.pin.recommend.util.TimeUtil
-import java.util.*
+import com.pin.util.AdLoadingProgress
+import com.pin.util.LoadThenShowInterstitial
+import com.pin.util.OnAdShowed
 
 class EditEventActivity : AppCompatActivity() {
 
     companion object {
-        const val INTENT_EDIT_EVENT_ID = "com.pin.recommend.CreateEventActivity.INTENT_EDIT_EVENT_ID"
+        const val INTENT_EDIT_EVENT_ID =
+            "com.pin.recommend.CreateEventActivity.INTENT_EDIT_EVENT_ID"
     }
 
     private val viewModel: EditEventViewModel by lazy {
@@ -38,7 +33,7 @@ class EditEventActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         val eventId = intent.getLongExtra(INTENT_EDIT_EVENT_ID, -1L);
-        if(eventId != -1L){
+        if (eventId != -1L) {
             viewModel.load(eventId)
         }
 
@@ -55,21 +50,46 @@ class EditEventActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.save -> {
-                if(!viewModel.updateEvent()){
-                    Toast.makeText(this, "保存できませんでした。", Toast.LENGTH_SHORT)
-                            .show()
-                }else{
-                    finish()
-                }
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    private fun save() {
+        val ad = LoadThenShowInterstitial(resources.getString(R.string.interstitial_f_id))
+        val progress = ProgressDialog(this).apply {
+            setTitle("少々お待ちください...")
+            setCancelable(false)
+        }
+        ad.show(this, AdLoadingProgress({
+            progress.show()
+        }, {
+            progress.dismiss()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }), OnAdShowed({
+            saveInner()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }))
+    }
+
+    private fun saveInner() {
+        if (!viewModel.updateEvent()) {
+            Toast.makeText(this, "保存できませんでした。", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            finish()
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.save -> {
+                save()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
 
 }

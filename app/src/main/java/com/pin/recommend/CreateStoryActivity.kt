@@ -1,7 +1,7 @@
 package com.pin.recommend
 
-import android.Manifest
 import android.app.DatePickerDialog
+import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -10,32 +10,32 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.*
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.adapter.PickStoryPictureAdapter
 import com.pin.recommend.databinding.ActivityCreateStoryBinding
-import com.pin.recommend.databinding.ActivityEditCharacterBinding
 import com.pin.recommend.main.StoryListFragment
-import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.entity.Story
 import com.pin.recommend.model.entity.StoryPicture
-import com.pin.recommend.model.viewmodel.*
+import com.pin.recommend.model.viewmodel.StoryEditorViewModel
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
+import com.pin.util.AdLoadingProgress
 import com.pin.util.AdMobAdaptiveBannerManager
+import com.pin.util.LoadThenShowInterstitial
+import com.pin.util.OnAdShowed
 import com.pin.util.PermissionChecker
 import com.pin.util.Reward.Companion.getInstance
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
 
 class CreateStoryActivity : AppCompatActivity() {
     private lateinit var pickStoryPictureAdapter: PickStoryPictureAdapter
@@ -54,7 +54,7 @@ class CreateStoryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_story)
         adViewContainer = findViewById(R.id.ad_container)
         adMobManager =
-            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id))
+            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.banner_id))
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
@@ -145,7 +145,11 @@ class CreateStoryActivity : AppCompatActivity() {
                 val bitmap = BitmapUtility.decodeUri(this, uri, 500, 500)
                 val count = pickStoryPictureAdapter.itemCount
                 if (count >= 3) {
-                    Toast.makeText(this@CreateStoryActivity, "３つ以上は選択出来ません", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        this@CreateStoryActivity,
+                        "３つ以上は選択出来ません",
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                     return
                 }
@@ -164,9 +168,29 @@ class CreateStoryActivity : AppCompatActivity() {
     }
 
     private fun save() {
-        storyEditorVM.save(Progress({
+        val ad = LoadThenShowInterstitial(resources.getString(R.string.interstitial_f_id))
+        val progress = ProgressDialog(this).apply {
+            setTitle("少々お待ちください...")
+            setCancelable(false)
+        }
+        ad.show(this, AdLoadingProgress({
+            progress.show()
+        }, {
+            progress.dismiss()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }), OnAdShowed({
+            saveInner()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }))
+    }
 
-        },{
+    private fun saveInner() {
+        storyEditorVM.save(Progress({
+        }, {
             finish()
         }, {
             Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()

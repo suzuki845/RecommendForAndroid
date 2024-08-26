@@ -3,6 +3,7 @@ package com.pin.recommend
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
+import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -39,8 +40,11 @@ import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
+import com.pin.util.AdLoadingProgress
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.DisplaySizeCheck
+import com.pin.util.LoadThenShowInterstitial
+import com.pin.util.OnAdShowed
 import com.pin.util.PermissionChecker
 import com.pin.util.Reward.Companion.getInstance
 import com.soundcloud.android.crop.Crop
@@ -83,7 +87,7 @@ class EditCharacterActivity : AppCompatActivity() {
         adViewContainer = findViewById(R.id.ad_container)
 
         adMobManager =
-            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id))
+            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.banner_id))
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
@@ -185,17 +189,6 @@ class EditCharacterActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         adMobManager.checkAndLoad()
-    }
-
-    fun save() {
-        vm.save(Progress({
-            val updateWidgetRequest = Intent("android.appwidget.action.APPWIDGET_UPDATE")
-            sendBroadcast(updateWidgetRequest)
-        }, {
-            finish()
-        }, { e ->
-            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-        }))
     }
 
     fun onSetBackgroundColor(v: View?) {
@@ -449,6 +442,38 @@ class EditCharacterActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_edit_character, menu)
         return true
+    }
+
+    private fun save() {
+        val ad = LoadThenShowInterstitial(resources.getString(R.string.interstitial_f_id))
+        val progress = ProgressDialog(this).apply {
+            setTitle("少々お待ちください...")
+            setCancelable(false)
+        }
+        ad.show(this, AdLoadingProgress({
+            progress.show()
+        }, {
+            progress.dismiss()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }), OnAdShowed({
+            saveInner()
+        }, {
+            progress.dismiss()
+            saveInner()
+        }))
+    }
+
+    private fun saveInner() {
+        vm.save(Progress({
+            val updateWidgetRequest = Intent("android.appwidget.action.APPWIDGET_UPDATE")
+            sendBroadcast(updateWidgetRequest)
+        }, {
+            finish()
+        }, { e ->
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+        }))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
