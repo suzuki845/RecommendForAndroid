@@ -7,13 +7,13 @@ import com.pin.recommend.model.entity.PaymentTag
 @Dao
 interface PaymentTagDao {
     @Insert
-    fun insertPaymentTag(tag: PaymentTag?): Long
+    fun insertPaymentTag(tag: PaymentTag): Long
 
     @Update
-    fun updatePaymentTag(tag: PaymentTag?): Int
+    fun updatePaymentTag(tag: PaymentTag): Int
 
     @Delete
-    fun deletePaymentTag(tag: PaymentTag?)
+    fun deletePaymentTag(tag: PaymentTag)
 
     @Query("DELETE FROM PaymentTag")
     fun deleteAll()

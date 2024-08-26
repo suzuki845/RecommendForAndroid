@@ -18,7 +18,6 @@ import com.pin.recommend.model.CharacterDetails
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.Reward.Companion.getInstance
-import kotlinx.android.synthetic.main.item_slide_show.view.*
 
 class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener {
     private lateinit var backgroundImage: ImageView
@@ -38,7 +37,8 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_detail)
         adViewContainer = findViewById(R.id.ad_container)
-        adMobManager = AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id))
+        adMobManager =
+            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.ad_unit_id))
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
@@ -63,39 +63,43 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
 
         val id = intent.getLongExtra(INTENT_CHARACTER, -1)
         detailsVM.id.value = id
-        detailsVM.state.observe(this){
+        detailsVM.state.observe(this) {
             initializeBackground(it)
             initializeToolbar(it)
         }
     }
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.home -> {
-                viewPager.currentItem = 0
-                return@OnNavigationItemSelectedListener true
+    private val mOnNavigationItemSelectedListener =
+        BottomNavigationView.OnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.home -> {
+                    viewPager.currentItem = 0
+                    return@OnNavigationItemSelectedListener true
+                }
+
+                R.id.story -> {
+                    viewPager.currentItem = 1
+                    return@OnNavigationItemSelectedListener true
+                }
+
+                R.id.pay_save -> {
+                    viewPager.currentItem = 2
+                    return@OnNavigationItemSelectedListener true
+                }
+
+                R.id.event -> {
+                    viewPager.currentItem = 3
+                    return@OnNavigationItemSelectedListener true
+                }
             }
-            R.id.story -> {
-                viewPager.currentItem = 1
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.pay_save -> {
-                viewPager.currentItem = 2
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.event -> {
-                viewPager.currentItem = 3
-                return@OnNavigationItemSelectedListener true
-            }
+            false
         }
-        false
-    }
 
     override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
 
     override fun onPageSelected(p0: Int) {
 
-        when(p0) {
+        when (p0) {
             0 -> navigation.menu.getItem(0).isChecked = true
             1 -> navigation.menu.getItem(1).isChecked = true
             2 -> navigation.menu.getItem(2).isChecked = true
@@ -113,8 +117,8 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
 
     private fun initializeBackground(state: CharacterDetails.State) {
         state.appearance?.backgroundColor?.let {
-                backgroundColor.setBackgroundColor(it)
-            }
+            backgroundColor.setBackgroundColor(it)
+        }
         state.appearance?.backgroundImageOpacity?.let {
             backgroundColor.alpha = it
         }
@@ -141,14 +145,15 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         }
 
         pinningView.setOnMenuItemClickListener {
-            if(isPinning){
+            if (isPinning) {
                 pinningView.setIcon(R.drawable.pin_outline)
                 detailsVM.unpinning()
                 finish()
-            }else{
+            } else {
                 pinningView.setIcon(R.drawable.pin_fill)
                 detailsVM.pinning()
-                Toast.makeText(this@CharacterDetailActivity, "トップページ に固定しました", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@CharacterDetailActivity, "トップページ に固定しました", Toast.LENGTH_SHORT)
+                    .show()
             }
             false
         }
@@ -166,10 +171,10 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         val isPinning = detailsVM.state.value?.isPinning ?: false
 
         if (isPinning) {
-                moveTaskToBack(true)
-            } else {
-                super.onBackPressed()
-            }
+            moveTaskToBack(true)
+        } else {
+            super.onBackPressed()
+        }
     }
 
     companion object {

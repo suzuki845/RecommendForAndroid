@@ -9,13 +9,13 @@ import java.util.*
 @Dao
 interface PaymentDao {
     @Insert
-    fun insertPayment(payment: Payment?): Long
+    fun insertPayment(payment: Payment): Long
 
     @Update
-    fun updatePayment(payment: Payment?): Int
+    fun updatePayment(payment: Payment): Int
 
     @Delete
-    fun deletePayment(payment: Payment?)
+    fun deletePayment(payment: Payment)
 
     @Query("DELETE FROM Payment")
     fun deleteAll()
@@ -38,7 +38,11 @@ interface PaymentDao {
 
     @Transaction
     @Query("SELECT * FROM Payment WHERE characterId = :characterId AND (createdAt >= :start AND createdAt <= :end) ORDER BY updatedAt ASC")
-    fun findByTrackedCharacterIdPaymentAndTagInDate(characterId: Long, start: Date, end: Date): LiveData<List<PaymentAndTag>>
+    fun findByTrackedCharacterIdPaymentAndTagInDate(
+        characterId: Long,
+        start: Date,
+        end: Date
+    ): LiveData<List<PaymentAndTag>>
 
     @Transaction
     @Query("SELECT * FROM Payment WHERE id = :id")

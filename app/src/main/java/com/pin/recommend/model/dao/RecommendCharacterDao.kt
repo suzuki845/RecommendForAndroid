@@ -8,13 +8,13 @@ import com.pin.recommend.model.entity.RecommendCharacter
 @Dao
 interface RecommendCharacterDao {
     @Insert
-    fun insertCharacter(character: RecommendCharacter?): Long
+    fun insertCharacter(character: RecommendCharacter): Long
 
     @Update
-    fun updateCharacter(character: RecommendCharacter?): Int
+    fun updateCharacter(character: RecommendCharacter): Int
 
     @Delete
-    fun deleteCharacter(character: RecommendCharacter?)
+    fun deleteCharacter(character: RecommendCharacter)
 
     @Query("DELETE FROM RecommendCharacter")
     fun deleteAll()

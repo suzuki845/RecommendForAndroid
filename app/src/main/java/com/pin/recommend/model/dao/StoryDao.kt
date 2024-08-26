@@ -8,13 +8,13 @@ import com.pin.recommend.model.entity.StoryWithPictures
 @Dao
 interface StoryDao {
     @Insert
-    fun insertStory(story: Story?): Long
+    fun insertStory(story: Story): Long
 
     @Update
-    fun updateStory(story: Story?): Int
+    fun updateStory(story: Story): Int
 
     @Delete
-    fun deleteStory(story: Story?)
+    fun deleteStory(story: Story)
 
     @Query("DELETE FROM Story")
     fun deleteAll()

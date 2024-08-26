@@ -8,13 +8,14 @@ import com.pin.recommend.model.entity.CustomAnniversary
 interface CustomAnniversaryDao {
 
     @Insert
-    fun insertAnniversary(anniversary: CustomAnniversary?): Long
+    fun insertAnniversary(anniversary: CustomAnniversary): Long
 
     @Update
-    fun updateAnniversary(anniversary: CustomAnniversary?): Int
+    fun updateAnniversary(anniversary: CustomAnniversary): Int
 
     @Delete
-    fun deleteAnniversary(anniversary: CustomAnniversary?)
+    fun deleteAnniversary(anniversary: CustomAnniversary)
+
     @Query("DELETE FROM CustomAnniversary WHERE characterId = :characterId")
     fun deleteByCharacterId(characterId: Long)
 

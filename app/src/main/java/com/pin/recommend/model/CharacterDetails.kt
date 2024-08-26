@@ -108,7 +108,13 @@ class CharacterDetails(
     fun updateStorySortOrder(order: Int) {
         val character = cwa.value?.character
         character?.storySortOrder = order
-        AppDatabase.executor.execute { db.recommendCharacterDao().updateCharacter(character) }
+        AppDatabase.executor.execute {
+            character?.let {
+                db.recommendCharacterDao().updateCharacter(
+                    it
+                )
+            }
+        }
     }
 
     data class State(

@@ -3,19 +3,18 @@ package com.pin.recommend
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityEditAnniversaryBinding
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.AnniversaryEditorViewModel
-import kotlinx.android.synthetic.main.row_date_separated.view.*
-import java.util.*
+import java.util.Calendar
 
 
 class EditAnniversaryActivity : AppCompatActivity() {
@@ -66,6 +65,7 @@ class EditAnniversaryActivity : AppCompatActivity() {
                 save()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -75,7 +75,8 @@ class EditAnniversaryActivity : AppCompatActivity() {
         val year = calendar[Calendar.YEAR]
         val month = calendar[Calendar.MONTH]
         val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-        val datePickerDialog = DatePickerDialog(this,
+        val datePickerDialog = DatePickerDialog(
+            this,
             DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
                     !dialog.isShown

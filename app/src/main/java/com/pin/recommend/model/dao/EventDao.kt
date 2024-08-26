@@ -8,13 +8,13 @@ import java.util.*
 @Dao
 interface EventDao {
     @Insert
-    fun insertEvent(event: Event?): Long
+    fun insertEvent(event: Event): Long
 
     @Update
-    fun updateEvent(event: Event?): Int
+    fun updateEvent(event: Event): Int
 
     @Delete
-    fun deleteEvent(event: Event?)
+    fun deleteEvent(event: Event)
 
     @Query("DELETE FROM Event")
     fun deleteAll()
@@ -41,7 +41,11 @@ interface EventDao {
 
     @Transaction
     @Query("SELECT * FROM Event WHERE characterId = :characterId AND (date >= :start AND date <= :end) ORDER BY date ASC")
-    fun watchByCharacterIdEventInDate(characterId: Long, start: Date, end: Date): LiveData<List<Event>>
+    fun watchByCharacterIdEventInDate(
+        characterId: Long,
+        start: Date,
+        end: Date
+    ): LiveData<List<Event>>
 
 
 }
