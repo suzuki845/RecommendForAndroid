@@ -17,8 +17,8 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.pin.recommend.adapter.PickStoryPictureAdapter
 import com.pin.recommend.model.viewmodel.StoryDetailsViewModel
-import com.pin.util.AdMobAdaptiveBannerManager
-import com.pin.util.Reward.Companion.getInstance
+import com.pin.util.admob.AdMobAdaptiveBannerManager
+import com.pin.util.admob.reward.RemoveAdReward
 
 class StoryDetailActivity : AppCompatActivity() {
 
@@ -45,7 +45,7 @@ class StoryDetailActivity : AppCompatActivity() {
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
-        val reward = getInstance(this)
+        val reward = RemoveAdReward.getInstance(this)
         reward.isBetweenRewardTime.observe(this) { isBetweenRewardTime ->
             adMobManager.setEnable(!isBetweenRewardTime!!)
             adMobManager.checkFirst()

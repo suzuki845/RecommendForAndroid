@@ -9,8 +9,7 @@ import com.pin.recommend.Constants.PREF_KEY_IS_LOCKED
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.util.PrefUtil
-import com.pin.util.Interstitial
-import com.pin.util.Reward
+import com.pin.util.admob.reward.RemoveAdReward
 
 class MainActivity : AppCompatActivity() {
 
@@ -56,9 +55,7 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
-        Interstitial.setUnitId(resources.getString(R.string.interstitial_id))
-        val reward = Reward.getInstance(this)
-        reward.setAdUnitId(resources.getString(R.string.reward_id))
+        val reward = RemoveAdReward.getInstance(this)
         //reward.reset()
         reward.checkRewardTime()
         reward.checkNotify()

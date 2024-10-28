@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.pin.recommend.model.AccountModel
 import com.pin.recommend.util.PrefUtil
-import com.pin.util.Reward.Companion.getInstance
+import com.pin.util.admob.reward.RemoveAdReward
 
 class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLifecycleCallbacks {
     override fun attachBaseContext(base: Context) {
@@ -25,8 +25,6 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
         AccountModel(this).initialize()
         PrefUtil.setSharedPreferences(applicationContext)
         registerActivityLifecycleCallbacks(this as ActivityLifecycleCallbacks)
-        val reward = getInstance(this)
-        reward.setAdUnitId(resources.getString(R.string.reward_id))
         var appStartCount = PrefUtil.getInt(Constants.APP_START_COUNT)
         PrefUtil.putInt(Constants.APP_START_COUNT, ++appStartCount)
     }
@@ -52,7 +50,7 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
     }
 
     override fun onActivityResumed(activity: Activity) {
-        val reward = getInstance(this)
+        val reward = RemoveAdReward.getInstance(activity)
         reward.checkRewardTime()
         setupStatusBarColor(activity, Color.parseColor("#000000"), Color.parseColor("#FAFAFA"))
     }

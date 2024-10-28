@@ -14,8 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.adapter.CharactersAdapter
 import com.pin.recommend.model.viewmodel.CharacterListViewModel
 import com.pin.recommend.model.viewmodel.EditStateViewModel
-import com.pin.util.AdMobAdaptiveBannerManager
-import com.pin.util.Reward.Companion.getInstance
+import com.pin.util.admob.AdMobAdaptiveBannerManager
+import com.pin.util.admob.reward.RemoveAdReward
 
 class CharacterListActivity : AppCompatActivity() {
     private val charactersAdapter: CharactersAdapter by lazy {
@@ -38,10 +38,14 @@ class CharacterListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_character_list)
         adViewContainer = findViewById(R.id.ad_container)
         adMobManager =
-            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.banner_id))
+            AdMobAdaptiveBannerManager(
+                this,
+                adViewContainer,
+                getString(R.string.banner_id)
+            )
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
-        val reward = getInstance(this)
+        val reward = RemoveAdReward.getInstance(this)
         reward.isBetweenRewardTime.observe(
             this
         ) { isBetweenRewardTime ->

@@ -40,13 +40,12 @@ import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
-import com.pin.util.AdLoadingProgress
-import com.pin.util.AdMobAdaptiveBannerManager
 import com.pin.util.DisplaySizeCheck
-import com.pin.util.LoadThenShowInterstitial
-import com.pin.util.OnAdShowed
 import com.pin.util.PermissionChecker
-import com.pin.util.Reward.Companion.getInstance
+import com.pin.util.admob.AdMobAdaptiveBannerManager
+import com.pin.util.admob.Interstitial
+import com.pin.util.admob.InterstitialAdStateAction
+import com.pin.util.admob.reward.RemoveAdReward
 import com.soundcloud.android.crop.Crop
 import java.io.File
 import java.text.SimpleDateFormat
@@ -87,11 +86,15 @@ class EditCharacterActivity : AppCompatActivity() {
         adViewContainer = findViewById(R.id.ad_container)
 
         adMobManager =
-            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.banner_id))
+            AdMobAdaptiveBannerManager(
+                this,
+                adViewContainer,
+                getString(R.string.banner_id)
+            )
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
-        val reward = getInstance(this)
+        val reward = RemoveAdReward.getInstance(this)
         reward.isBetweenRewardTime.observe(
             this
         ) { isBetweenRewardTime ->
@@ -445,19 +448,19 @@ class EditCharacterActivity : AppCompatActivity() {
     }
 
     private fun save() {
-        val ad = LoadThenShowInterstitial(resources.getString(R.string.interstitial_f_id))
+        val ad = Interstitial(resources.getString(R.string.interstitial_f_id))
         val progress = ProgressDialog(this).apply {
             setTitle("少々お待ちください...")
             setCancelable(false)
         }
-        ad.show(this, AdLoadingProgress({
+        ad.show(this, InterstitialAdStateAction({
             progress.show()
         }, {
             progress.dismiss()
         }, {
             progress.dismiss()
             saveInner()
-        }), OnAdShowed({
+        }, {
             saveInner()
         }, {
             progress.dismiss()

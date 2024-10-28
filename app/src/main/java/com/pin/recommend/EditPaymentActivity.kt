@@ -19,9 +19,8 @@ import com.pin.recommend.adapter.PaymentTagAdapter
 import com.pin.recommend.databinding.ActivityEditPaymentBinding
 import com.pin.recommend.model.viewmodel.EditPaymentViewModel
 import com.pin.recommend.util.TimeUtil
-import com.pin.util.AdLoadingProgress
-import com.pin.util.LoadThenShowInterstitial
-import com.pin.util.OnAdShowed
+import com.pin.util.admob.Interstitial
+import com.pin.util.admob.InterstitialAdStateAction
 import java.util.Calendar
 import java.util.Date
 
@@ -137,19 +136,19 @@ class EditPaymentActivity : AppCompatActivity() {
     }
 
     private fun save() {
-        val ad = LoadThenShowInterstitial(resources.getString(R.string.interstitial_f_id))
+        val ad = Interstitial(resources.getString(R.string.interstitial_f_id))
         val progress = ProgressDialog(this).apply {
             setTitle("少々お待ちください...")
             setCancelable(false)
         }
-        ad.show(this, AdLoadingProgress({
+        ad.show(this, InterstitialAdStateAction({
             progress.show()
         }, {
             progress.dismiss()
         }, {
             progress.dismiss()
             saveInner()
-        }), OnAdShowed({
+        }, {
             saveInner()
         }, {
             progress.dismiss()

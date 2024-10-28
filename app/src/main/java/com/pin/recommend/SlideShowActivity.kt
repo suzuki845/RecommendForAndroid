@@ -7,8 +7,8 @@ import androidx.appcompat.widget.Toolbar
 import com.daimajia.slider.library.SliderLayout
 import com.pin.recommend.model.entity.StoryWithPictures
 import com.pin.recommend.view.SlideShowItemView
-import com.pin.util.AdMobAdaptiveBannerManager
-import com.pin.util.Reward.Companion.getInstance
+import com.pin.util.admob.AdMobAdaptiveBannerManager
+import com.pin.util.admob.reward.RemoveAdReward
 
 class SlideShowActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
@@ -22,11 +22,15 @@ class SlideShowActivity : AppCompatActivity() {
         setContentView(R.layout.activity_slide_show)
         adViewContainer = findViewById(R.id.ad_container)
         adMobManager =
-            AdMobAdaptiveBannerManager(this, adViewContainer, getString(R.string.banner_id))
+            AdMobAdaptiveBannerManager(
+                this,
+                adViewContainer,
+                getString(R.string.banner_id)
+            )
         adMobManager!!.setAllowAdClickLimit(6)
         adMobManager!!.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager!!.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
-        val reward = getInstance(this)
+        val reward = RemoveAdReward.getInstance(this)
         reward.isBetweenRewardTime.observe(this) { isBetweenRewardTime ->
             adMobManager!!.setEnable(!isBetweenRewardTime!!)
             adMobManager!!.checkFirst()

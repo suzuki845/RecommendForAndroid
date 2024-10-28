@@ -10,9 +10,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityEditEventBinding
 import com.pin.recommend.model.viewmodel.EditEventViewModel
-import com.pin.util.AdLoadingProgress
-import com.pin.util.LoadThenShowInterstitial
-import com.pin.util.OnAdShowed
+import com.pin.util.admob.Interstitial
+import com.pin.util.admob.InterstitialAdStateAction
 
 class EditEventActivity : AppCompatActivity() {
 
@@ -51,19 +50,19 @@ class EditEventActivity : AppCompatActivity() {
     }
 
     private fun save() {
-        val ad = LoadThenShowInterstitial(resources.getString(R.string.interstitial_f_id))
+        val ad = Interstitial(resources.getString(R.string.interstitial_f_id))
         val progress = ProgressDialog(this).apply {
             setTitle("少々お待ちください...")
             setCancelable(false)
         }
-        ad.show(this, AdLoadingProgress({
+        ad.show(this, InterstitialAdStateAction({
             progress.show()
         }, {
             progress.dismiss()
         }, {
             progress.dismiss()
             saveInner()
-        }), OnAdShowed({
+        }, {
             saveInner()
         }, {
             progress.dismiss()

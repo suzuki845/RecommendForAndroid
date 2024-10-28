@@ -1,29 +1,23 @@
 package com.pin.recommend
 
-import android.Manifest
 import android.app.ProgressDialog
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.pin.imageutil.insertImage
-import com.pin.recommend.databinding.ActivityEditAnniversaryBinding
 import com.pin.recommend.databinding.ActivityScreenShotBinding
 import com.pin.recommend.model.CharacterDetails
-import com.pin.util.Interstitial
-import com.pin.util.Reward
-import com.pin.util.RuntimePermissionUtils
-import de.hdodenhof.circleimageview.CircleImageView
-import java.util.*
+import com.pin.util.admob.Interstitial
+import com.pin.util.admob.InterstitialAdStateAction
+import com.pin.util.admob.reward.RemoveAdReward
 
 
 class ScreenShotActivity : AppCompatActivity() {
@@ -59,6 +53,53 @@ class ScreenShotActivity : AppCompatActivity() {
         }
     }
 
+    fun save() {
+        val ad = Interstitial(resources.getString(R.string.interstitial_f_id))
+        val progress = ProgressDialog(this).apply {
+            setTitle("少々お待ちください...")
+            setCancelable(false)
+        }
+        ad.show(this, InterstitialAdStateAction({
+            progress.show()
+        }, {
+            progress.dismiss()
+        }, {
+            saveInner()
+            progress.dismiss()
+            finish()
+        }, {
+            saveInner()
+            progress.dismiss()
+            finish()
+        }, {
+            saveInner()
+            progress.dismiss()
+            finish()
+        }))
+    }
+
+    private fun saveInner() {
+        try {
+            val image = getViewBitmap()
+            save(
+                this,
+                image!!,
+                Bitmap.CompressFormat.PNG,
+                "image/png",
+                "anniversary-${System.currentTimeMillis()}"
+            )
+            Toast.makeText(
+                this, """
+     スクリーンショットを保存しました。ファイルをご確認ください。
+     """.trimIndent(), Toast.LENGTH_LONG
+            )
+        } catch (e: Exception) {
+            println(e)
+            Toast.makeText(this, "保存に失敗しました。 \n\n ${e.message}", Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_screen_shot, menu)
 
@@ -66,64 +107,12 @@ class ScreenShotActivity : AppCompatActivity() {
         item.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.save -> {
-                    try {
-                        val dialog = ProgressDialog(this)
-                        dialog.show()
-
-                        val image = getViewBitmap()
-                        val reward = Reward.getInstance(this)
-                        if (reward.isBetweenRewardTime.value == false) {
-                            Interstitial.loadAndShow(this, {
-                                save(
-                                    this,
-                                    image!!,
-                                    Bitmap.CompressFormat.PNG,
-                                    "image/png",
-                                    "anniversary-${System.currentTimeMillis()}"
-                                )
-                                dialog.dismiss()
-                                finish()
-                                Toast.makeText(
-                                    this, """
-     スクリーンショットを保存しました。ファイルをご確認ください。
-     """.trimIndent(), Toast.LENGTH_LONG
-                                ).show()
-                            }, {
-                                save(
-                                    this,
-                                    image!!,
-                                    Bitmap.CompressFormat.PNG,
-                                    "image/png",
-                                    "anniversary-${System.currentTimeMillis()}"
-                                )
-                                dialog.dismiss()
-                                finish()
-                                Toast.makeText(
-                                    this, """
-     スクリーンショットを保存しました。ファイルをご確認ください。
-     """.trimIndent(), Toast.LENGTH_LONG
-                                ).show()
-                            })
-                        } else {
-                            save(
-                                this,
-                                image!!,
-                                Bitmap.CompressFormat.PNG,
-                                "image/png",
-                                "anniversary-${System.currentTimeMillis()}"
-                            )
-                            dialog.dismiss()
-                            finish()
-                            Toast.makeText(
-                                this, """
-     スクリーンショットを保存しました。ファイルをご確認ください。
-     """.trimIndent(), Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    } catch (e: Exception) {
-                        println(e)
-                        Toast.makeText(this, "保存に失敗しました。 \n\n ${e.message}", Toast.LENGTH_LONG)
-                            .show()
+                    val reward = RemoveAdReward.getInstance(this)
+                    if (reward.isBetweenRewardTime.value == false) {
+                        save()
+                    } else {
+                        saveInner()
+                        finish()
                     }
                 }
             }

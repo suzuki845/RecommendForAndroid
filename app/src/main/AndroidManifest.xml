@@ -126,7 +126,7 @@
             android:screenOrientation="behind"
             android:theme="@style/Translucent" />
         <activity
-            android:name="com.pin.util.reward.RewardDialogFragmentActivity"
+            android:name="com.pin.util.admob.reward.RewardDialogFragmentActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="behind"
             android:theme="@style/Translucent" />

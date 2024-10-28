@@ -16,8 +16,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.pin.recommend.main.SectionsPagerAdapter
 import com.pin.recommend.model.CharacterDetails
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
-import com.pin.util.AdMobAdaptiveBannerManager
-import com.pin.util.Reward.Companion.getInstance
+import com.pin.util.admob.AdMobAdaptiveBannerManager
+import com.pin.util.admob.reward.RemoveAdReward
 
 class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener {
     private lateinit var backgroundImage: ImageView
@@ -46,8 +46,8 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         adMobManager.setAllowAdClickLimit(6)
         adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
         adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
-        val reward = getInstance(this)
-        reward.isBetweenRewardTime.observe(
+        val removeAdReward = RemoveAdReward.getInstance(this)
+        removeAdReward.isBetweenRewardTime.observe(
             this
         ) { isBetweenRewardTime ->
             adMobManager.setEnable(!isBetweenRewardTime!!)
