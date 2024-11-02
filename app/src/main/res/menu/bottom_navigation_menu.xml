@@ -3,17 +3,21 @@
     <item
         android:id="@+id/home"
         android:icon="@drawable/ic_baseline_home_24"
-        android:title="ホーム"/>
+        android:title="ホーム" />
     <item
         android:id="@+id/story"
         android:icon="@drawable/ic_baseline_menu_book_24"
-        android:title="ストーリー"/>
+        android:title="ストーリー" />
+    <item
+        android:id="@+id/special"
+        android:icon="@drawable/baseline_star_24"
+        android:title="スペシャル" />
     <item
         android:id="@+id/pay_save"
         android:icon="@drawable/ic_baseline_credit_card_24"
-        android:title="pay 貯金"/>
+        android:title="pay 貯金" />
     <item
         android:id="@+id/event"
         android:icon="@drawable/ic_baseline_calendar_month_24"
-        android:title="イベント"/>
+        android:title="イベント" />
 </menu>

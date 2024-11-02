@@ -113,6 +113,9 @@
             android:name=".CharacterDetailActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".StringContentGachaActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".PassCodeSetActivity"
             android:screenOrientation="behind"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -127,6 +130,11 @@
             android:theme="@style/Translucent" />
         <activity
             android:name="com.pin.util.admob.reward.RewardDialogFragmentActivity"
+            android:launchMode="singleInstance"
+            android:screenOrientation="behind"
+            android:theme="@style/Translucent" />
+        <activity
+            android:name="com.pin.util.SimpleDialogFragmentActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="behind"
             android:theme="@style/Translucent" />

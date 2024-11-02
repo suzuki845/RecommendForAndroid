@@ -86,13 +86,18 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
                     return@OnNavigationItemSelectedListener true
                 }
 
-                R.id.pay_save -> {
+                R.id.special -> {
                     viewPager.currentItem = 2
                     return@OnNavigationItemSelectedListener true
                 }
 
-                R.id.event -> {
+                R.id.pay_save -> {
                     viewPager.currentItem = 3
+                    return@OnNavigationItemSelectedListener true
+                }
+
+                R.id.event -> {
+                    viewPager.currentItem = 4
                     return@OnNavigationItemSelectedListener true
                 }
             }

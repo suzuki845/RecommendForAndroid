@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -69,22 +68,22 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp" />
+                    <!--
+                                        <LinearLayout
+                                            android:id="@+id/show_reward"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:background="#ffffff"
+                                            android:onClick="onShowRewardDialog"
+                                            android:orientation="horizontal"
+                                            android:padding="6dp">
 
-                    <LinearLayout
-                        android:id="@+id/show_reward"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="#ffffff"
-                        android:onClick="onShowRewardDialog"
-                        android:orientation="horizontal"
-                        android:padding="6dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="動画を見て広告を削除" />
-                    </LinearLayout>
-
+                                            <TextView
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:text="動画を見て広告を削除" />
+                                        </LinearLayout>
+                    -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp" />

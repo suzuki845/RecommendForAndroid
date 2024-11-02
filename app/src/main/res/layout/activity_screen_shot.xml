@@ -15,6 +15,7 @@
         <variable
             name="state"
             type="com.pin.recommend.model.CharacterDetails.State" />
+
         <variable
             name="typeface"
             type="android.graphics.Typeface" />
@@ -25,7 +26,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".CharacterDetailActivity">
-
 
         <ImageView
             android:id="@+id/backgroundImage"

@@ -19,9 +19,10 @@
     <string name="title_activity_story_detail">ストーリー</string>
     <string name="title_activity_main"></string>
     <string name="tab_text_1">ホーム</string>
-    <string name="tab_text_2">ストーリー</string>
-    <string name="tab_text_3">Pay ＆ 貯金</string>
-    <string name="tab_text_4">カレンダー</string>
+    <string name="tab_text_2">スペシャル</string>
+    <string name="tab_text_3">ストーリー</string>
+    <string name="tab_text_4">Pay ＆ 貯金</string>
+    <string name="tab_text_5">カレンダー</string>
 
     <!-- use pass code lock -->
     <string name="image_error">image</string>

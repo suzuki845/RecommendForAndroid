@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Switch
 import android.widget.Toast
@@ -19,7 +18,6 @@ import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.BackupExportModel
 import com.pin.recommend.model.BackupImportModel
 import com.pin.recommend.util.PrefUtil
-import com.pin.util.admob.reward.RemoveAdReward
 import com.pin.util.admob.reward.RewardDialogFragment
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -51,17 +49,17 @@ class GlobalSettingActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.toolbar)
         toolbar.title = "設定"
         setSupportActionBar(toolbar)
-
-        val showReward = findViewById<ViewGroup>(R.id.show_reward)
-        val reward = RemoveAdReward.getInstance(this)
-        reward.isBetweenRewardTime.observe(this) {
-            if (!it) {
-                showReward.visibility = View.VISIBLE
-            } else {
-                showReward.visibility = View.GONE
-            }
-        }
-
+        /*
+                val showReward = findViewById<ViewGroup>(R.id.show_reward)
+                val reward = RemoveAdReward.getInstance(this)
+                reward.isBetweenRewardTime.observe(this) {
+                    if (!it) {
+                        showReward.visibility = View.VISIBLE
+                    } else {
+                        showReward.visibility = View.GONE
+                    }
+                }
+        */
         passCodeRock = findViewById(R.id.passcode_rock)
     }
 
