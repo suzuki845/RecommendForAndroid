@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.daimajia.slider.library.SliderLayout
+import com.bumptech.glide.request.RequestOptions
+import com.glide.slider.library.SliderLayout
+import com.glide.slider.library.slidertypes.TextSliderView
 import com.pin.recommend.model.entity.StoryWithPictures
-import com.pin.recommend.view.SlideShowItemView
 import com.pin.util.admob.AdMobAdaptiveBannerManager
 import com.pin.util.admob.reward.RemoveAdReward
+
 
 class SlideShowActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
@@ -43,16 +45,16 @@ class SlideShowActivity : AppCompatActivity() {
 
         sliderView = findViewById(R.id.slider)
         sliderView.stopAutoCycle()
-
+        val requestOptions = RequestOptions()
         for (picture in story.pictures) {
-            val bitmap = picture.getBitmap(this@SlideShowActivity, 500, 500)
-            val sliderItem = SlideShowItemView(
-                this@SlideShowActivity, bitmap
-            )
-            sliderView.addSlider(sliderItem)
+            val textSliderView = TextSliderView(this)
+            textSliderView
+                .image(picture.getFile(this))
+                .setRequestOption(requestOptions)
+                .setProgressBarVisible(true)
+            sliderView.addSlider(textSliderView)
         }
         sliderView.currentPosition = initPosition
-
 
         toolbar.title = "スライドショー"
         setSupportActionBar(toolbar)

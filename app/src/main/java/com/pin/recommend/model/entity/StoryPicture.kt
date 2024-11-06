@@ -8,10 +8,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.google.gson.Gson
 import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.R
 import com.pin.recommend.model.entity.Story
+import java.io.File
 import java.util.*
 
 @Entity(
@@ -31,6 +31,10 @@ class StoryPicture {
     var storyId: Long = 0
     var uri: String? = null
 
+    fun getFile(context: Context): File {
+        return File(context.filesDir, uri)
+    }
+
     fun testGetBitmap(context: Context?, width: Int, height: Int): Bitmap {
         var bitmap = BitmapUtility.decodeResource(context, R.drawable.test, width, height)
         bitmap = BitmapUtility.getRoundedCornerBitmap(bitmap, 50)
@@ -47,7 +51,7 @@ class StoryPicture {
         width: Int,
         height: Int
     ): Bitmap? {
-        if(uri == null) return null
+        if (uri == null) return null
         return BitmapUtility.readPrivateImage(context, uri, width, height)
     }
 
