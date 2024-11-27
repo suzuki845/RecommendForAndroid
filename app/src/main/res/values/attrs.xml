@@ -4,4 +4,8 @@
         <attr name="appWidgetInnerRadius" format="dimension" />
         <attr name="appWidgetRadius" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="ToteBagView">
+        <!-- カスタム属性を必要に応じて追加 -->
+    </declare-styleable>
 </resources>

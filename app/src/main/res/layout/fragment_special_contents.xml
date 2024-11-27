@@ -18,6 +18,36 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
+            <LinearLayout
+                android:id="@+id/onBadgeGachaAsset"
+                android:padding="8dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="痛バガチャ"
+                        android:textSize="20sp"
+                        android:paddingBottom="4dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="推しのバッジを当てて痛バを完成させよう！"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:background="#cccccc"
+                android:layout_height="1dp"
+                android:layout_width="match_parent" />
 
             <LinearLayout
                 android:id="@+id/onRelationshipWithOshiNextLifeGachaAsset"
@@ -32,7 +62,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:text="👬来世のあなたと推しの関係ガチャ"
+                        android:text="来世のあなたと推しの関係ガチャ"
                         android:textSize="20sp"
                         android:paddingBottom="4dp"
                         android:layout_width="wrap_content"
@@ -50,7 +80,6 @@
                 android:layout_height="1dp"
                 android:layout_width="match_parent" />
 
-
             <LinearLayout
                 android:id="@+id/onReadFortunesGachaAsset"
                 android:padding="8dp"
@@ -64,7 +93,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:text="🔮あなたと推しの運勢ガチャ"
+                        android:text="あなたと推しの運勢ガチャ"
                         android:textSize="20sp"
                         android:paddingBottom="4dp"
                         android:layout_width="wrap_content"
@@ -96,7 +125,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:text="🚶推しとおでかけガチャ"
+                        android:text="推しとおでかけガチャ"
                         android:textSize="20sp"
                         android:paddingBottom="4dp"
                         android:layout_width="wrap_content"
@@ -128,7 +157,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:text="🏪0.1％の確率で近所のコンビニで推しと遭遇するガチャ"
+                        android:text="0.1％の確率で近所のコンビニで推しと遭遇するガチャ"
                         android:textSize="20sp"
                         android:paddingBottom="4dp"
                         android:layout_width="wrap_content"

@@ -1,5 +1,6 @@
 package com.pin.recommend.model.gacha
 
+import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
 import kotlin.random.Random
 
@@ -67,4 +68,75 @@ class GachaMachine<Content> {
         isComplete.value = true
         isRolling.value = false
     }
+}
+
+class BadgeGachaMachine(
+) {
+
+    val machine = GachaMachine<Bitmap?>()
+
+    val title = MutableLiveData("痛バガチャ")
+
+    val result = machine.result
+
+    val isComplete = machine.isComplete
+
+    val isRolling = machine.isRolling
+
+    private var prizeSummary = 0
+
+    private var prizeImage: Bitmap? = null
+
+    fun setPrizeImage(image: Bitmap) {
+        this.prizeImage = image
+    }
+
+    fun setPrizeSummary(summary: Int) {
+        this.prizeSummary = summary
+    }
+
+    fun reset() {
+        machine.reset()
+    }
+
+    fun calcPercentAsset() {
+        var prizeItem: GachaItem<Bitmap?>
+        if (prizeSummary == 0) {
+            prizeItem = GachaItem(name = "Prize", probability = 100.0, content = prizeImage)
+        } else if (prizeSummary <= 5) {
+            prizeItem = GachaItem(name = "Prize", probability = 50.0, content = prizeImage)
+        } else if (prizeSummary <= 10) {
+            prizeItem = GachaItem(name = "Prize", probability = 25.0, content = prizeImage)
+        } else if (prizeSummary <= 15) {
+            prizeItem = GachaItem(name = "Prize", probability = 12.0, content = prizeImage)
+        } else if (prizeSummary <= 20) {
+            prizeItem = GachaItem(name = "Prize", probability = 6.0, content = prizeImage)
+        } else if (prizeSummary <= 25) {
+            prizeItem = GachaItem(name = "Prize", probability = 3.0, content = prizeImage)
+        } else {
+            prizeItem = GachaItem(name = "Prize", probability = 2.0, content = prizeImage)
+        }
+
+        val asset = object : GachaItemAsset<Bitmap?> {
+            override val id: String
+                get() = "GachaAsset"
+            override val title: String
+                get() = "痛バガチャ"
+            override val items: List<GachaItem<Bitmap?>>
+                get() = listOf(
+                    prizeItem
+                )
+            override val defaultItem: GachaItem<Bitmap?>
+                get() = GachaItem(name = "NotPrize", probability = 0.0, content = null)
+        }
+
+        machine.setAsset(asset)
+    }
+
+    fun rollGacha() {
+        calcPercentAsset()
+        machine.rollGacha()
+    }
+
+
 }

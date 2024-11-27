@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import com.pin.recommend.BadgeGachaActivity
 import com.pin.recommend.StringContentGachaActivity
 import com.pin.recommend.databinding.FragmentSpecialContentsBinding
 import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
@@ -39,7 +40,22 @@ class SpecialContentsFragment : Fragment() {
         binding = FragmentSpecialContentsBinding.inflate(inflater)
         binding.lifecycleOwner = requireActivity()
 
-        val intent = Intent(requireActivity(), StringContentGachaActivity::class.java)
+        val intent = Intent(requireActivity(), BadgeGachaActivity::class.java)
+        binding.onBadgeGachaAsset.setOnClickListener {
+            intent.putExtra(
+                INTENT_SPECIAL_CONTENT_ID,
+                "BadgeGachaAsset"
+            )
+            intent.putExtra(
+                INTENT_CHARACTER_STATE,
+                detailsVM.state.value?.toJson()
+            )
+            intent.putExtra(
+                INTENT_PLACE_HOLDER,
+                "あなたの来世は$0の\n$1"
+            )
+            startActivity(intent)
+        }
         binding.onRelationshipWithOshiNextLifeGachaAsset.setOnClickListener {
             intent.putExtra(
                 INTENT_SPECIAL_CONTENT_ID,
@@ -64,10 +80,6 @@ class SpecialContentsFragment : Fragment() {
             intent.putExtra(
                 INTENT_CHARACTER_STATE,
                 detailsVM.state.value?.toJson()
-            )
-            intent.putExtra(
-                INTENT_PLACE_HOLDER,
-                "あなたは近所のコンビニで\n$0と\n$1"
             )
             startActivity(intent)
         }

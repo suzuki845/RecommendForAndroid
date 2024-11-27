@@ -14,7 +14,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <receiver
             android:name=".widget.AnniversaryWidgetProvider"
             android:exported="false">
@@ -33,7 +32,7 @@
 
         <service
             android:name=".widget.AnniversaryRemoteViewsService"
-            android:permission="android.permission.BIND_REMOTEVIEWS"></service>
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <activity
             android:name=".CreateAnniversaryActivity"
@@ -79,6 +78,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".EditEventActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".BadgeGachaActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
