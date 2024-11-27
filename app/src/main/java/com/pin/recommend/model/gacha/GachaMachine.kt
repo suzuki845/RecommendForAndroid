@@ -2,6 +2,15 @@ package com.pin.recommend.model.gacha
 
 import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import com.pin.recommend.model.AppDatabase
+import com.pin.recommend.model.entity.Badge
+import com.pin.recommend.model.entity.BadgeSummary
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.util.Date
+import java.util.UUID
 import kotlin.random.Random
 
 class GachaItem<Content>(
@@ -70,12 +79,13 @@ class GachaMachine<Content> {
     }
 }
 
-class BadgeGachaMachine(
-) {
+class BadgeGachaMachine(private val db: AppDatabase) {
 
-    val machine = GachaMachine<Bitmap?>()
+    private val machine = GachaMachine<Bitmap?>()
 
     val title = MutableLiveData("痛バガチャ")
+
+    val characterId = MutableLiveData(-1L)
 
     val result = machine.result
 
@@ -83,38 +93,75 @@ class BadgeGachaMachine(
 
     val isRolling = machine.isRolling
 
-    private var prizeSummary = 0
+    val summary = characterId.switchMap { id ->
+        db.badgeSummary()
+            .watchByCharacterIdBadgeSummary(id).map { it?.amount ?: 0 }
+    }
 
     private var prizeImage: Bitmap? = null
 
-    fun setPrizeImage(image: Bitmap) {
-        this.prizeImage = image
+    init {
+        result.observeForever {
+            if (it?.name == "Prize") {
+                try {
+                    GlobalScope.launch {
+                        val badge = Badge(
+                            id = 0,
+                            characterId = characterId.value ?: -1,
+                            uuid = UUID.randomUUID().toString(),
+                            createdAt = Date(),
+                            updatedAt = Date()
+                        )
+                        db.badgeDao().insertBadge(badge)
+                        val summary =
+                            db.badgeSummary()
+                                .findByCharacterIdBadgeSummary(characterId.value ?: -1)
+                                ?: BadgeSummary(
+                                    id = 0,
+                                    characterId = characterId.value ?: -1,
+                                    uuid = UUID.randomUUID().toString(),
+                                    amount = 0,
+                                    createdAt = Date(), updatedAt = Date()
+                                )
+                        val newSummary = summary.incrementAmount()
+                        if (newSummary.id == 0L) {
+                            db.badgeSummary().insertBadgeSummary(newSummary)
+                        } else {
+                            db.badgeSummary().updateBadgeSummary(newSummary)
+                        }
+                    }
+                } catch (e: Exception) {
+                    println("GachaMachine.result: failed $e")
+                }
+            }
+        }
     }
 
-    fun setPrizeSummary(summary: Int) {
-        this.prizeSummary = summary
+    fun setPrizeImage(image: Bitmap?) {
+        this.prizeImage = image
     }
 
     fun reset() {
         machine.reset()
     }
 
-    fun calcPercentAsset() {
-        var prizeItem: GachaItem<Bitmap?>
-        if (prizeSummary == 0) {
-            prizeItem = GachaItem(name = "Prize", probability = 100.0, content = prizeImage)
+    private fun calcPercentAsset() {
+        val prizeSummary = summary.value ?: 0
+
+        val prizeItem = if (prizeSummary == 0) {
+            GachaItem(name = "Prize", probability = 100.0, content = prizeImage)
         } else if (prizeSummary <= 5) {
-            prizeItem = GachaItem(name = "Prize", probability = 50.0, content = prizeImage)
+            GachaItem(name = "Prize", probability = 50.0, content = prizeImage)
         } else if (prizeSummary <= 10) {
-            prizeItem = GachaItem(name = "Prize", probability = 25.0, content = prizeImage)
+            GachaItem(name = "Prize", probability = 25.0, content = prizeImage)
         } else if (prizeSummary <= 15) {
-            prizeItem = GachaItem(name = "Prize", probability = 12.0, content = prizeImage)
+            GachaItem(name = "Prize", probability = 12.0, content = prizeImage)
         } else if (prizeSummary <= 20) {
-            prizeItem = GachaItem(name = "Prize", probability = 6.0, content = prizeImage)
+            GachaItem(name = "Prize", probability = 6.0, content = prizeImage)
         } else if (prizeSummary <= 25) {
-            prizeItem = GachaItem(name = "Prize", probability = 3.0, content = prizeImage)
+            GachaItem(name = "Prize", probability = 3.0, content = prizeImage)
         } else {
-            prizeItem = GachaItem(name = "Prize", probability = 2.0, content = prizeImage)
+            GachaItem(name = "Prize", probability = 2.0, content = prizeImage)
         }
 
         val asset = object : GachaItemAsset<Bitmap?> {
@@ -134,6 +181,9 @@ class BadgeGachaMachine(
     }
 
     fun rollGacha() {
+        if (characterId == null) {
+            throw IllegalStateException("characterId is null.")
+        }
         calcPercentAsset()
         machine.rollGacha()
     }

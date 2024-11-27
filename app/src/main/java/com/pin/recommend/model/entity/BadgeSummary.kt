@@ -27,4 +27,8 @@ class BadgeSummary(
     var amount: Int,
     var createdAt: Date,
     var updatedAt: Date
-)
+) {
+    fun incrementAmount(): BadgeSummary {
+        return BadgeSummary(id, characterId, uuid, ++amount, createdAt, Date())
+    }
+}

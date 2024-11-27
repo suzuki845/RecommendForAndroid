@@ -50,10 +50,6 @@ class SpecialContentsFragment : Fragment() {
                 INTENT_CHARACTER_STATE,
                 detailsVM.state.value?.toJson()
             )
-            intent.putExtra(
-                INTENT_PLACE_HOLDER,
-                "あなたの来世は$0の\n$1"
-            )
             startActivity(intent)
         }
         binding.onRelationshipWithOshiNextLifeGachaAsset.setOnClickListener {

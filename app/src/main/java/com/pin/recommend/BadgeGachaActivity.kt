@@ -1,6 +1,7 @@
 package com.pin.recommend
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -28,20 +29,32 @@ class BadgeGachaActivity : AppCompatActivity() {
         val json = intent.getStringExtra(SpecialContentsFragment.INTENT_CHARACTER_STATE) ?: "";
         val state = CharacterDetails.State.fromJson(json)
         vm.setCharacterDetailsState(state)
+        vm.characterId.value = state.characterId
 
         binding.lifecycleOwner = this
         binding.gachaVM = vm
         binding.state = state
-        binding.toolbar.title = "ガチャ"
 
-        state.appearance.iconImage?.let {
+        binding.roleGachaButton.setOnClickListener {
+            vm.rollGacha()
+        }
+
+        val icon = state.appearance.iconImage ?: BitmapFactory.decodeResource(
+            resources,
+            R.drawable.ic_person_300dp
+        )
+
+        vm.summary.observe(this) {
+            println("GachaMachineSummary: actual: $it")
             val list = mutableListOf<Bitmap>()
-            for (i in 1..50) {
-                list.add(it)
+            for (i in 1..it) {
+                list.add(icon)
             }
+            println("GachaMachineSummary: listSize:${list.size}")
             binding.toteBagView.badges = list
         }
 
+        binding.toolbar.title = "ガチャ"
         setSupportActionBar(binding.toolbar)
     }
 }
