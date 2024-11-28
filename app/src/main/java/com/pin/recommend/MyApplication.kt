@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import com.pin.recommend.model.AccountModel
 import com.pin.recommend.util.PrefUtil
 import com.pin.util.admob.reward.RemoveAdReward
+import com.pin.util.admob.reward.UserDidEarnRewardCounter
 
 class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLifecycleCallbacks {
     override fun attachBaseContext(base: Context) {
@@ -50,8 +51,21 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
     }
 
     override fun onActivityResumed(activity: Activity) {
-        val reward = RemoveAdReward.getInstance(activity)
-        reward.checkRewardTime()
+        val normalRemoveAdReward = RemoveAdReward.getInstance(activity)
+        normalRemoveAdReward.checkRewardTime()
+        val badgeGachaRemoveAdReward = BadgeGachaRemoveAdReward.getInstance(activity)
+        badgeGachaRemoveAdReward.checkRewardTime()
+
+        val normalRewardCounter = UserDidEarnRewardCounter.getInstance(activity)
+        normalRewardCounter.checkRewardCoolDownElapsed()
+        val badgeGachaRardCounter = BadgeGachaUserDidEarnRewardCounter.getInstance(activity)
+        badgeGachaRardCounter.checkRewardCoolDownElapsed()
+        /*
+                normalRemoveAdReward.reset()
+                badgeGachaRemoveAdReward.reset()
+                normalRewardCounter.reset()
+                badgeGachaRardCounter.reset()
+        */
         setupStatusBarColor(activity, Color.parseColor("#000000"), Color.parseColor("#FAFAFA"))
     }
 
@@ -77,20 +91,16 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
             }
         }
 
-        fun isNearWhite(color: Int): Boolean {
+        private fun isNearWhite(color: Int): Boolean {
             val red = Color.red(color)
             val green = Color.green(color)
             val blue = Color.blue(color)
-            return if (red >= 180 && green >= 180 && blue >= 180) {
-                true
-            } else false
+            return red >= 180 && green >= 180 && blue >= 180
         }
 
-        fun isNearAlphaZero(color: Int): Boolean {
+        private fun isNearAlphaZero(color: Int): Boolean {
             val alpha = Color.alpha(color)
-            return if (alpha <= 100) {
-                true
-            } else false
+            return alpha <= 100
         }
 
         private var app: MyApplication? = null
@@ -101,5 +111,38 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
                 if (app == null) app = MyApplication()
                 return app
             }
+    }
+}
+
+
+class BadgeGachaRemoveAdReward(context: Context) : RemoveAdReward(context) {
+
+    companion object {
+        private var instance: BadgeGachaRemoveAdReward? = null
+
+        fun getInstance(context: Context): BadgeGachaRemoveAdReward {
+            instance?.let {
+                return it
+            }
+            val i = BadgeGachaRemoveAdReward(context)
+            i.setPrefix("BadgeGacha")
+            instance = i
+            return i
+        }
+    }
+}
+
+class BadgeGachaUserDidEarnRewardCounter(context: Context) : UserDidEarnRewardCounter(context) {
+    companion object {
+        private var instance: BadgeGachaUserDidEarnRewardCounter? = null
+        fun getInstance(context: Context): BadgeGachaUserDidEarnRewardCounter {
+            instance?.let {
+                return it
+            }
+            val i = BadgeGachaUserDidEarnRewardCounter(context)
+            i.setPrefix("BadgeGacha")
+            instance = i
+            return i
+        }
     }
 }

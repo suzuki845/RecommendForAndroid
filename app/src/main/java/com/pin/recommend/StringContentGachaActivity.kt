@@ -58,9 +58,9 @@ class StringContentGachaActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
     }
 
-    private fun remainingRewardCooldownElapsedTimeToHours(): Int {
+    private fun remainingRewardCoolDownElapsedTimeToHours(): Int {
         val counter = UserDidEarnRewardCounter(this)
-        val v = counter.remainingRewardCooldownElapsedTimeToHours()
+        val v = counter.remainingRewardCoolDownElapsedTimeToHours()
         if (v <= 0) {
             return 16
         }
@@ -73,11 +73,12 @@ class StringContentGachaActivity : AppCompatActivity() {
             vm.rollGacha()
             return
         }
-        val counter = UserDidEarnRewardCounter(this)
-        val count = 10 - counter.count()
+        val border = 10
+        val counter = UserDidEarnRewardCounter.getInstance(this)
+        val count = border - counter.count()
         SimpleDialogFragment(
             title = "広告を視聴してガチャを回す",
-            message = "あと${count}回ガチャを回すと24時間全ての動画広告が非表示になります。\n(⚠️あと${remainingRewardCooldownElapsedTimeToHours()}時間経過するとカウントがリセットされます。)",
+            message = "あと${count}回ガチャを回すと24時間バッジガチャ以外の動画広告が非表示になります。\n(⚠️あと${remainingRewardCoolDownElapsedTimeToHours()}時間経過するとカウントがリセットされます。)",
             onPositive = {
                 it.dismiss()
                 val progress = ProgressDialog(this)
@@ -100,7 +101,7 @@ class StringContentGachaActivity : AppCompatActivity() {
                     onUserEarnedReward = { _ ->
                         counter.increment()
                         vm.rollGacha()
-                        if (counter.count() >= 10) {
+                        if (counter.count() >= border) {
                             removeAdReward.setTimeLeft(24)
                             counter.reset()
                         }

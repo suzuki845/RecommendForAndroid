@@ -40,8 +40,8 @@ class SpecialContentsFragment : Fragment() {
         binding = FragmentSpecialContentsBinding.inflate(inflater)
         binding.lifecycleOwner = requireActivity()
 
-        val intent = Intent(requireActivity(), BadgeGachaActivity::class.java)
         binding.onBadgeGachaAsset.setOnClickListener {
+            val intent = Intent(requireActivity(), BadgeGachaActivity::class.java)
             intent.putExtra(
                 INTENT_SPECIAL_CONTENT_ID,
                 "BadgeGachaAsset"
@@ -53,6 +53,7 @@ class SpecialContentsFragment : Fragment() {
             startActivity(intent)
         }
         binding.onRelationshipWithOshiNextLifeGachaAsset.setOnClickListener {
+            val intent = Intent(requireActivity(), StringContentGachaActivity::class.java)
             intent.putExtra(
                 INTENT_SPECIAL_CONTENT_ID,
                 "RelationshipWithOshiNextLifeGachaAsset"
