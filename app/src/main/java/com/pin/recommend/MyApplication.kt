@@ -58,8 +58,8 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
 
         val normalRewardCounter = UserDidEarnRewardCounter.getInstance(activity)
         normalRewardCounter.checkRewardCoolDownElapsed()
-        val badgeGachaRardCounter = BadgeGachaUserDidEarnRewardCounter.getInstance(activity)
-        badgeGachaRardCounter.checkRewardCoolDownElapsed()
+        val badgeGachaRewardCounter = BadgeGachaUserDidEarnRewardCounter.getInstance(activity)
+        badgeGachaRewardCounter.checkRewardCoolDownElapsed()
         /*
                 normalRemoveAdReward.reset()
                 badgeGachaRemoveAdReward.reset()

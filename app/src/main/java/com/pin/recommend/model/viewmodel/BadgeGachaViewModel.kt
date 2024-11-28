@@ -35,15 +35,19 @@ class BadgeGachaViewModel(application: Application) : AndroidViewModel(applicati
         model.reset()
     }
 
+    val notPrizeImage = BitmapFactory.decodeResource(
+        application.resources,
+        R.drawable.ic_person_300dp
+    )
+
     val resultImage = model.result.map {
-        if (it?.name == "Prize") it?.content else BitmapFactory.decodeResource(
-            application.resources,
-            R.drawable.ic_person_300dp
-        )
+        if (it?.name == "Prize") {
+            it?.content
+        } else notPrizeImage
     }
 
     val resultMessage = model.result.map {
-        return@map if (it?.name == "Prize") "アタリ!" else "ハズレ"
+        return@map if (it?.name == "Prize") "アタリ!" else "ハズレ・・・"
     }
 
     fun rollGacha() {
