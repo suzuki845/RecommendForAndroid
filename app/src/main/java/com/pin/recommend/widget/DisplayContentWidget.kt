@@ -3,32 +3,35 @@ package com.pin.recommend.widget
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.gson.Gson
-import com.pin.recommend.model.entity.AnniversaryId
-import com.pin.recommend.model.entity.AnniversaryInterface
+import com.pin.recommend.model.entity.ContentId
 import com.pin.recommend.model.entity.SerializableAppearance
-import java.util.Date
+import com.pin.recommend.model.entity.TypedEntity
 
 class DisplayContentWidget(
     val appWidgetId: Int,
     val characterName: String,
-    val anniversary: AnniversaryInterface,
+    val content: TypedEntity,
     val appearance: SerializableAppearance
 ) {
 
-    fun getId(): AnniversaryId {
-        return anniversary.getId()
+    fun getId(): ContentId {
+        return content.id
+    }
+
+    fun getContentType(): String {
+        return content.type
     }
 
     fun getAnniversaryName(): String {
-        return anniversary.getName()
+        return content.name
     }
 
-    fun getRemainingDays(date: Date): Long? {
-        return anniversary.getRemainingDays(date)
+    fun getRemainingDays(): Long? {
+        return content.remainingDays
     }
 
-    fun getMessage(date: Date): String {
-        return anniversary.getMessage(date)
+    fun getMessage(): String {
+        return content.message
     }
 
     fun getBackgroundColor(): Int {
@@ -51,6 +54,9 @@ class DisplayContentWidget(
         return appearance.getBackgroundBitmap(context, w, h)
     }
 
+    fun getBadgeSummary(): Int {
+        return content.badgeSummary
+    }
 
     fun toJson(): String {
         return Gson().toJson(this)

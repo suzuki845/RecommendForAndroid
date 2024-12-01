@@ -31,7 +31,7 @@ class CustomAnniversary(
 
     fun toUserDefinedAnniversary(isZeroDayStart: Boolean): UserDefinedAnniversary {
         return UserDefinedAnniversary(
-            AnniversaryId(characterId, id.toString()),
+            ContentId(characterId, id.toString()),
             name,
             date,
             isZeroDayStart,

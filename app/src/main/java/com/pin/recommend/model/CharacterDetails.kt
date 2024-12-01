@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.google.gson.Gson
-import com.pin.recommend.model.entity.Anniversary
-import com.pin.recommend.model.entity.AnniversaryId
+import com.pin.recommend.model.entity.AnniversaryData
 import com.pin.recommend.model.entity.AnniversaryInterface
 import com.pin.recommend.model.entity.Appearance
+import com.pin.recommend.model.entity.ContentId
 import com.pin.recommend.model.entity.Story
 import com.pin.recommend.model.entity.StoryPicture
 import com.pin.recommend.util.combine2
@@ -47,8 +47,8 @@ class CharacterDetails(
 
     private val displayOnHomeAnniversary = _displayOnHomeAnniversaries.map {
         val a = it.firstOrNull()
-        Anniversary(
-            a?.getId() ?: AnniversaryId.getEmpty(),
+        AnniversaryData(
+            a?.getId() ?: ContentId.getEmpty(),
             a?.getName() ?: "",
             a?.getTopText() ?: "",
             a?.getBottomText() ?: "",
@@ -65,7 +65,7 @@ class CharacterDetails(
             a?.fixedCharacterId != null,
             b?.character?.name ?: "",
             b?.appearance(context) ?: Appearance(),
-            c ?: Anniversary(),
+            c ?: AnniversaryData(),
             b?.character?.storySortOrder ?: 0
         )
     }
@@ -122,7 +122,7 @@ class CharacterDetails(
         val isPinning: Boolean = false,
         val characterName: String,
         val appearance: Appearance,
-        val anniversary: Anniversary,
+        val anniversary: AnniversaryData,
         val storySortOrder: Int,
     ) {
         fun toJson(): String {

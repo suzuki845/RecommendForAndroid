@@ -31,7 +31,7 @@ class CharacterWithRelations(
         val entities =
             anniversaries().map {
                 TypedEntity(
-                    id = it.getId().getId(),
+                    id = it.getId(),
                     type = "Anniversary",
                     name = it.getName(),
                     topText = it.getTopText(),
@@ -44,9 +44,9 @@ class CharacterWithRelations(
             }.toMutableList()
         entities.add(
             TypedEntity(
-                id = "characters/${character.id}/badge",
-                type = "Badge",
-                name = "Badge",
+                id = ContentId(character.id, "/bag"),
+                type = "Bag",
+                name = "痛バ",
                 topText = "",
                 bottomText = "",
                 elapsedDays = 0,

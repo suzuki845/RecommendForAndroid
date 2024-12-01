@@ -6,13 +6,18 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import android.widget.RemoteViews
 import androidx.core.graphics.drawable.toBitmap
 import com.pin.recommend.MainActivity
 import com.pin.recommend.R
-import java.util.Date
+import com.pin.recommend.view.ToteBagView
+import com.pin.recommend.view.toBitmap
 import java.util.Random
 
 
@@ -90,7 +95,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
                     intent.getStringExtra(ACTION_ITEM_CLICK) ?: ""
                 val piningItem = PinnedContentWidget.fromJson(json)
                 if (piningItem != null) {
-                    db.register(piningItem.widgetId, piningItem.anniversary)
+                    db.register(piningItem.widgetId, piningItem.content)
                     val widgetManager = AppWidgetManager.getInstance(context.applicationContext)
                     updateAppWidget(context, widgetManager, piningItem.widgetId)
                 }
@@ -168,9 +173,25 @@ class ContentWidgetProvider : AppWidgetProvider() {
         private fun getDisplayView(
             context: Context,
             appWidgetId: Int,
+            content: DisplayContentWidget
+        ): RemoteViews {
+            val type = content.getContentType()
+            if (type == "Anniversary") {
+                return getAnniversaryView(context, appWidgetId, content)
+            }
+            if (type == "Bag") {
+                return getBagView(context, appWidgetId, content)
+            }
+
+            return RemoteViews(context.packageName, R.layout.widget_default)
+        }
+
+        private fun getAnniversaryView(
+            context: Context,
+            appWidgetId: Int,
             a: DisplayContentWidget
         ): RemoteViews {
-            val views = RemoteViews(context.packageName, R.layout.widget_display_content)
+            val views = RemoteViews(context.packageName, R.layout.widget_display_anniversary)
             views.setImageViewBitmap(
                 R.id.background_image,
                 a.getIconImage(context, 500, 500)
@@ -179,7 +200,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.character_name, a.characterName)
             views.setTextViewText(
                 R.id.remaining_days,
-                a.getMessage(Date())
+                a.getMessage()
             )
             val pinDrawable = context.getDrawable(
                 R.drawable.pin_fill
@@ -223,6 +244,75 @@ class ContentWidgetProvider : AppWidgetProvider() {
 
             return views
         }
+
+        private fun getBagView(
+            context: Context,
+            appWidgetId: Int,
+            content: DisplayContentWidget
+        ): RemoteViews {
+            val views = RemoteViews(context.packageName, R.layout.widget_display_bag)
+
+            val bag = ToteBagView(context)
+            val widthInDp = 300
+            val heightInDp = 300
+            val density = context.resources.displayMetrics.density
+            val widthInPx = (widthInDp * density).toInt()
+            val heightInPx = (heightInDp * density).toInt()
+            bag.layoutParams = ViewGroup.LayoutParams(widthInPx, heightInPx)
+            bag.measure(
+                View.MeasureSpec.makeMeasureSpec(widthInPx, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(heightInPx, View.MeasureSpec.EXACTLY)
+            )
+            bag.layout(0, 0, widthInPx, heightInPx)
+            val list = mutableListOf<Bitmap>()
+            val icon = content.getIconImage(context, 50, 50) ?: BitmapFactory.decodeResource(
+                context.resources,
+                R.drawable.ic_person_add_24dp
+            )
+
+            for (i in 1..content.getBadgeSummary()) {
+                list.add(
+                    icon
+                )
+            }
+            bag.badges = list
+            views.setImageViewBitmap(R.id.bag, bag.toBitmap())
+
+            views.setInt(R.id.background_color, "setBackgroundColor", content.getBackgroundColor())
+
+            val pinDrawable = context.getDrawable(
+                R.drawable.pin_fill
+            )
+
+            views.setImageViewBitmap(R.id.unpinning, pinDrawable?.toBitmap(30, 30))
+
+            val intent = Intent(context, ContentWidgetProvider::class.java)
+            intent.action = ACTION_UNPINNING
+            intent.putExtra(ACTION_UNPINNING, appWidgetId)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            val pIntent = PendingIntent.getBroadcast(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.unpinning, pIntent)
+
+            val openAppIntent = Intent(
+                context,
+                MainActivity::class.java
+            )
+            val pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                openAppIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.container, pendingIntent)
+
+            return views
+        }
+
     }
 
 }

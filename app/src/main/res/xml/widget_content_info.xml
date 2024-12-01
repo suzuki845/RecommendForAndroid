@@ -5,7 +5,7 @@
     android:initialLayout="@layout/widget_default"
     android:minWidth="180dp"
     android:minHeight="110dp"
-    android:previewLayout="@layout/widget_display_content"
+    android:previewLayout="@layout/widget_display_anniversary"
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="3"
     android:targetCellHeight="2"

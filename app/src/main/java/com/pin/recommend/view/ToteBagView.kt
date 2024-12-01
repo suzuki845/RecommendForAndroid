@@ -40,6 +40,16 @@ class ToteBagView @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_SOFTWARE, null) // ソフトウェアレンダリング（必要に応じて変更）
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val defaultWidth = 200 * context.resources.displayMetrics.density.toInt() // 200dp
+        val defaultHeight = 300 * context.resources.displayMetrics.density.toInt() // 300dp
+
+        val width = resolveSize(defaultWidth, widthMeasureSpec)
+        val height = resolveSize(defaultHeight, heightMeasureSpec)
+
+        setMeasuredDimension(width, height)
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 

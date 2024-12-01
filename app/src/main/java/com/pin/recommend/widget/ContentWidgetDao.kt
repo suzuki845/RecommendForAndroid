@@ -36,8 +36,8 @@ class ContentWidgetDao(context: Context) {
             .findByIdCharacterWithRelations(
                 pinned.content.getId().getCharacterId()
             )
-        val a = cwr?.anniversaries()?.firstOrNull {
-            pinned.getId().getId() == it.getId().getId()
+        val a = cwr?.typedEntities()?.firstOrNull {
+            pinned.getId().getId() == it.id.getId()
         }
         if (a != null) {
             return@withContext DisplayContentWidget(
@@ -52,20 +52,19 @@ class ContentWidgetDao(context: Context) {
 
     fun unsafeGet(widgetId: Int): DisplayContentWidget? {
         val pinned = getPinned(widgetId) ?: return null
-        val cwa = db.recommendCharacterDao()
-            .findByIdCharacterWithAnniversaries(
+        val cwr = db.recommendCharacterDao()
+            .findByIdCharacterWithRelations(
                 pinned.content.getId().getCharacterId()
             )
-        val a = cwa?.anniversaries()?.firstOrNull {
-            pinned.getId().getId() == it.getId().getId()
+        val content = cwr?.typedEntities()?.firstOrNull {
+            pinned.getId().getId() == it.id.getId()
         }
-        println("widget!! ${cwa?.id}")
-        if (a != null) {
+        if (content != null) {
             return DisplayContentWidget(
                 pinned.widgetId,
-                cwa.character.name ?: "",
-                a,
-                cwa.serializableAppearance()
+                cwr.character.name ?: "",
+                content,
+                cwr.serializableAppearance()
             )
         }
         return null

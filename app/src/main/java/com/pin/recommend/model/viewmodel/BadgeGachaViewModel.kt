@@ -1,6 +1,7 @@
 package com.pin.recommend.model.viewmodel
 
 import android.app.Application
+import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.map
@@ -10,7 +11,12 @@ import com.pin.recommend.model.CharacterDetails
 import com.pin.recommend.model.gacha.BadgeGachaMachine
 
 class BadgeGachaViewModel(application: Application) : AndroidViewModel(application) {
-    private val model = BadgeGachaMachine(AppDatabase.getDatabase(application))
+    private val model = BadgeGachaMachine(AppDatabase.getDatabase(application)).apply {
+        setOnPrizeListener {
+            val updateWidgetRequest = Intent("android.appwidget.action.APPWIDGET_UPDATE")
+            application.sendBroadcast(updateWidgetRequest)
+        }
+    }
 
     private var characterDetailsState: CharacterDetails.State? = null
 

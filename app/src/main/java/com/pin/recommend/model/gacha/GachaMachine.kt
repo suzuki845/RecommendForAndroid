@@ -100,6 +100,12 @@ class BadgeGachaMachine(private val db: AppDatabase) {
 
     private var prizeImage: Bitmap? = null
 
+    private var onPrizeListener: (() -> Unit)? = null
+
+    fun setOnPrizeListener(listener: () -> Unit) {
+        this.onPrizeListener = listener
+    }
+
     init {
         result.observeForever {
             if (it?.name == "Prize") {
@@ -129,6 +135,7 @@ class BadgeGachaMachine(private val db: AppDatabase) {
                         } else {
                             db.badgeSummary().updateBadgeSummary(newSummary)
                         }
+                        onPrizeListener?.invoke()
                     }
                 } catch (e: Exception) {
                     println("GachaMachine.result: failed $e")

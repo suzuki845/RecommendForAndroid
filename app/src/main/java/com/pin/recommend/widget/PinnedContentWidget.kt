@@ -3,7 +3,7 @@ package com.pin.recommend.widget
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.gson.Gson
-import com.pin.recommend.model.entity.AnniversaryId
+import com.pin.recommend.model.entity.ContentId
 import com.pin.recommend.model.entity.SerializableAppearance
 
 data class PinnedContentWidget(
@@ -11,7 +11,7 @@ data class PinnedContentWidget(
     val content: ContentWidgetItem,
 ) {
 
-    fun getId(): AnniversaryId {
+    fun getId(): ContentId {
         return content.getId()
     }
 
@@ -19,16 +19,16 @@ data class PinnedContentWidget(
         return content.characterName
     }
 
-    fun getAnniversaryName(): String {
-        return content.anniversary.name
+    fun getContentName(): String {
+        return content.content.name
     }
 
     fun getRemainingDays(): String {
-        return content.anniversary.getRemainingDays
+        return "${content.content.remainingDays}日"
     }
 
     fun getMessage(): String {
-        return content.anniversary.message
+        return content.content.message
     }
 
     fun getBackgroundColor(): Int {

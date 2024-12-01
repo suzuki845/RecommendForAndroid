@@ -13,19 +13,42 @@ interface AnniversaryInterface {
     fun isAnniversary(current: Date): Boolean
     fun getMessage(current: Date): String
 
+    fun toData(date: Date): AnniversaryData {
+        return AnniversaryData(
+            getId(),
+            getName(),
+            getTopText(),
+            getBottomText(),
+            getElapsedDays(date).let { d -> "${d}日" },
+            getRemainingDays(date).let { d -> "${d}日" },
+            getMessage(date),
+            isAnniversary(date)
+        )
+    }
+
     fun toTypedEntity(date: Date): TypedEntity {
         return TypedEntity(
-            id = getId(),
-            type = "Anniversary",
-            name = getName(),
-            topText = getTopText(),
-            bottomText = getBottomText(),
-            elapsedDays = getElapsedDays(date) ?: 0,
-            remainingDays = getRemainingDays(date) ?: 0,
-            message = getMessage(date),
-            isAnniversary = isAnniversary(date),
-            badgeSummary = 0
+            getId(),
+            "Anniversary",
+            getName(),
+            getTopText(),
+            getBottomText(),
+            getElapsedDays(date),
+            getRemainingDays(date) ?: 0,
+            getMessage(date),
+            isAnniversary(date)
         )
     }
 }
 
+
+data class AnniversaryData(
+    val id: ContentId = ContentId.getEmpty(),
+    val name: String = "",
+    val topText: String = "",
+    val bottomText: String = "",
+    val elapsedDays: String = "",
+    val getRemainingDays: String = "",
+    val message: String = "",
+    val isAnniversary: Boolean = false,
+)

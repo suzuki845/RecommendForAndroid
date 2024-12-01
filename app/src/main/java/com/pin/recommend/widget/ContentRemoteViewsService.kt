@@ -8,7 +8,6 @@ import android.widget.RemoteViewsService
 import android.widget.RemoteViewsService.RemoteViewsFactory
 import com.pin.recommend.R
 import com.pin.recommend.widget.ContentWidgetProvider.Companion.ACTION_ITEM_CLICK
-import java.util.Date
 
 
 class ContentRemoteViewsService : RemoteViewsService() {
@@ -31,12 +30,12 @@ class ContentRemoteViewsFactory(context: Context, intent: Intent) : RemoteViewsF
     val anniversaries = mutableListOf<ContentWidgetItem>()
 
     private fun setData() {
-        val entries = db.unsafeCharacters().flatMap { cwa ->
-            cwa.anniversaries().map { anniversary ->
+        val entries = db.unsafeCharacters().flatMap { cwr ->
+            cwr.typedEntities().map {
                 return@map ContentWidgetItem(
-                    cwa.character.name ?: "",
-                    anniversary.toData(Date()),
-                    cwa.serializableAppearance()
+                    cwr.character.name ?: "",
+                    it,
+                    cwr.serializableAppearance()
                 )
             }
         }
@@ -70,7 +69,7 @@ class ContentRemoteViewsFactory(context: Context, intent: Intent) : RemoteViewsF
 
         val rv = RemoteViews(ctx.packageName, R.layout.widget_content_item)
         rv.setTextViewText(R.id.character_name, data.characterName)
-        rv.setTextViewText(R.id.anniversary_name, data.anniversary.name + "記念")
+        rv.setTextViewText(R.id.anniversary_name, data.content.name)
         rv.setImageViewBitmap(
             R.id.character_icon,
             anniversaries[i].appearance.getIconImage(ctx, 30, 30)

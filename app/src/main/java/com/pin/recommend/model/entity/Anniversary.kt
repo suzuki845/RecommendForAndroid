@@ -7,7 +7,7 @@ import java.util.Date
 
 
 class UserDefinedAnniversary : AnniversaryInterface {
-    private val id: AnniversaryId
+    private val id: ContentId
     private val name: String
     private val date: Date
     private val isZeroDayStart: Boolean
@@ -15,7 +15,7 @@ class UserDefinedAnniversary : AnniversaryInterface {
     private val bottomText: String
 
     constructor(
-        id: AnniversaryId,
+        id: ContentId,
         name: String,
         date: Date,
         isZeroDayStart: Boolean,
@@ -31,7 +31,7 @@ class UserDefinedAnniversary : AnniversaryInterface {
         this.bottomText = bottomText
     }
 
-    override fun getId(): AnniversaryId {
+    override fun getId(): ContentId {
         return id
     }
 
@@ -99,7 +99,7 @@ class UserDefinedAnniversary : AnniversaryInterface {
 
 class SystemDefinedAnniversary : AnniversaryInterface {
 
-    private val id: AnniversaryId
+    private val id: ContentId
     private val name: String
     private val startDate = Calendar.getInstance()
     private val farInAdvance: Int
@@ -109,7 +109,7 @@ class SystemDefinedAnniversary : AnniversaryInterface {
     private val bottomText: String
 
     constructor(
-        id: AnniversaryId,
+        id: ContentId,
         name: String,
         startDate: Date,
         periodType: PeriodType,
@@ -129,7 +129,7 @@ class SystemDefinedAnniversary : AnniversaryInterface {
         this.bottomText = bottomText
     }
 
-    override fun getId(): AnniversaryId {
+    override fun getId(): ContentId {
         return id
     }
 
@@ -199,7 +199,7 @@ class SystemDefinedAnniversary : AnniversaryInterface {
 
 class SystemDefinedAnniversaries : AnniversaryInterface {
 
-    private val id: AnniversaryId
+    private val id: ContentId
 
     private var character: RecommendCharacter
 
@@ -207,10 +207,10 @@ class SystemDefinedAnniversaries : AnniversaryInterface {
 
     constructor(character: RecommendCharacter) {
         this.character = character
-        this.id = AnniversaryId(character.id, "SystemDefinedAnniversaries")
+        this.id = ContentId(character.id, "SystemDefinedAnniversaries")
     }
 
-    override fun getId(): AnniversaryId {
+    override fun getId(): ContentId {
         return id
     }
 
@@ -223,7 +223,7 @@ class SystemDefinedAnniversaries : AnniversaryInterface {
             val unit = i * 100
             anniversaries.add(
                 SystemDefinedAnniversary(
-                    id = AnniversaryId(character.id, "${unit}日"),
+                    id = ContentId(character.id, "${unit}日"),
                     name = "${unit}日",
                     startDate = created.time,
                     periodType = PeriodType.Days,
@@ -238,7 +238,7 @@ class SystemDefinedAnniversaries : AnniversaryInterface {
             val unit = i
             anniversaries.add(
                 SystemDefinedAnniversary(
-                    id = AnniversaryId(character.id, "${unit}日"),
+                    id = ContentId(character.id, "${unit}日"),
                     name = "${unit}周年",
                     startDate = created.time,
                     periodType = PeriodType.Year,
@@ -276,7 +276,7 @@ class SystemDefinedAnniversaries : AnniversaryInterface {
     }
 
     override fun getName(): String {
-        return getCurrentAnniversary(Date())?.let { it.getName() } ?: ""
+        return getCurrentAnniversary(Date())?.let { it.getName() + "記念" } ?: ""
     }
 
     override fun getTopText(): String {
