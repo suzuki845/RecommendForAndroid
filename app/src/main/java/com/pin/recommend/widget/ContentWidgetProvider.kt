@@ -138,6 +138,8 @@ class ContentWidgetProvider : AppWidgetProvider() {
         ) {
             val db = ContentWidgetDao(context)
             val a = db.unsafeGet(appWidgetId)
+            println("Widget!!! ${a?.toJson()}")
+
             val views = if (a != null) {
                 getDisplayView(context, appWidgetId, a)
             } else {
