@@ -18,7 +18,7 @@ class CharacterWithRelations(
         parentColumn = "id",
         entityColumn = "characterId"
     )
-    val badgeSummary: BadgeSummary,
+    val badgeSummary: BadgeSummary?,
 ) {
     fun anniversaries(): List<AnniversaryInterface> {
         val list = mutableListOf<AnniversaryInterface>()
@@ -52,7 +52,7 @@ class CharacterWithRelations(
                 elapsedDays = 0,
                 remainingDays = 0,
                 isAnniversary = false,
-                badgeSummary = badgeSummary.amount
+                badgeSummary = badgeSummary?.amount ?: 0
             )
         )
         return entities
