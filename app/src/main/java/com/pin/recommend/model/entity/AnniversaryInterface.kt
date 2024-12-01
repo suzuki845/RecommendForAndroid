@@ -4,7 +4,7 @@ import java.util.Date
 
 interface AnniversaryInterface {
 
-    fun getId(): AnniversaryId
+    fun getId(): ContentId
     fun getName(): String
     fun getTopText(): String
     fun getBottomText(): String
@@ -13,47 +13,19 @@ interface AnniversaryInterface {
     fun isAnniversary(current: Date): Boolean
     fun getMessage(current: Date): String
 
-    fun toData(date: Date): Anniversary {
-        return Anniversary(
-            getId(),
-            getName(),
-            getTopText(),
-            getBottomText(),
-            getElapsedDays(date).let { d -> "${d}日" },
-            getRemainingDays(date).let { d -> "${d}日" },
-            getMessage(date),
-            isAnniversary(date)
+    fun toTypedEntity(date: Date): TypedEntity {
+        return TypedEntity(
+            id = getId(),
+            type = "Anniversary",
+            name = getName(),
+            topText = getTopText(),
+            bottomText = getBottomText(),
+            elapsedDays = getElapsedDays(date) ?: 0,
+            remainingDays = getRemainingDays(date) ?: 0,
+            message = getMessage(date),
+            isAnniversary = isAnniversary(date),
+            badgeSummary = 0
         )
     }
 }
 
-data class AnniversaryId(private val characterId: Long, private val anniversaryId: String) {
-    fun getId(): String {
-        return "anniversaries/characterId/$characterId/anniversaryId/$anniversaryId"
-    }
-
-    fun getCharacterId(): Long {
-        return characterId
-    }
-
-    fun getAnniversaryId(): String {
-        return anniversaryId
-    }
-
-    companion object {
-        fun getEmpty(): AnniversaryId {
-            return AnniversaryId(-1, "null")
-        }
-    }
-}
-
-data class Anniversary(
-    val id: AnniversaryId = AnniversaryId.getEmpty(),
-    val name: String = "",
-    val topText: String = "",
-    val bottomText: String = "",
-    val elapsedDays: String = "",
-    val getRemainingDays: String = "",
-    val message: String = "",
-    val isAnniversary: Boolean = false
-)

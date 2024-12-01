@@ -3,18 +3,18 @@ package com.pin.recommend.widget
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.gson.Gson
-import com.pin.recommend.model.entity.Anniversary
-import com.pin.recommend.model.entity.AnniversaryId
+import com.pin.recommend.model.entity.ContentId
 import com.pin.recommend.model.entity.SerializableAppearance
+import com.pin.recommend.model.entity.TypedEntity
 
-data class AnniversaryWidgetItem(
+data class ContentWidgetItem(
     val characterName: String,
-    val anniversary: Anniversary,
+    val content: TypedEntity,
     val appearance: SerializableAppearance
 ) {
 
-    fun getId(): AnniversaryId {
-        return anniversary.id
+    fun getId(): ContentId {
+        return content.id
     }
 
     fun getIconImage(context: Context, w: Int, h: Int): Bitmap? {
@@ -30,8 +30,8 @@ data class AnniversaryWidgetItem(
     }
 
     companion object {
-        fun fromJson(json: String): AnniversaryWidgetItem {
-            return Gson().fromJson(json, AnniversaryWidgetItem::class.java)
+        fun fromJson(json: String): ContentWidgetItem {
+            return Gson().fromJson(json, ContentWidgetItem::class.java)
         }
     }
 }

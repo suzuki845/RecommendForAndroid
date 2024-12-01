@@ -8,7 +8,7 @@ import com.pin.recommend.model.entity.AnniversaryInterface
 import com.pin.recommend.model.entity.SerializableAppearance
 import java.util.Date
 
-class DisplayAnniversaryWidget(
+class DisplayContentWidget(
     val appWidgetId: Int,
     val characterName: String,
     val anniversary: AnniversaryInterface,
@@ -18,7 +18,7 @@ class DisplayAnniversaryWidget(
     fun getId(): AnniversaryId {
         return anniversary.getId()
     }
-    
+
     fun getAnniversaryName(): String {
         return anniversary.getName()
     }
@@ -57,8 +57,8 @@ class DisplayAnniversaryWidget(
     }
 
     companion object {
-        fun fromJson(json: String): PinnedAnniversaryWidget? {
-            return Gson().fromJson(json, PinnedAnniversaryWidget::class.java)
+        fun fromJson(json: String): PinnedContentWidget? {
+            return Gson().fromJson(json, PinnedContentWidget::class.java)
         }
     }
 

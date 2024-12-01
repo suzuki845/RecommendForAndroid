@@ -21,7 +21,7 @@ import java.util.Random
  */
 
 
-class AnniversaryWidgetProvider : AppWidgetProvider() {
+class ContentWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -54,7 +54,7 @@ class AnniversaryWidgetProvider : AppWidgetProvider() {
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        val db = AnniversaryWidgetDao(context)
+        val db = ContentWidgetDao(context)
         val appWidgetManager = AppWidgetManager.getInstance(context.applicationContext)
 
         for (appWidgetId in appWidgetIds) {
@@ -74,7 +74,7 @@ class AnniversaryWidgetProvider : AppWidgetProvider() {
                 val ids = widgetManager.getAppWidgetIds(
                     ComponentName(
                         context,
-                        AnniversaryWidgetProvider::class.java
+                        ContentWidgetProvider::class.java
                     )
                 )
 
@@ -85,10 +85,10 @@ class AnniversaryWidgetProvider : AppWidgetProvider() {
             }
 
             ACTION_ITEM_CLICK -> {
-                val db = AnniversaryWidgetDao(context)
+                val db = ContentWidgetDao(context)
                 val json =
                     intent.getStringExtra(ACTION_ITEM_CLICK) ?: ""
-                val piningItem = PinnedAnniversaryWidget.fromJson(json)
+                val piningItem = PinnedContentWidget.fromJson(json)
                 if (piningItem != null) {
                     db.register(piningItem.widgetId, piningItem.anniversary)
                     val widgetManager = AppWidgetManager.getInstance(context.applicationContext)
@@ -99,14 +99,14 @@ class AnniversaryWidgetProvider : AppWidgetProvider() {
             ACTION_UNPINNING -> {
                 val appWidgetId =
                     intent.getIntExtra(ACTION_UNPINNING, -1)
-                val db = AnniversaryWidgetDao(context)
+                val db = ContentWidgetDao(context)
                 db.remove(appWidgetId)
 
                 val widgetManager = AppWidgetManager.getInstance(context.applicationContext)
                 val ids = widgetManager.getAppWidgetIds(
                     ComponentName(
                         context,
-                        AnniversaryWidgetProvider::class.java
+                        ContentWidgetProvider::class.java
                     )
                 )
                 for (appWidgetId in ids) {
@@ -131,7 +131,7 @@ class AnniversaryWidgetProvider : AppWidgetProvider() {
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int
         ) {
-            val db = AnniversaryWidgetDao(context)
+            val db = ContentWidgetDao(context)
             val a = db.unsafeGet(appWidgetId)
             val views = if (a != null) {
                 getDisplayView(context, appWidgetId, a)
@@ -145,14 +145,14 @@ class AnniversaryWidgetProvider : AppWidgetProvider() {
             context: Context,
             appWidgetId: Int
         ): RemoteViews {
-            val serviceIntent = Intent(context, AnniversaryRemoteViewsService::class.java)
+            val serviceIntent = Intent(context, ContentRemoteViewsService::class.java)
             serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
             serviceIntent.putExtra("random", Random().nextInt())
             serviceIntent.data = Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME))
 
-            val views = RemoteViews(context.packageName, R.layout.widget_anniversary_list)
+            val views = RemoteViews(context.packageName, R.layout.widget_content_list)
             views.setRemoteAdapter(R.id.anniversary_list, serviceIntent)
-            val itemClickIntent = Intent(context, AnniversaryWidgetProvider::class.java)
+            val itemClickIntent = Intent(context, ContentWidgetProvider::class.java)
             itemClickIntent.action = ACTION_ITEM_CLICK
             val itemClickPendingIntent = PendingIntent.getBroadcast(
                 context,
@@ -168,9 +168,9 @@ class AnniversaryWidgetProvider : AppWidgetProvider() {
         private fun getDisplayView(
             context: Context,
             appWidgetId: Int,
-            a: DisplayAnniversaryWidget
+            a: DisplayContentWidget
         ): RemoteViews {
-            val views = RemoteViews(context.packageName, R.layout.widget_display_anniversary)
+            val views = RemoteViews(context.packageName, R.layout.widget_display_content)
             views.setImageViewBitmap(
                 R.id.background_image,
                 a.getIconImage(context, 500, 500)
@@ -197,7 +197,7 @@ class AnniversaryWidgetProvider : AppWidgetProvider() {
 
             views.setImageViewBitmap(R.id.unpinning, pinDrawable?.toBitmap(30, 30))
 
-            val intent = Intent(context, AnniversaryWidgetProvider::class.java)
+            val intent = Intent(context, ContentWidgetProvider::class.java)
             intent.action = ACTION_UNPINNING
             intent.putExtra(ACTION_UNPINNING, appWidgetId)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)

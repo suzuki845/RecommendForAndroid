@@ -6,53 +6,53 @@ import com.google.gson.Gson
 import com.pin.recommend.model.entity.AnniversaryId
 import com.pin.recommend.model.entity.SerializableAppearance
 
-data class PinnedAnniversaryWidget(
+data class PinnedContentWidget(
     val widgetId: Int,
-    val anniversary: AnniversaryWidgetItem,
+    val content: ContentWidgetItem,
 ) {
 
     fun getId(): AnniversaryId {
-        return anniversary.getId()
+        return content.getId()
     }
 
     fun getCharacterName(): String {
-        return anniversary.characterName
+        return content.characterName
     }
 
     fun getAnniversaryName(): String {
-        return anniversary.anniversary.name
+        return content.anniversary.name
     }
 
     fun getRemainingDays(): String {
-        return anniversary.anniversary.getRemainingDays
+        return content.anniversary.getRemainingDays
     }
 
     fun getMessage(): String {
-        return anniversary.anniversary.message
+        return content.anniversary.message
     }
 
     fun getBackgroundColor(): Int {
-        return anniversary.appearance.backgroundColor
+        return content.appearance.backgroundColor
     }
 
     fun getTextColor(): Int {
-        return anniversary.appearance.homeTextColor
+        return content.appearance.homeTextColor
     }
 
     fun getTextShadowColor(): Int? {
-        return anniversary.appearance.homeTextShadowColor
+        return content.appearance.homeTextShadowColor
     }
 
     fun getIconImage(context: Context, w: Int, h: Int): Bitmap? {
-        return anniversary.getIconImage(context, w, h)
+        return content.getIconImage(context, w, h)
     }
 
     fun getBackgroundImage(context: Context, w: Int, h: Int): Bitmap? {
-        return anniversary.getBackgroundImage(context, w, h)
+        return content.getBackgroundImage(context, w, h)
     }
 
     fun getAppearance(): SerializableAppearance {
-        return anniversary.appearance
+        return content.appearance
     }
 
 
@@ -61,8 +61,8 @@ data class PinnedAnniversaryWidget(
     }
 
     companion object {
-        fun fromJson(json: String): PinnedAnniversaryWidget? {
-            return Gson().fromJson(json, PinnedAnniversaryWidget::class.java)
+        fun fromJson(json: String): PinnedContentWidget? {
+            return Gson().fromJson(json, PinnedContentWidget::class.java)
         }
     }
 

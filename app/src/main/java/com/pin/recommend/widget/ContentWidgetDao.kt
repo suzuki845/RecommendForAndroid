@@ -1,0 +1,74 @@
+package com.pin.recommend.widget
+
+import android.content.Context
+import com.pin.recommend.model.AppDatabase
+import com.pin.recommend.model.entity.CharacterWithRelations
+import com.pin.recommend.util.PrefUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+class ContentWidgetDao(context: Context) {
+    private val db = AppDatabase.getDatabase(context)
+
+    fun unsafeCharacters(): List<CharacterWithRelations> {
+        return db.recommendCharacterDao().findCharacterWithRelations()
+    }
+
+    fun register(widgetId: Int, item: ContentWidgetItem) {
+        PrefUtil.putString(
+            widgetId.toString(),
+            PinnedContentWidget(widgetId, item).toJson()
+        )
+    }
+
+    fun remove(widgetId: Int) {
+        PrefUtil.remove(widgetId.toString())
+    }
+
+    private fun getPinned(widgetId: Int): PinnedContentWidget? {
+        val json = PrefUtil.getString(widgetId.toString())
+        return PinnedContentWidget.fromJson(json)
+    }
+
+    suspend fun get(widgetId: Int): DisplayContentWidget? = withContext(Dispatchers.IO) {
+        val pinned = getPinned(widgetId) ?: return@withContext null
+        val cwr = db.recommendCharacterDao()
+            .findByIdCharacterWithRelations(
+                pinned.content.getId().getCharacterId()
+            )
+        val a = cwr?.anniversaries()?.firstOrNull {
+            pinned.getId().getId() == it.getId().getId()
+        }
+        if (a != null) {
+            return@withContext DisplayContentWidget(
+                pinned.widgetId,
+                cwr.character.name ?: "",
+                a,
+                cwr.serializableAppearance()
+            )
+        }
+        return@withContext null
+    }
+
+    fun unsafeGet(widgetId: Int): DisplayContentWidget? {
+        val pinned = getPinned(widgetId) ?: return null
+        val cwa = db.recommendCharacterDao()
+            .findByIdCharacterWithAnniversaries(
+                pinned.content.getId().getCharacterId()
+            )
+        val a = cwa?.anniversaries()?.firstOrNull {
+            pinned.getId().getId() == it.getId().getId()
+        }
+        println("widget!! ${cwa?.id}")
+        if (a != null) {
+            return DisplayContentWidget(
+                pinned.widgetId,
+                cwa.character.name ?: "",
+                a,
+                cwa.serializableAppearance()
+            )
+        }
+        return null
+    }
+}
+
