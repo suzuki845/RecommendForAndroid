@@ -63,7 +63,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
         val appWidgetManager = AppWidgetManager.getInstance(context.applicationContext)
 
         for (appWidgetId in appWidgetIds) {
-            db.remove(appWidgetId)
+            db.unpinning(appWidgetId)
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
 
@@ -89,13 +89,13 @@ class ContentWidgetProvider : AppWidgetProvider() {
                 widgetManager.notifyAppWidgetViewDataChanged(ids, R.id.anniversary_list);
             }
 
-            ACTION_ITEM_CLICK -> {
+            ACTION_PINING -> {
                 val db = ContentWidgetDao(context)
                 val json =
-                    intent.getStringExtra(ACTION_ITEM_CLICK) ?: ""
+                    intent.getStringExtra(ACTION_PINING) ?: ""
                 val piningItem = PinnedContentWidget.fromJson(json)
                 if (piningItem != null) {
-                    db.register(piningItem.widgetId, piningItem.content)
+                    db.pinning(piningItem.widgetId, piningItem.content)
                     val widgetManager = AppWidgetManager.getInstance(context.applicationContext)
                     updateAppWidget(context, widgetManager, piningItem.widgetId)
                 }
@@ -105,19 +105,28 @@ class ContentWidgetProvider : AppWidgetProvider() {
                 val appWidgetId =
                     intent.getIntExtra(ACTION_UNPINNING, -1)
                 val db = ContentWidgetDao(context)
-                db.remove(appWidgetId)
+                db.unpinning(appWidgetId)
 
                 val widgetManager = AppWidgetManager.getInstance(context.applicationContext)
+
                 val ids = widgetManager.getAppWidgetIds(
                     ComponentName(
                         context,
                         ContentWidgetProvider::class.java
                     )
                 )
+                println("appWidgetId: $appWidgetId")
+                /*
                 for (appWidgetId in ids) {
                     widgetManager.updateAppWidget(appWidgetId, getListView(context, appWidgetId))
                 }
-                widgetManager.notifyAppWidgetViewDataChanged(ids, R.id.anniversary_list);
+                */
+                updateAppWidget(context, widgetManager, appWidgetId)
+                widgetManager.notifyAppWidgetViewDataChanged(
+                    intArrayOf(appWidgetId),
+                    R.id.anniversary_list
+                )
+                //widgetManager.notifyAppWidgetViewDataChanged(ids, R.id.anniversary_list);
             }
         }
 
@@ -127,8 +136,8 @@ class ContentWidgetProvider : AppWidgetProvider() {
     companion object {
         const val ACTION_UPDATE =
             "com.pin.recommend.AnniversaryWidgetProvider.ACTION_UPDATE"
-        const val ACTION_ITEM_CLICK =
-            "com.pin.recommend.AnniversaryWidgetProvider.ACTION_ITEM_CLICK"
+        const val ACTION_PINING =
+            "com.pin.recommend.AnniversaryWidgetProvider.ACTION_PINING"
         const val ACTION_UNPINNING = "com.pin.recommend.AnniversaryWidgetProvider.ACTION_UNPINNING"
 
         fun updateAppWidget(
@@ -137,11 +146,10 @@ class ContentWidgetProvider : AppWidgetProvider() {
             appWidgetId: Int
         ) {
             val db = ContentWidgetDao(context)
-            val a = db.unsafeGet(appWidgetId)
-            println("Widget!!! ${a?.toJson()}")
+            val pinned = db.unsafeGet(appWidgetId)
 
-            val views = if (a != null) {
-                getDisplayView(context, appWidgetId, a)
+            val views = if (pinned != null) {
+                getDisplayView(context, appWidgetId, pinned)
             } else {
                 getListView(context, appWidgetId)
             }
@@ -160,7 +168,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_content_list)
             views.setRemoteAdapter(R.id.anniversary_list, serviceIntent)
             val itemClickIntent = Intent(context, ContentWidgetProvider::class.java)
-            itemClickIntent.action = ACTION_ITEM_CLICK
+            itemClickIntent.action = ACTION_PINING
             val itemClickPendingIntent = PendingIntent.getBroadcast(
                 context,
                 0,
@@ -178,47 +186,11 @@ class ContentWidgetProvider : AppWidgetProvider() {
             content: DisplayContentWidget
         ): RemoteViews {
             val type = content.getContentType()
-            if (type == "Anniversary") {
-                return getAnniversaryView(context, appWidgetId, content)
+            val views = if (type == "Bag") {
+                getBagView(context, appWidgetId, content)
+            } else {
+                getAnniversaryView(context, appWidgetId, content)
             }
-            if (type == "Bag") {
-                return getBagView(context, appWidgetId, content)
-            }
-
-            return RemoteViews(context.packageName, R.layout.widget_default)
-        }
-
-        private fun getAnniversaryView(
-            context: Context,
-            appWidgetId: Int,
-            a: DisplayContentWidget
-        ): RemoteViews {
-            val views = RemoteViews(context.packageName, R.layout.widget_display_anniversary)
-            views.setImageViewBitmap(
-                R.id.background_image,
-                a.getIconImage(context, 500, 500)
-            )
-            views.setInt(R.id.background_color, "setBackgroundColor", a.getBackgroundColor())
-            views.setTextViewText(R.id.character_name, a.characterName)
-            views.setTextViewText(
-                R.id.remaining_days,
-                a.getMessage()
-            )
-            val pinDrawable = context.getDrawable(
-                R.drawable.pin_fill
-            )
-            views.setTextColor(R.id.character_name, a.getTextColor())
-            views.setTextColor(R.id.anniversary_name, a.getTextColor())
-            views.setTextColor(R.id.remaining_days, a.getTextColor())
-            pinDrawable?.setTint(a.getTextColor())
-
-            a.getTextShadowColor()?.let {
-                views.setInt(R.id.character_name_background, "setColorFilter", it)
-                views.setInt(R.id.anniversary_background, "setColorFilter", it)
-                views.setInt(R.id.unpinning_background, "setColorFilter", it)
-            }
-
-            views.setImageViewBitmap(R.id.unpinning, pinDrawable?.toBitmap(30, 30))
 
             val intent = Intent(context, ContentWidgetProvider::class.java)
             intent.action = ACTION_UNPINNING
@@ -226,7 +198,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             val pIntent = PendingIntent.getBroadcast(
                 context,
-                0,
+                appWidgetId,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
@@ -238,11 +210,46 @@ class ContentWidgetProvider : AppWidgetProvider() {
             )
             val pendingIntent = PendingIntent.getActivity(
                 context,
-                0,
+                appWidgetId,
                 openAppIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
             views.setOnClickPendingIntent(R.id.container, pendingIntent)
+
+            return views
+        }
+
+        private fun getAnniversaryView(
+            context: Context,
+            appWidgetId: Int,
+            content: DisplayContentWidget
+        ): RemoteViews {
+            val views = RemoteViews(context.packageName, R.layout.widget_display_anniversary)
+            views.setImageViewBitmap(
+                R.id.background_image,
+                content.getIconImage(context, 500, 500)
+            )
+            views.setInt(R.id.background_color, "setBackgroundColor", content.getBackgroundColor())
+            views.setTextViewText(R.id.character_name, content.characterName)
+            views.setTextViewText(
+                R.id.remaining_days,
+                content.getMessage()
+            )
+            val pinDrawable = context.getDrawable(
+                R.drawable.pin_fill
+            )
+            views.setTextColor(R.id.character_name, content.getTextColor())
+            views.setTextColor(R.id.anniversary_name, content.getTextColor())
+            views.setTextColor(R.id.remaining_days, content.getTextColor())
+            pinDrawable?.setTint(content.getTextColor())
+
+            content.getTextShadowColor()?.let {
+                views.setInt(R.id.character_name_background, "setColorFilter", it)
+                views.setInt(R.id.anniversary_background, "setColorFilter", it)
+                views.setInt(R.id.unpinning_background, "setColorFilter", it)
+            }
+
+            views.setImageViewBitmap(R.id.unpinning, pinDrawable?.toBitmap(30, 30))
 
             return views
         }
@@ -287,30 +294,6 @@ class ContentWidgetProvider : AppWidgetProvider() {
             )
 
             views.setImageViewBitmap(R.id.unpinning, pinDrawable?.toBitmap(30, 30))
-
-            val intent = Intent(context, ContentWidgetProvider::class.java)
-            intent.action = ACTION_UNPINNING
-            intent.putExtra(ACTION_UNPINNING, appWidgetId)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            val pIntent = PendingIntent.getBroadcast(
-                context,
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
-            views.setOnClickPendingIntent(R.id.unpinning, pIntent)
-
-            val openAppIntent = Intent(
-                context,
-                MainActivity::class.java
-            )
-            val pendingIntent = PendingIntent.getActivity(
-                context,
-                0,
-                openAppIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
-            views.setOnClickPendingIntent(R.id.container, pendingIntent)
 
             return views
         }

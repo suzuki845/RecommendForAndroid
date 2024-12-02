@@ -36,7 +36,8 @@ interface AnniversaryInterface {
             getElapsedDays(date),
             getRemainingDays(date) ?: 0,
             getMessage(date),
-            isAnniversary(date)
+            isAnniversary(date),
+            0
         )
     }
 }

@@ -14,14 +14,14 @@ class ContentWidgetDao(context: Context) {
         return db.recommendCharacterDao().findCharacterWithRelations()
     }
 
-    fun register(widgetId: Int, item: ContentWidgetItem) {
+    fun pinning(widgetId: Int, item: ContentWidgetItem) {
         PrefUtil.putString(
             widgetId.toString(),
             PinnedContentWidget(widgetId, item).toJson()
         )
     }
 
-    fun remove(widgetId: Int) {
+    fun unpinning(widgetId: Int) {
         PrefUtil.remove(widgetId.toString())
     }
 

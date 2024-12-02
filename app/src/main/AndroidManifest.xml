@@ -21,7 +21,7 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
                 <action android:name="com.pin.recommend.ContentWidgetProvider.ACTION_UPDATE" />
-                <action android:name="com.pin.recommend.ContentWidgetProvider.ACTION_ITEM_CLICK" />
+                <action android:name="com.pin.recommend.ContentWidgetProvider.ACTION_PINING" />
                 <action android:name="com.pin.recommend.ContentWidgetProvider.ACTION_UNPINNING" />
             </intent-filter>
 

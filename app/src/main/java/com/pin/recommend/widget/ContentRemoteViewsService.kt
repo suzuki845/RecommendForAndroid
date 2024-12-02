@@ -7,7 +7,7 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import android.widget.RemoteViewsService.RemoteViewsFactory
 import com.pin.recommend.R
-import com.pin.recommend.widget.ContentWidgetProvider.Companion.ACTION_ITEM_CLICK
+import com.pin.recommend.widget.ContentWidgetProvider.Companion.ACTION_PINING
 
 
 class ContentRemoteViewsService : RemoteViewsService() {
@@ -65,7 +65,7 @@ class ContentRemoteViewsFactory(context: Context, intent: Intent) : RemoteViewsF
 
         val pinRequest = Intent(ctx, ContentWidgetProvider::class.java)
         pinRequest.action = ContentWidgetProvider.ACTION_UPDATE
-        pinRequest.putExtra(ACTION_ITEM_CLICK, PinnedContentWidget(appWidgetId, data).toJson())
+        pinRequest.putExtra(ACTION_PINING, PinnedContentWidget(appWidgetId, data).toJson())
 
         val rv = RemoteViews(ctx.packageName, R.layout.widget_content_item)
         rv.setTextViewText(R.id.character_name, data.characterName)

@@ -38,19 +38,21 @@ class CharacterWithRelations(
                     bottomText = it.getBottomText(),
                     elapsedDays = it.getElapsedDays(Date()),
                     remainingDays = it.getRemainingDays(Date()) ?: 0,
+                    message = it.getMessage(Date()),
                     isAnniversary = it.isAnniversary(Date()),
                     badgeSummary = 0
                 )
             }.toMutableList()
         entities.add(
             TypedEntity(
-                id = ContentId(character.id, "/bag"),
+                id = ContentId(character.id, "/Bag"),
                 type = "Bag",
                 name = "痛バ",
                 topText = "",
                 bottomText = "",
                 elapsedDays = 0,
                 remainingDays = 0,
+                message = "",
                 isAnniversary = false,
                 badgeSummary = badgeSummary?.amount ?: 0
             )
