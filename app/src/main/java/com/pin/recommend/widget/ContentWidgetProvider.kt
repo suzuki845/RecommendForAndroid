@@ -97,6 +97,10 @@ class ContentWidgetProvider : AppWidgetProvider() {
                 if (piningItem != null) {
                     db.pinning(piningItem.widgetId, piningItem.content)
                     val widgetManager = AppWidgetManager.getInstance(context.applicationContext)
+                    widgetManager.notifyAppWidgetViewDataChanged(
+                        intArrayOf(piningItem.widgetId),
+                        R.id.event_list
+                    )
                     updateAppWidget(context, widgetManager, piningItem.widgetId)
                 }
             }
@@ -108,25 +112,11 @@ class ContentWidgetProvider : AppWidgetProvider() {
                 db.unpinning(appWidgetId)
 
                 val widgetManager = AppWidgetManager.getInstance(context.applicationContext)
-
-                val ids = widgetManager.getAppWidgetIds(
-                    ComponentName(
-                        context,
-                        ContentWidgetProvider::class.java
-                    )
-                )
-                println("appWidgetId: $appWidgetId")
-                /*
-                for (appWidgetId in ids) {
-                    widgetManager.updateAppWidget(appWidgetId, getListView(context, appWidgetId))
-                }
-                */
-                updateAppWidget(context, widgetManager, appWidgetId)
                 widgetManager.notifyAppWidgetViewDataChanged(
                     intArrayOf(appWidgetId),
                     R.id.anniversary_list
                 )
-                //widgetManager.notifyAppWidgetViewDataChanged(ids, R.id.anniversary_list);
+                updateAppWidget(context, widgetManager, appWidgetId)
             }
         }
 
@@ -185,11 +175,18 @@ class ContentWidgetProvider : AppWidgetProvider() {
             appWidgetId: Int,
             content: DisplayContentWidget
         ): RemoteViews {
-            val type = content.getContentType()
-            val views = if (type == "Bag") {
-                getBagView(context, appWidgetId, content)
-            } else {
-                getAnniversaryView(context, appWidgetId, content)
+            val views = when (content.getContentType()) {
+                "Bag" -> {
+                    getBagView(context, appWidgetId, content)
+                }
+
+                "Event" -> {
+                    getEventView(context, appWidgetId, content)
+                }
+
+                else -> {
+                    getAnniversaryView(context, appWidgetId, content)
+                }
             }
 
             val intent = Intent(context, ContentWidgetProvider::class.java)
@@ -298,6 +295,33 @@ class ContentWidgetProvider : AppWidgetProvider() {
             return views
         }
 
+        private fun getEventView(
+            context: Context,
+            appWidgetId: Int,
+            content: DisplayContentWidget
+        ): RemoteViews {
+            val views = RemoteViews(context.packageName, R.layout.widget_display_event)
+
+            val serviceIntent = Intent(context, EventRemoteViewsService::class.java)
+            serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            serviceIntent.putExtra("random", Random().nextInt())
+            serviceIntent.data = Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME))
+            views.setRemoteAdapter(R.id.event_list, serviceIntent)
+
+            views.setImageViewBitmap(
+                R.id.character_icon,
+                content.getIconImage(context, 50, 50)
+            )
+            views.setTextViewText(R.id.character_name, content.characterName)
+
+            val pinDrawable = context.getDrawable(
+                R.drawable.pin_fill
+            )
+            pinDrawable?.setTint(content.getTextColor())
+            views.setImageViewBitmap(R.id.unpinning, pinDrawable?.toBitmap(30, 30))
+
+            return views
+        }
     }
 
 }

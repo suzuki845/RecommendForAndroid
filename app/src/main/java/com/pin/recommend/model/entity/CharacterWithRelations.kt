@@ -3,6 +3,7 @@ package com.pin.recommend.model.entity
 import android.content.Context
 import android.graphics.Color
 import androidx.room.Embedded
+import androidx.room.Ignore
 import androidx.room.Relation
 import com.google.gson.Gson
 import java.util.Date
@@ -20,6 +21,9 @@ class CharacterWithRelations(
     )
     val badgeSummary: BadgeSummary?,
 ) {
+    @Ignore
+    var recentEvents: List<Event> = emptyList()
+
     fun anniversaries(): List<AnniversaryInterface> {
         val list = mutableListOf<AnniversaryInterface>()
         list.add(SystemDefinedAnniversaries(character).apply { initialize() })
@@ -40,7 +44,8 @@ class CharacterWithRelations(
                     remainingDays = it.getRemainingDays(Date()) ?: 0,
                     message = it.getMessage(Date()),
                     isAnniversary = it.isAnniversary(Date()),
-                    badgeSummary = 0
+                    badgeSummary = 0,
+                    recentEvents = listOf()
                 )
             }.toMutableList()
         entities.add(
@@ -54,9 +59,26 @@ class CharacterWithRelations(
                 remainingDays = 0,
                 message = "",
                 isAnniversary = false,
-                badgeSummary = badgeSummary?.amount ?: 0
+                badgeSummary = badgeSummary?.amount ?: 0,
+                recentEvents = listOf()
             )
         )
+        entities.add(
+            TypedEntity(
+                id = ContentId(character.id, "/Event"),
+                type = "Event",
+                name = "イベント",
+                topText = "",
+                bottomText = "",
+                elapsedDays = 0,
+                remainingDays = 0,
+                message = "",
+                isAnniversary = false,
+                badgeSummary = badgeSummary?.amount ?: 0,
+                recentEvents = recentEvents
+            )
+        )
+
         return entities
     }
 

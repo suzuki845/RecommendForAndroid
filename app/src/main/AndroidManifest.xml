@@ -34,6 +34,10 @@
             android:name=".widget.ContentRemoteViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
+        <service
+            android:name=".widget.EventRemoteViewsService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
         <activity
             android:name=".CreateAnniversaryActivity"
             android:exported="false"

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.google.gson.Gson
 import com.pin.recommend.model.entity.ContentId
+import com.pin.recommend.model.entity.Event
 import com.pin.recommend.model.entity.SerializableAppearance
 import com.pin.recommend.model.entity.TypedEntity
 
@@ -23,6 +24,10 @@ data class ContentWidgetItem(
 
     fun getBackgroundImage(context: Context, w: Int, h: Int): Bitmap? {
         return appearance.getBackgroundBitmap(context, w, h)
+    }
+
+    fun recentEvents(): List<Event> {
+        return content.recentEvents
     }
 
     fun toJson(): String {

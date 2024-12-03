@@ -13,6 +13,7 @@ class TypedEntity(
     val message: String = "",
     val isAnniversary: Boolean = false,
     val badgeSummary: Int = 0,
+    val recentEvents: List<Event> = listOf()
 ) {
 
     fun toJson(): String {

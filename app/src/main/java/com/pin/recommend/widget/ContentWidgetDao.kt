@@ -11,7 +11,7 @@ class ContentWidgetDao(context: Context) {
     private val db = AppDatabase.getDatabase(context)
 
     fun unsafeCharacters(): List<CharacterWithRelations> {
-        return db.recommendCharacterDao().findCharacterWithRelations()
+        return db.recommendCharacterDao().findCharacterWithRelationsAndRecentEvents()
     }
 
     fun pinning(widgetId: Int, item: ContentWidgetItem) {
@@ -53,7 +53,7 @@ class ContentWidgetDao(context: Context) {
     fun unsafeGet(widgetId: Int): DisplayContentWidget? {
         val pinned = getPinned(widgetId) ?: return null
         val cwr = db.recommendCharacterDao()
-            .findByIdCharacterWithRelations(
+            .findByIdCharacterWithRelationsAndRecentEvents(
                 pinned.content.getId().getCharacterId()
             )
         val content = cwr?.typedEntities()?.firstOrNull {

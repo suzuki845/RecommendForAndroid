@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.google.gson.Gson
 import com.pin.recommend.model.entity.ContentId
+import com.pin.recommend.model.entity.Event
 import com.pin.recommend.model.entity.SerializableAppearance
 
 data class PinnedContentWidget(
@@ -55,6 +56,9 @@ data class PinnedContentWidget(
         return content.appearance
     }
 
+    fun recentEvents(): List<Event> {
+        return content.recentEvents()
+    }
 
     fun toJson(): String {
         return Gson().toJson(this)

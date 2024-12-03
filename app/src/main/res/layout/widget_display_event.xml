@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/container"
+    style="@style/Widget.Recommend.AppWidget.Container"
+    android:theme="@style/AppTheme.AppWidgetContainer">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/character_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/baseline_person_24" />
+
+            <TextView
+                android:id="@+id/character_name"
+                android:paddingLeft="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/event_list"
+            android:dividerHeight="1dp"
+            android:divider="#eeeeee"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_gravity="right|top"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/unpinning_background"
+            android:src="@drawable/shape_rounded_corners_10dp"
+            android:scaleType="fitXY"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:layout_gravity="center"
+            android:src="@drawable/pin_fill"
+            android:id="@+id/unpinning"
+            android:layout_width="26dp"
+            android:layout_height="26dp" />
+    </FrameLayout>
+
+</FrameLayout>

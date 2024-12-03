@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.CharacterWithRelations
+import com.pin.recommend.model.entity.Event
 import com.pin.recommend.model.entity.RecommendCharacter
 
 @Dao
@@ -74,5 +75,33 @@ interface RecommendCharacterDao {
                 "WHERE id = :id"
     )
     fun findByIdCharacterWithRelations(id: Long): CharacterWithRelations?
+
+    @Query(
+        """
+        SELECT * FROM Event
+        WHERE characterId = :characterId
+        ORDER BY date ASC
+        LIMIT 10
+    """
+    )
+    fun findRecentEventsForCharacter(characterId: Long): List<Event>
+
+    @Transaction
+    fun findByIdCharacterWithRelationsAndRecentEvents(characterId: Long): CharacterWithRelations? {
+        val characterWithRelations = findByIdCharacterWithRelations(characterId)
+        val recentEvents = findRecentEventsForCharacter(characterId)
+        characterWithRelations?.recentEvents = recentEvents
+        return characterWithRelations
+    }
+
+    @Transaction
+    fun findCharacterWithRelationsAndRecentEvents(): List<CharacterWithRelations> {
+        val characterWithRelations = findCharacterWithRelations()
+        return characterWithRelations.map {
+            val recentEvents = findRecentEventsForCharacter(it.character.id)
+            it.recentEvents = recentEvents
+            it
+        }
+    }
 
 }
