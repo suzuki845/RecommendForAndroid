@@ -5,7 +5,7 @@
     android:theme="@style/AppTheme.AppWidgetContainer">
 
     <ListView
-        android:id="@+id/anniversary_list"
+        android:id="@+id/content_list"
         android:dividerHeight="1dp"
         android:divider="#eeeeee"
         android:orientation="vertical"

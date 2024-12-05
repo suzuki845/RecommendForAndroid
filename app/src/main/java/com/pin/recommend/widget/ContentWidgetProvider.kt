@@ -36,7 +36,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
 
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.anniversary_list);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.content_list);
 
         super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
@@ -86,7 +86,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
                 for (appWidgetId in ids) {
                     updateAppWidget(context, widgetManager, appWidgetId)
                 }
-                widgetManager.notifyAppWidgetViewDataChanged(ids, R.id.anniversary_list);
+                widgetManager.notifyAppWidgetViewDataChanged(ids, R.id.content_list);
             }
 
             ACTION_PINING -> {
@@ -114,7 +114,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
                 val widgetManager = AppWidgetManager.getInstance(context.applicationContext)
                 widgetManager.notifyAppWidgetViewDataChanged(
                     intArrayOf(appWidgetId),
-                    R.id.anniversary_list
+                    R.id.content_list
                 )
                 updateAppWidget(context, widgetManager, appWidgetId)
             }
@@ -156,7 +156,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
             serviceIntent.data = Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME))
 
             val views = RemoteViews(context.packageName, R.layout.widget_content_list)
-            views.setRemoteAdapter(R.id.anniversary_list, serviceIntent)
+            views.setRemoteAdapter(R.id.content_list, serviceIntent)
             val itemClickIntent = Intent(context, ContentWidgetProvider::class.java)
             itemClickIntent.action = ACTION_PINING
             val itemClickPendingIntent = PendingIntent.getBroadcast(
@@ -165,7 +165,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
                 itemClickIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
-            views.setPendingIntentTemplate(R.id.anniversary_list, itemClickPendingIntent)
+            views.setPendingIntentTemplate(R.id.content_list, itemClickPendingIntent)
 
             return views
         }
