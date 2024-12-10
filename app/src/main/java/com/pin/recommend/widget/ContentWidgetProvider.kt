@@ -222,11 +222,19 @@ class ContentWidgetProvider : AppWidgetProvider() {
             content: DisplayContentWidget
         ): RemoteViews {
             val views = RemoteViews(context.packageName, R.layout.widget_display_anniversary)
+            /*
             views.setImageViewBitmap(
                 R.id.background_image,
                 content.getIconImage(context, 500, 500)
             )
             views.setInt(R.id.background_color, "setBackgroundColor", content.getBackgroundColor())
+            */
+
+            views.setImageViewBitmap(
+                R.id.background_image,
+                content.getFilteredIconImage(context, 500, 500)
+            )
+
             views.setTextViewText(R.id.character_name, content.characterName)
             views.setTextViewText(
                 R.id.remaining_days,
@@ -284,7 +292,10 @@ class ContentWidgetProvider : AppWidgetProvider() {
             bag.badges = list
             views.setImageViewBitmap(R.id.bag, bag.toBitmap())
 
-            views.setInt(R.id.background_color, "setBackgroundColor", content.getBackgroundColor())
+            views.setImageViewBitmap(
+                R.id.background_image,
+                content.getFilteredIconImage(context, 500, 500)
+            )
 
             val pinDrawable = context.getDrawable(
                 R.drawable.pin_fill
