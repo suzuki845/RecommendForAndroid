@@ -232,7 +232,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
 
             views.setImageViewBitmap(
                 R.id.background_image,
-                content.getFilteredIconImage(context, 500, 500)
+                content.getFilteredIconImage(context, 350, 350)
             )
 
             views.setTextViewText(R.id.character_name, content.characterName)
@@ -294,7 +294,7 @@ class ContentWidgetProvider : AppWidgetProvider() {
 
             views.setImageViewBitmap(
                 R.id.background_image,
-                content.getFilteredIconImage(context, 500, 500)
+                content.getFilteredIconImage(context, 350, 350)
             )
 
             val pinDrawable = context.getDrawable(
