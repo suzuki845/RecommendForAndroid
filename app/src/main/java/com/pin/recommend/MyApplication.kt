@@ -66,7 +66,7 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
                 normalRewardCounter.reset()
                 badgeGachaRardCounter.reset()
         */
-        setupStatusBarColor(activity, Color.parseColor("#000000"), Color.parseColor("#FAFAFA"))
+        setupStatusBarColor(activity, Color.parseColor("#000000"), Color.parseColor("#FFFFFF"))
     }
 
     override fun onActivityPaused(activity: Activity) {}

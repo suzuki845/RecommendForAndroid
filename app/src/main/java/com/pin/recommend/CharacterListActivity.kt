@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -72,7 +73,7 @@ class CharacterListActivity : AppCompatActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    backgroundColor = Color.White,
+                    backgroundColor = MaterialTheme.colors.background,
                     contentColor = Color.Black,
                     title = {
                         Text("推しリスト")
