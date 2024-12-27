@@ -10,7 +10,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('/Users/turuwo/Documents/android/Memo.jks')
+            storeFile file('/Users/turuwo/Documents/android/release-build-keystore.jks')
             storePassword 'pinkichi1988'
             keyAlias = 'memo'
             keyPassword 'pinkichi7183'
@@ -23,8 +23,8 @@ android {
         applicationId "com.pin.recommend"
         minSdkVersion 26
         targetSdkVersion 34
-        versionCode 41
-        versionName "1.17.1"
+        versionCode 42
+        versionName "1.17.2"
         //vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
