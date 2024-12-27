@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -57,6 +59,8 @@ class CharacterListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         vm.subscribe(this)
+
+
         setContent {
             Body()
         }
@@ -105,7 +109,25 @@ class CharacterListActivity : AppCompatActivity() {
             Modifier
                 .padding(padding)
                 .fillMaxWidth()
+            ErrorMessage()
             ListView()
+        }
+    }
+
+    @Composable
+    fun ErrorMessage() {
+        val state = vm.state.collectAsState().value
+        if (state.errorMessage != null) {
+            AlertDialog(
+                onDismissRequest = { vm.resetError() },
+                title = { Text("Error") },
+                text = { Text(state.errorMessage ?: "Unknown error") },
+                confirmButton = {
+                    TextButton(onClick = { vm.resetError() }) {
+                        Text("OK")
+                    }
+                }
+            )
         }
     }
 
@@ -125,7 +147,8 @@ class CharacterListActivity : AppCompatActivity() {
     fun ListItem(character: RecommendCharacter) {
         val state = vm.state.collectAsState().value
         Row(
-            Modifier
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
                 .padding(6.dp)
                 .fillMaxWidth()
                 .clickable {
@@ -140,7 +163,6 @@ class CharacterListActivity : AppCompatActivity() {
             Image(
                 bitmap = character.getIconImage(this@CharacterListActivity, 50, 50)
                     .asImageBitmap(),
-                //painter = painterResource(id = R.drawable.ic_person_300dp),
                 contentDescription = "",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -151,7 +173,7 @@ class CharacterListActivity : AppCompatActivity() {
             Spacer(Modifier.width(6.dp))
             Column {
                 Text(character.name ?: "", fontSize = 20.sp)
-                Text(character.getDiffDays(Calendar.getInstance()))
+                Text(character.getDiffDays(Calendar.getInstance()), fontSize = 20.sp)
                 Text(character.formattedDate)
             }
             Spacer(modifier = Modifier.weight(1f))

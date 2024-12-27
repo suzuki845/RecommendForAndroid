@@ -45,13 +45,15 @@ class CharacterListViewModel(application: Application) : AndroidViewModel(applic
                 .invoke(character, getApplication())
         } catch (e: Exception) {
             _state.value = CharacterListViewState(
-                characters = state.value?.characters ?: listOf(),
-                deleteMode = state.value?.deleteMode ?: false,
+                characters = state.value.characters,
+                deleteMode = state.value.deleteMode,
                 errorMessage = e.message
             )
-        } finally {
-            _state.value = _state.value.copy(errorMessage = null)
         }
+    }
+
+    fun resetError() {
+        _state.value = _state.value.copy(errorMessage = null)
     }
 
 }
