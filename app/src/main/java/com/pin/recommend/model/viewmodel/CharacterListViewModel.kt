@@ -1,42 +1,57 @@
 package com.pin.recommend.model.viewmodel
 
 import android.app.Application
-import androidx.arch.core.util.Function
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.asLiveData
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.dao.RecommendCharacterDao
-import com.pin.recommend.model.dao.StoryDao
-import com.pin.recommend.model.dao.StoryPictureDao
-import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
+import com.pin.recommend.util.combine2
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+data class CharacterListViewState
+    (
+    val characters: List<RecommendCharacter> = listOf(),
+    val deleteMode: Boolean = false,
+    val errorMessage: String? = null,
+)
 
 class CharacterListViewModel(application: Application) : AndroidViewModel(application) {
-    private val characterDao: RecommendCharacterDao
-    private val storyDao: StoryDao
-    private val storyPictureDao: StoryPictureDao
+    private val characterDao: RecommendCharacterDao =
+        AppDatabase.getDatabase(application).recommendCharacterDao()
 
-    init {
-        characterDao = AppDatabase.getDatabase(application).recommendCharacterDao()
-        storyDao = AppDatabase.getDatabase(application).storyDao()
-        storyPictureDao = AppDatabase.getDatabase(application).storyPictureDao()
-    }
+    val deleteMode = MutableStateFlow(false)
 
-    val characters = characterDao.watch()
+    private val _state = MutableStateFlow(CharacterListViewState())
 
-    fun delete(character: RecommendCharacter) {
-        AppDatabase.executor.execute {
-            character.deleteIconImage(getApplication())
-            character.deleteBackgroundImage(getApplication())
-            val stories = storyDao.findByCharacterId(character.id)
-            for (story in stories) {
-                val storyPictures = storyPictureDao.findByStoryId(story.id)
-                for (storyPicture in storyPictures) {
-                    storyPicture.deleteImage(getApplication())
-                }
-            }
-            characterDao.deleteCharacter(character)
+    val state: StateFlow<CharacterListViewState> = _state
+
+    fun subscribe(owner: LifecycleOwner) {
+        combine2(characterDao.watch(), deleteMode.asLiveData(), { a, b ->
+            CharacterListViewState(
+                characters = a ?: listOf(),
+                deleteMode = b ?: false,
+            )
+        }).observe(owner) {
+            _state.value = it
         }
     }
+
+    fun delete(character: RecommendCharacter) {
+        try {
+            AppDatabase.getDatabase(getApplication()).characterDeleteLogic()
+                .invoke(character, getApplication())
+        } catch (e: Exception) {
+            _state.value = CharacterListViewState(
+                characters = state.value?.characters ?: listOf(),
+                deleteMode = state.value?.deleteMode ?: false,
+                errorMessage = e.message
+            )
+        } finally {
+            _state.value = _state.value.copy(errorMessage = null)
+        }
+    }
+
 }

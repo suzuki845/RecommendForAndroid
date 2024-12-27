@@ -5,8 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -126,7 +124,7 @@ class RecommendCharacter {
         return if (belowText != null) belowText!! else "になりました"
     }
 
-    fun getIconImage(context: Context, width: Int, height: Int): Bitmap? {
+    fun getIconImage(context: Context, width: Int, height: Int): Bitmap {
         if (iconImageUri == null) {
             val d = context.getDrawable(R.drawable.ic_person_300dp)
             return BitmapUtility.drawableToBitmap(d)

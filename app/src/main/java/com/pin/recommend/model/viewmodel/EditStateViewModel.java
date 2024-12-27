@@ -6,17 +6,17 @@ import androidx.lifecycle.ViewModel;
 
 public class EditStateViewModel extends ViewModel {
 
-    private MutableLiveData<Boolean> editState = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> editState = new MutableLiveData<>();
 
-    public EditStateViewModel(){
+    public EditStateViewModel() {
         editState.setValue(false);
     }
 
-    public LiveData<Boolean> getEditMode(){
+    public LiveData<Boolean> getEditMode() {
         return editState;
     }
 
-    public void setEditMode(boolean editMode){
+    public void setEditMode(boolean editMode) {
         editState.setValue(editMode);
     }
 

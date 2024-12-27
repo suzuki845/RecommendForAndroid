@@ -1,7 +1,14 @@
 package com.pin.recommend.model.dao
 
+import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
+import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.CharacterWithRelations
 import com.pin.recommend.model.entity.Event
@@ -104,4 +111,25 @@ interface RecommendCharacterDao {
         }
     }
 
+}
+
+class CharacterDeleteLogic(
+    private val characterDao: RecommendCharacterDao,
+    private val storyDao: StoryDao,
+    private val storyPictureDao: StoryPictureDao
+) {
+    fun invoke(character: RecommendCharacter, context: Context) {
+        AppDatabase.executor.execute {
+            character.deleteIconImage(context)
+            character.deleteBackgroundImage(context)
+            val stories = storyDao.findByCharacterId(character.id)
+            for (story in stories) {
+                val storyPictures = storyPictureDao.findByStoryId(story.id)
+                for (storyPicture in storyPictures) {
+                    storyPicture.deleteImage(context)
+                }
+            }
+            characterDao.deleteCharacter(character)
+        }
+    }
 }

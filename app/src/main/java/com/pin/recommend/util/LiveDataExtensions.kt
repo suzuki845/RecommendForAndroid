@@ -2,6 +2,17 @@ package com.pin.recommend.util
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+
+fun <T> LiveData<T>.asStateFlow(initialValue: T): StateFlow<T> {
+    val stateFlow = MutableStateFlow(initialValue) // 初期値として LiveData の最初の値を使う
+    this.observeForever { value ->
+        value?.let { stateFlow.value = it }
+    }
+    return stateFlow
+}
 
 fun <T0, T1, R> combine2(
     a: LiveData<T0>,

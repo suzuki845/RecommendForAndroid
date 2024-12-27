@@ -10,6 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.pin.recommend.model.dao.AccountDao
 import com.pin.recommend.model.dao.BadgeDao
 import com.pin.recommend.model.dao.BadgeSummaryDao
+import com.pin.recommend.model.dao.CharacterDeleteLogic
 import com.pin.recommend.model.dao.CustomAnniversaryDao
 import com.pin.recommend.model.dao.EventDao
 import com.pin.recommend.model.dao.PaymentDao
@@ -46,6 +47,14 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun customAnniversaryDao(): CustomAnniversaryDao
     abstract fun badgeDao(): BadgeDao
     abstract fun badgeSummary(): BadgeSummaryDao
+
+    fun characterDeleteLogic(): CharacterDeleteLogic {
+        return CharacterDeleteLogic(
+            recommendCharacterDao(),
+            storyDao(),
+            storyPictureDao()
+        )
+    }
 
     companion object {
         private const val NUMBER_OF_THREADS = 4

@@ -2,126 +2,187 @@ package com.pin.recommend
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ListView
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.adapter.CharactersAdapter
+import com.pin.recommend.composable.ComposableAdaptiveBanner
+import com.pin.recommend.dialog.DeleteDialogFragment
+import com.pin.recommend.dialog.DialogActionListener
+import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.viewmodel.CharacterListViewModel
-import com.pin.recommend.model.viewmodel.EditStateViewModel
-import com.pin.util.admob.AdMobAdaptiveBannerManager
-import com.pin.util.admob.reward.RemoveAdReward
+import java.util.Calendar
 
 class CharacterListActivity : AppCompatActivity() {
     private val charactersAdapter: CharactersAdapter by lazy {
-        CharactersAdapter(this, characterListViewModel)
+        CharactersAdapter(this, vm)
     }
-    private val characterListViewModel: CharacterListViewModel by lazy {
-        ViewModelProvider(this).get(CharacterListViewModel::class.java)
+    private val vm: CharacterListViewModel by lazy {
+        ViewModelProvider(this)[CharacterListViewModel::class.java]
     }
-    private val editListViewModel: EditStateViewModel by lazy {
-        ViewModelProvider(this).get(EditStateViewModel::class.java)
-    }
-    private lateinit var adMobManager: AdMobAdaptiveBannerManager
-    private var adViewContainer: ViewGroup? = null
-
-    private lateinit var charactersListView: ListView
-    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_character_list)
-        adViewContainer = findViewById(R.id.ad_container)
-        adMobManager =
-            AdMobAdaptiveBannerManager(
-                this,
-                adViewContainer,
-                getString(R.string.banner_id)
-            )
-        adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
-        adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
-        val reward = RemoveAdReward.getInstance(this)
-        reward.isBetweenRewardTime.observe(
-            this
-        ) { isBetweenRewardTime ->
-            adMobManager.setEnable(!isBetweenRewardTime)
-            adMobManager.checkFirst()
+        vm.subscribe(this)
+        setContent {
+            Body()
         }
+    }
 
-        charactersListView = findViewById(R.id.characters_listview)
-        charactersListView.adapter = charactersAdapter
-        characterListViewModel.characters.observe(this) {
-            charactersAdapter.setList(it)
-        }
-
-        charactersListView.onItemClickListener =
-            AdapterView.OnItemClickListener { _, view, position, id ->
-                val intent = Intent(this@CharacterListActivity, CharacterDetailActivity::class.java)
-                intent.putExtra(
-                    CharacterDetailActivity.INTENT_CHARACTER,
-                    id
+    @Composable
+    fun Body() {
+        val state = vm.state.collectAsState().value
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    backgroundColor = Color.White,
+                    contentColor = Color.Black,
+                    title = {
+                        Text("推しリスト")
+                    },
+                    navigationIcon = {
+                        TextButton({
+                            startActivity(Intent(this, GlobalSettingActivity::class.java))
+                        }) {
+                            Text("設定")
+                        }
+                    },
+                    actions = {
+                        TextButton({
+                            vm.deleteMode.value = !state.deleteMode
+                        }) {
+                            Text(if (state.deleteMode) "完了" else "削除")
+                        }
+                        TextButton({
+                            val intent = Intent(
+                                this@CharacterListActivity,
+                                CreateCharacterActivity::class.java
+                            )
+                            startActivity(intent)
+                        }) {
+                            Text("作成")
+                        }
+                    },
                 )
-                startActivity(intent)
+            },
+            bottomBar = {
+                ComposableAdaptiveBanner(adId = "ca-app-pub-3940256099942544/6300978111")
             }
-
-        toolbar = findViewById(R.id.toolbar)
-
-        toolbar.title = "推しリスト"
-        setSupportActionBar(toolbar)
-
-        editListViewModel.editMode.observe(
-            this
-        ) { aBoolean -> charactersAdapter.setEditMode(aBoolean) }
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        adMobManager!!.checkAndLoad()
-    }
-
-    fun destinationSetting(v: View) {
-        startActivity(Intent(this, GlobalSettingActivity::class.java))
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_character_list, menu)
-        val editMode = menu.findItem(R.id.edit_mode)
-        editListViewModel!!.editMode.observe(
-            this
-        ) { mode ->
-            if (mode) {
-                editMode.title = "完了"
-            } else {
-                editMode.title = "編集"
-            }
-        }
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.edit_mode -> {
-                if (editListViewModel!!.editMode.value!!) {
-                    editListViewModel!!.setEditMode(false)
-                } else {
-                    editListViewModel!!.setEditMode(true)
-                }
-                true
-            }
-
-            R.id.create -> {
-                val intent = Intent(this@CharacterListActivity, CreateCharacterActivity::class.java)
-                startActivity(intent)
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
+        ) { padding ->
+            Modifier
+                .padding(padding)
+                .fillMaxWidth()
+            ListView()
         }
     }
+
+    @Composable
+    fun ListView() {
+        val state = vm.state.collectAsState().value
+        LazyColumn {
+            items(state.characters) {
+                ListItem(it)
+                Divider()
+            }
+        }
+    }
+
+
+    @Composable
+    fun ListItem(character: RecommendCharacter) {
+        val state = vm.state.collectAsState().value
+        Row(
+            Modifier
+                .padding(6.dp)
+                .fillMaxWidth()
+                .clickable {
+                    val intent =
+                        Intent(this@CharacterListActivity, CharacterDetailActivity::class.java)
+                    intent.putExtra(
+                        CharacterDetailActivity.INTENT_CHARACTER,
+                        character.id
+                    )
+                    startActivity(intent)
+                }) {
+            Image(
+                bitmap = character.getIconImage(this@CharacterListActivity, 50, 50)
+                    .asImageBitmap(),
+                //painter = painterResource(id = R.drawable.ic_person_300dp),
+                contentDescription = "",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(25.dp))
+                    .size(50.dp)
+                    .border(1.dp, Color.Black, CircleShape)
+            )
+            Spacer(Modifier.width(6.dp))
+            Column {
+                Text(character.name ?: "", fontSize = 20.sp)
+                Text(character.getDiffDays(Calendar.getInstance()))
+                Text(character.formattedDate)
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if (state.deleteMode) {
+                DeleteButton(character)
+            }
+        }
+    }
+
+    @Composable
+    fun DeleteButton(character: RecommendCharacter) {
+        IconButton({
+            val dialog =
+                DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
+                    override fun onDecision(dialog: DeleteDialogFragment) {
+                        vm.delete(character)
+                        val updateWidgetRequest =
+                            Intent("android.appwidget.action.APPWIDGET_UPDATE")
+                        sendBroadcast(updateWidgetRequest)
+                    }
+
+                    override fun onCancel() {}
+                })
+            dialog.show(supportFragmentManager, DeleteDialogFragment.Tag)
+        }) {
+            Icon(
+                painter = rememberVectorPainter(image = Icons.Default.Delete),
+                contentDescription = null,
+                modifier = Modifier.padding(4.dp),
+            )
+        }
+    }
+
 }
