@@ -6,19 +6,49 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Typeface
 import androidx.core.graphics.drawable.toBitmapOrNull
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.R
-import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.util.Progress
-import java.util.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import java.util.Date
 
-class CharacterEditor(val context: Context) {
+enum class CharacterEditAction {
+    Init,
+    Save,
+}
 
+enum class CharacterEditStatus {
+    Processing,
+    Success,
+    Failure
+}
+
+data class CharacterEditState(
+    val status: CharacterEditStatus = CharacterEditStatus.Processing,
+    val action: CharacterEditAction = CharacterEditAction.Init,
+    val id: Long = 0,
+    val name: String? = null,
+    val created: Date = Date(),
+    val iconImage: Bitmap? = null,
+    val beforeIconImageUri: String? = null,
+    val backgroundImage: Bitmap? = null,
+    val backgroundImageOpacity: Float = defaultBackgroundImageOpacity,
+    val beforeBackgroundImageUri: String? = null,
+    val backgroundColor: Int = defaultBackgroundColor,
+    val homeTextColor: Int = defaultTextColor,
+    val homeTextShadowColor: Int = defaultTextShadowColor,
+    val aboveText: String = "を推して",
+    val belowText: String = "になりました",
+    val isZeroDayStart: Boolean = false,
+    val elapsedDateFormat: Int = 0,
+    val fontFamily: String = "デフォルト",
+    val typeface: Typeface? = null,
+    val anniversaries: List<CustomAnniversary.Draft> = listOf(),
+    val errorMessage: String? = null
+) {
     companion object {
         val defaultBackgroundColor = Color.parseColor("#00ffffff")
         val defaultBackgroundImageOpacity = 1f
@@ -26,146 +56,177 @@ class CharacterEditor(val context: Context) {
         val defaultTextShadowColor = Color.parseColor("#00000000")
     }
 
-    private val db = AppDatabase.getDatabase(context)
-
-    private val id = MutableLiveData<Long>(0)
-
-    val name = MutableLiveData<String?>()
-
-    val created = MutableLiveData(Date())
-
-    val iconImage = MutableLiveData<Bitmap?>()
-
-    val iconWithDefaultImage = iconImage.map {
-        if(it == null) {
-            return@map context.getDrawable(R.drawable.ic_person_300dp)?.toBitmapOrNull()
-        }
-        return@map it
+    fun iconWithDefault(context: Context): Bitmap? {
+        if (iconImage != null) return iconImage
+        return context.getDrawable(R.drawable.ic_person_300dp)?.toBitmapOrNull()
     }
 
-    private val beforeIconImageUri = MutableLiveData<String?>()
-
-    val backgroundImage = MutableLiveData<Bitmap?>()
-
-    val backgroundImageOpacity = MutableLiveData(defaultBackgroundImageOpacity)
-
-    private val beforeBackgroundImageUri = MutableLiveData<String?>()
-
-    val backgroundColor = MutableLiveData(defaultBackgroundColor)
-
-    val backgroundColorToBitmap = backgroundColor.map {
-        colorIntToBitmap(it)
+    fun typeface(context: Context): Typeface? {
+        if (fontFamily == "Default") return null
+        if (fontFamily == "default") return null
+        if (fontFamily == "デフォルト") return null
+        return Typeface.createFromAsset(context.assets, "fonts/" + fontFamily + ".ttf")
     }
 
-    val homeTextColor = MutableLiveData(defaultTextColor)
-
-    val homeTextColorToBitmap = homeTextColor.map {
-        colorIntToBitmap(it)
-    }
-
-    val homeTextShadowColor = MutableLiveData(defaultTextShadowColor)
-
-    val homeTextShadowColorToBitmap = homeTextShadowColor.map {
-        colorIntToBitmap(it)
-    }
-
-    val aboveText = MutableLiveData("を推して")
-
-    val belowText = MutableLiveData("になりました")
-
-    val isZeroDayStart = MutableLiveData(false)
-
-    val elapsedDateFormat = MutableLiveData(0)
-
-    val fontFamily = MutableLiveData("デフォルト")
-
-    val typeface = fontFamily.map {
-        if(it == null) return@map null
-        if(it == "Default") return@map null
-        if(it == "default") return@map null
-        if(it == "デフォルト") return@map  null
-        return@map Typeface.createFromAsset(context.assets, "fonts/" + it + ".ttf")
-    }
-
-    val anniversaries = MutableLiveData<MutableList<CustomAnniversary.Draft>>(mutableListOf())
-
-    private fun colorIntToBitmap(color: Int?): Bitmap?{
-        if(color == null) return null
+    private fun colorIntToBitmap(color: Int?): Bitmap? {
+        if (color == null) return null
         val bitmap = Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(color)
         return bitmap
     }
 
-    fun initialize(id: Long){
-        val entity = db.recommendCharacterDao().findByIdCharacterWithAnniversaries(id)
-        if (entity != null){
-            initialize(entity)
-        }
+    val backgroundColorToBitmap: Bitmap?
+        get() =
+            colorIntToBitmap(backgroundColor)
+
+    val homeTextColorToBitmap: Bitmap?
+        get() =
+            colorIntToBitmap(homeTextColor)
+
+    val homeTextShadowColorToBitmap: Bitmap?
+        get() =
+            colorIntToBitmap(homeTextShadowColor)
+}
+
+class CharacterEditor(val context: Context) {
+
+    private val db = AppDatabase.getDatabase(context)
+
+    private val _state = MutableStateFlow(CharacterEditState())
+
+    val state: StateFlow<CharacterEditState> = _state
+
+    fun setName(v: String?) {
+        _state.value = _state.value.copy(name = v)
     }
 
-    open fun initialize(entity: CharacterWithAnniversaries? = null) {
-        id.value = entity?.id
-        name.value = entity?.character?.name
-        created.value = entity?.character?.created ?: Date()
-        aboveText.value = entity?.character?.aboveText
-        belowText.value = entity?.character?.belowText
-        homeTextColor.value = entity?.character?.homeTextColor
-        homeTextShadowColor.value = entity?.character?.homeTextShadowColor
-        backgroundColor.value = entity?.character?.backgroundColor
-        backgroundImageOpacity.value = entity?.character?.backgroundImageOpacity ?: 1f
-        isZeroDayStart.value = entity?.character?.isZeroDayStart
-        fontFamily.value = entity?.character?.fontFamily
-        iconImage.value = entity?.character?.getIconImage(context, 500, 500)
-        beforeIconImageUri.value = entity?.character?.iconImageUri
-        backgroundImage.value = entity?.character?.getBackgroundBitmap(context, 500, 500)
-        beforeBackgroundImageUri.value = entity?.character?.backgroundImageUri
-        anniversaries.value = entity?.anniversaries?.map { it.toDraft() }?.toMutableList() ?: mutableListOf()
+    fun setCreated(v: Date) {
+        _state.value = _state.value.copy(created = v)
     }
 
-    fun addAnniversary(anniversary: CustomAnniversary.Draft){
-        val list = anniversaries.value ?: mutableListOf()
+    fun setIconImage(v: Bitmap) {
+        _state.value = _state.value.copy(iconImage = v)
+    }
+
+    fun setBackgroundImage(v: Bitmap) {
+        _state.value = _state.value.copy(backgroundImage = v)
+    }
+
+    fun setBackgroundImageOpacity(v: Float) {
+        _state.value = _state.value.copy(backgroundImageOpacity = v)
+    }
+
+    fun setBackgroundColor(v: Int) {
+        _state.value = _state.value.copy(backgroundColor = v)
+    }
+
+    fun setHomeTextColor(v: Int) {
+        _state.value = _state.value.copy(homeTextColor = v)
+    }
+
+    fun setHomeTextShadowColor(v: Int) {
+        _state.value = _state.value.copy(homeTextShadowColor = v)
+    }
+
+    fun setAboveText(v: String) {
+        _state.value = _state.value.copy(aboveText = v)
+    }
+
+    fun setBelowText(v: String) {
+        _state.value = _state.value.copy(aboveText = v)
+    }
+
+    fun isZeroDayStart(v: Boolean) {
+        _state.value = _state.value.copy(isZeroDayStart = v)
+    }
+
+    fun elapsedDateFormat(v: Int) {
+        _state.value = _state.value.copy(elapsedDateFormat = v)
+    }
+
+    fun fontFamily(v: String) {
+        _state.value = _state.value.copy(fontFamily = v)
+    }
+
+    fun addAnniversary(anniversary: CustomAnniversary.Draft) {
+        val list = _state.value.anniversaries.toMutableList()
         list.add(anniversary)
-        anniversaries.value = list
+        _state.value = _state.value.copy(anniversaries = list)
     }
 
-    fun replaceAnniversary(anniversary: CustomAnniversary.Draft){
-        val list = anniversaries.value ?: mutableListOf()
+    fun replaceAnniversary(anniversary: CustomAnniversary.Draft) {
+        val list = _state.value.anniversaries.toMutableList()
         val index = list.indexOfFirst { e -> e.uuid == anniversary.uuid }
-        if(index != -1){
+        if (index != -1) {
             list[index] = anniversary
         }
-
-        anniversaries.value = list
+        _state.value = _state.value.copy(anniversaries = list)
     }
 
-    fun removeAnniversary(pos: Int){
-        val items = anniversaries.value ?: mutableListOf()
-        items.removeAt(pos)
-        anniversaries.value = items
+    fun removeAnniversary(pos: Int) {
+        val list = _state.value.anniversaries.toMutableList()
+        list.removeAt(pos)
+        _state.value = _state.value.copy(anniversaries = list)
     }
 
-    fun save(p: Progress){
+    fun setEntity(id: Long) {
+        val entity = db.recommendCharacterDao().findByIdCharacterWithAnniversaries(id)
+        if (entity != null) {
+            setEntity(entity)
+        }
+    }
+
+    fun setEntity(entity: CharacterWithAnniversaries? = null) {
+        _state.value = CharacterEditState(
+            id = entity?.id ?: 0,
+            name = entity?.character?.name,
+            created = entity?.character?.created ?: Date(),
+            aboveText = entity?.character?.aboveText ?: "",
+            belowText = entity?.character?.belowText ?: "",
+            homeTextColor = entity?.character?.homeTextColor ?: CharacterEditState.defaultTextColor,
+            homeTextShadowColor = entity?.character?.homeTextShadowColor
+                ?: CharacterEditState.defaultTextShadowColor,
+            backgroundColor = entity?.character?.backgroundColor
+                ?: CharacterEditState.defaultBackgroundColor,
+            backgroundImageOpacity = entity?.character?.backgroundImageOpacity
+                ?: CharacterEditState.defaultBackgroundImageOpacity,
+            isZeroDayStart = entity?.character?.isZeroDayStart ?: false,
+            fontFamily = entity?.character?.fontFamily ?: "デフォルト",
+            iconImage = entity?.character?.getIconImage(context, 500, 500),
+            beforeIconImageUri = entity?.character?.iconImageUri,
+            backgroundImage = entity?.character?.getBackgroundBitmap(context, 500, 500),
+            beforeBackgroundImageUri = entity?.character?.backgroundImageUri,
+            anniversaries =
+            entity?.anniversaries?.map { it.toDraft() }?.toMutableList() ?: mutableListOf()
+        )
+    }
+
+    fun save() {
         try {
-            p.onStart()
-
+            _state.value = _state.value.copy(
+                action = CharacterEditAction.Save,
+                status = CharacterEditStatus.Processing
+            )
             db.runInTransaction {
                 val account = AccountModel(context).initialize()
                 val entity = RecommendCharacter()
-                entity.id = id.value ?: 0
+                val state = _state.value
+                entity.id = state.id
                 entity.accountId = account.id
-                entity.name = name.value
-                entity.created = created.value ?: throw Exception("Date is null")
-                entity.aboveText = aboveText.value
-                entity.belowText = belowText.value
-                entity.homeTextColor = homeTextColor.value
-                entity.homeTextShadowColor = homeTextShadowColor.value
-                entity.backgroundColor = backgroundColor.value ?: defaultBackgroundColor
-                entity.backgroundImageOpacity = backgroundImageOpacity.value ?: defaultBackgroundImageOpacity
-                entity.isZeroDayStart = isZeroDayStart.value ?: false
-                entity.fontFamily = fontFamily.value
+                entity.name = state.name
+                entity.created = state.created
+                entity.aboveText = state.aboveText
+                entity.belowText = state.belowText
+                entity.homeTextColor = state.homeTextColor
+                entity.homeTextShadowColor = state.homeTextShadowColor
+                entity.backgroundColor = state.backgroundColor
+                entity.backgroundImageOpacity =
+                    state.backgroundImageOpacity
+                entity.isZeroDayStart = state.isZeroDayStart
+                entity.fontFamily = state.fontFamily
 
-                beforeBackgroundImageUri.value?.let {
+                state.beforeBackgroundImageUri?.let {
                     if (BitmapUtility.fileExistsByPrivate(
                             context,
                             it
@@ -174,14 +235,14 @@ class CharacterEditor(val context: Context) {
                         BitmapUtility.deletePrivateImage(context, it)
                     }
                 }
-                backgroundImage.value?.let {
+                state.backgroundImage?.let {
                     val filename = BitmapUtility.generateFilename()
                     val ext = ".png"
                     BitmapUtility.insertPrivateImage(context, it, filename, ext)
                     entity.backgroundImageUri = filename + ext
                 }
 
-                beforeIconImageUri.value?.let {
+                state.beforeIconImageUri?.let {
                     if (BitmapUtility.fileExistsByPrivate(
                             context,
                             it
@@ -190,7 +251,7 @@ class CharacterEditor(val context: Context) {
                         BitmapUtility.deletePrivateImage(context, it)
                     }
                 }
-                iconImage.value?.let {
+                state.iconImage?.let {
                     val filename = BitmapUtility.generateFilename()
                     val ext = ".png"
                     BitmapUtility.insertPrivateImage(context, it, filename, ext)
@@ -206,17 +267,17 @@ class CharacterEditor(val context: Context) {
 
                 db.customAnniversaryDao().deleteByCharacterId(entity.id)
 
-                anniversaries.value?.forEach {
+                state.anniversaries.forEach {
                     it.characterId = characterId
                     db.customAnniversaryDao().insertAnniversary(it.toFinal())
                 }
 
-                initialize(null)
+                _state.value = _state.value.copy(status = CharacterEditStatus.Success)
+                setEntity(null)
             }
-
-            p.onComplete()
         } catch (e: Exception) {
-            p.onError(e)
+            _state.value =
+                _state.value.copy(status = CharacterEditStatus.Failure, errorMessage = e.message)
         }
     }
 }
