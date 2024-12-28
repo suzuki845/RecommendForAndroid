@@ -1,6 +1,7 @@
 package com.pin.recommend.model.viewmodel
 
 import android.app.Application
+import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
@@ -18,7 +19,7 @@ data class CharacterListViewState
     val errorMessage: String? = null,
 )
 
-class CharacterListViewModel(application: Application) : AndroidViewModel(application) {
+class CharacterListViewModel(val application: Application) : AndroidViewModel(application) {
     private val characterDao: RecommendCharacterDao =
         AppDatabase.getDatabase(application).recommendCharacterDao()
 
@@ -43,6 +44,12 @@ class CharacterListViewModel(application: Application) : AndroidViewModel(applic
         try {
             AppDatabase.getDatabase(getApplication()).characterDeleteLogic()
                 .invoke(character, getApplication())
+            val updateWidgetRequest =
+                Intent("android.appwidget.action.APPWIDGET_UPDATE").setClassName(/* TODO: provide the application ID. For example: */
+                    application.packageName,
+                    "com.pin.recommend.widget.ContentWidgetProvider"
+                )
+            application.sendBroadcast(updateWidgetRequest)
         } catch (e: Exception) {
             _state.value = CharacterListViewState(
                 characters = state.value.characters,

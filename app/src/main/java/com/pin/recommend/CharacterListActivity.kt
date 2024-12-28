@@ -191,9 +191,6 @@ class CharacterListActivity : AppCompatActivity() {
                 DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
                     override fun onDecision(dialog: DeleteDialogFragment) {
                         vm.delete(character)
-                        val updateWidgetRequest =
-                            Intent("android.appwidget.action.APPWIDGET_UPDATE")
-                        sendBroadcast(updateWidgetRequest)
                     }
 
                     override fun onCancel() {}

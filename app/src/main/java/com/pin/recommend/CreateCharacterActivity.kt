@@ -175,7 +175,11 @@ class CreateCharacterActivity : AppCompatActivity() {
 
     fun save() {
         vm.save(Progress({
-            val updateWidgetRequest = Intent("android.appwidget.action.APPWIDGET_UPDATE")
+            val updateWidgetRequest =
+                Intent("android.appwidget.action.APPWIDGET_UPDATE").setClassName(/* TODO: provide the application ID. For example: */
+                    packageName,
+                    "com.pin.recommend.widget.ContentWidgetProvider"
+                )
             sendBroadcast(updateWidgetRequest)
         }, {
             finish()
