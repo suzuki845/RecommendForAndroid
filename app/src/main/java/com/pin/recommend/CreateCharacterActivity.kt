@@ -118,6 +118,7 @@ class CreateCharacterActivity : AppCompatActivity() {
         }
 
         vm.setEntity(null)
+
         setContent {
             Body(vm, vm.state.collectAsState(CharacterEditorViewModelState()).value)
         }
@@ -129,16 +130,9 @@ class CreateCharacterActivity : AppCompatActivity() {
             topBar = {
                 TopAppBar(
                     backgroundColor = MaterialTheme.colors.background,
-                    contentColor = androidx.compose.ui.graphics.Color.Black,
+                    contentColor = Color.Black,
                     title = {
                         Text("作成")
-                    },
-                    navigationIcon = {
-                        TextButton({
-                            startActivity(Intent(this, GlobalSettingActivity::class.java))
-                        }) {
-                            Text("設定")
-                        }
                     },
                     actions = {
                         TextButton({
