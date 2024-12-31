@@ -13,7 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityEditAnniversaryBinding
 import com.pin.recommend.model.entity.CustomAnniversary
-import com.pin.recommend.model.viewmodel.AnniversaryEditorViewModel
+import com.pin.recommend.viewmodel.AnniversaryEditorViewModel
 import java.util.Calendar
 
 

@@ -13,7 +13,7 @@ import com.pin.recommend.R
 import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.viewmodel.CharacterListViewModel
+import com.pin.recommend.viewmodel.CharacterListViewModel
 import java.util.Calendar
 
 class CharactersAdapter(

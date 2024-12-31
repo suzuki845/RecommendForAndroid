@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="com.pin.recommend.model.viewmodel.DoubleConverter"/>
-        <import type="com.pin.recommend.model.viewmodel.IntConverter"/>
-        <import type="com.pin.recommend.model.viewmodel.DateConverter"/>
-        <import type="com.pin.recommend.model.viewmodel.DateMonthConverter"/>
-        <variable name="owner" type="com.pin.recommend.main.EventDetailsFragment" />
-        <variable name="vm" type="com.pin.recommend.model.viewmodel.EventDetailsViewModel"/>
+
+        <import type="com.pin.recommend.viewmodel.DoubleConverter" />
+
+        <import type="com.pin.recommend.viewmodel.IntConverter" />
+
+        <import type="com.pin.recommend.viewmodel.DateConverter" />
+
+        <import type="com.pin.recommend.viewmodel.DateMonthConverter" />
+
+        <variable
+            name="owner"
+            type="com.pin.recommend.main.EventDetailsFragment" />
+
+        <variable
+            name="vm"
+            type="com.pin.recommend.viewmodel.EventDetailsViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -24,18 +33,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+            <com.prolificinteractive.materialcalendarview.MaterialCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/calendarView"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                app:mcv_tileWidth="match_parent"
-                />
+                app:mcv_tileWidth="match_parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/event_recycle_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
         </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

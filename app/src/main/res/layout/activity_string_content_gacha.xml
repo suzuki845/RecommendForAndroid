@@ -12,7 +12,7 @@
 
         <variable
             name="gachaVM"
-            type="com.pin.recommend.model.viewmodel.StringContentGachaViewModel" />
+            type="com.pin.recommend.viewmodel.StringContentGachaViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

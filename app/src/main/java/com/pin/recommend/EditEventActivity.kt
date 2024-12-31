@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityEditEventBinding
-import com.pin.recommend.model.viewmodel.EditEventViewModel
+import com.pin.recommend.viewmodel.EditEventViewModel
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
 

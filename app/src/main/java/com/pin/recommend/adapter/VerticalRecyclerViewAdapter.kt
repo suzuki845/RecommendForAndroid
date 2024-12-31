@@ -19,8 +19,8 @@ import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.model.entity.RecommendCharacter
 import com.pin.recommend.model.entity.StoryPicture
 import com.pin.recommend.model.entity.StoryWithPictures
-import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
-import java.util.*
+import com.pin.recommend.viewmodel.CharacterDetailsViewModel
+import java.util.Calendar
 
 class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharacter?) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {

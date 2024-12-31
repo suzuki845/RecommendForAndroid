@@ -1,24 +1,21 @@
-package com.pin.recommend.model.viewmodel
+package com.pin.recommend.viewmodel
 
 import android.app.Application
-import android.graphics.Color
-import android.util.Log
-import android.widget.EditText
 import androidx.core.content.ContextCompat
-import androidx.databinding.InverseMethod
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import com.pin.recommend.R
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.dao.PaymentDao
 import com.pin.recommend.model.dao.PaymentTagDao
-import com.pin.recommend.model.dao.RecommendCharacterDao
 import com.pin.recommend.model.entity.Payment
 import com.pin.recommend.model.entity.PaymentTag
 import com.pin.recommend.util.TimeUtil
-import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Date
 
-class CreatePaymentViewModel(application: Application) : AndroidViewModel(application)  {
+class CreatePaymentViewModel(application: Application) : AndroidViewModel(application) {
 
     private val paymentDao: PaymentDao = AppDatabase.getDatabase(application).paymentDao()
     private val tagDao: PaymentTagDao = AppDatabase.getDatabase(application).paymentTagDao()
@@ -37,17 +34,17 @@ class CreatePaymentViewModel(application: Application) : AndroidViewModel(applic
     val type = MutableLiveData(0)
 
     val payColor = type.map {
-            if (it == 0) {
-                ContextCompat.getColor(application, R.color.blue_600)
-            }else{
-                ContextCompat.getColor(application, R.color.grey_600)
-            }
+        if (it == 0) {
+            ContextCompat.getColor(application, R.color.blue_600)
+        } else {
+            ContextCompat.getColor(application, R.color.grey_600)
         }
+    }
 
-    val savingsColor  = type.map {
+    val savingsColor = type.map {
         if (it != 0) {
             ContextCompat.getColor(application, R.color.blue_600)
-        }else{
+        } else {
             ContextCompat.getColor(application, R.color.grey_600)
         }
     }
@@ -62,32 +59,32 @@ class CreatePaymentViewModel(application: Application) : AndroidViewModel(applic
 
     val tag = MutableLiveData<PaymentTag?>()
 
-    val selectedTag = tags.switchMap{ list ->
-            tag.map { selected ->
-                list.find {
-                    selected?.id.let { id -> id ==  it.id}
-                }
+    val selectedTag = tags.switchMap { list ->
+        tag.map { selected ->
+            list.find {
+                selected?.id.let { id -> id == it.id }
             }
         }
+    }
 
 
-    fun createPayment(): Boolean{
+    fun createPayment(): Boolean {
         val characterId = characterId.value ?: return false
         val date = TimeUtil.resetDate(date.value ?: Date())
         //print("test!! $date")
         val amount = (amount.value ?: 0).toDouble()
-        val memo  = memo.value
+        val memo = memo.value
         val selectedTag = selectedTag.value
         val type = type.value ?: 0
         val newPayment = Payment(
-                id = 0,
-                characterId = characterId,
-                type = type,
-                amount = amount,
-                memo = memo,
-                paymentTagId = selectedTag?.id,
-                createdAt = date,
-                updatedAt = date
+            id = 0,
+            characterId = characterId,
+            type = type,
+            amount = amount,
+            memo = memo,
+            paymentTagId = selectedTag?.id,
+            createdAt = date,
+            updatedAt = date
         )
         val r = paymentDao.insertPayment(newPayment) != 0L
         return r;

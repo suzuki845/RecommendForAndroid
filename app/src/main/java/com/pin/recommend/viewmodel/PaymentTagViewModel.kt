@@ -1,13 +1,17 @@
-package com.pin.recommend.model.viewmodel
+package com.pin.recommend.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.pin.recommend.model.AppDatabase
 import com.pin.recommend.model.dao.PaymentTagDao
 import com.pin.recommend.model.entity.PaymentTag
 import kotlinx.coroutines.launch
 
-class PaymentTagViewModel(application: Application) : AndroidViewModel(application)  {
+class PaymentTagViewModel(application: Application) : AndroidViewModel(application) {
 
     private val tagDao: PaymentTagDao = AppDatabase.getDatabase(application).paymentTagDao()
 
@@ -28,7 +32,7 @@ class PaymentTagViewModel(application: Application) : AndroidViewModel(applicati
 
     val type = MutableLiveData(0)
 
-    fun insertTag(tag: PaymentTag) = viewModelScope.launch{
+    fun insertTag(tag: PaymentTag) = viewModelScope.launch {
         tagDao.insertPaymentTag(tag)
     }
 

@@ -17,8 +17,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.adapter.PaymentTagAdapter
 import com.pin.recommend.databinding.ActivityEditPaymentBinding
-import com.pin.recommend.model.viewmodel.EditPaymentViewModel
 import com.pin.recommend.util.TimeUtil
+import com.pin.recommend.viewmodel.EditPaymentViewModel
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
 import java.util.Calendar

@@ -3,7 +3,12 @@ package com.pin.recommend.main
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
@@ -13,20 +18,18 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.l4digital.fastscroll.FastScrollRecyclerView
 import com.pin.recommend.CreateStoryActivity
 import com.pin.recommend.R
 import com.pin.recommend.adapter.VerticalRecyclerViewAdapter
 import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
-import com.pin.recommend.model.viewmodel.EditStateViewModel
+import com.pin.recommend.viewmodel.CharacterDetailsViewModel
 
 class StoryListFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
     private lateinit var verticalRecyclerViewAdapter: VerticalRecyclerViewAdapter
     private lateinit var recyclerView: FastScrollRecyclerView
-    private lateinit var editListViewModel: EditStateViewModel
+    private lateinit var editListViewModel: com.pin.recommend.viewmodel.EditStateViewModel
     private lateinit var sortView: TextView
     private val detailsVM: CharacterDetailsViewModel by lazy {
         ViewModelProvider(requireActivity()).get(CharacterDetailsViewModel::class.java)
@@ -40,7 +43,8 @@ class StoryListFragment : Fragment() {
             index = requireArguments().getInt(ARG_SECTION_NUMBER)
         }
         pageViewModel?.setIndex(index)
-        editListViewModel = ViewModelProvider(this).get(EditStateViewModel::class.java)
+        editListViewModel =
+            ViewModelProvider(this).get(com.pin.recommend.viewmodel.EditStateViewModel::class.java)
 
         setHasOptionsMenu(true)
     }
@@ -144,6 +148,7 @@ class StoryListFragment : Fragment() {
                 }
                 return true
             }
+
             R.id.create -> {
                 val intent = Intent(activity, CreateStoryActivity::class.java)
                 val characterId = detailsVM.id.value

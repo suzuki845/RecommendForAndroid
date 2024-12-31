@@ -1,23 +1,19 @@
 package com.pin.recommend
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityWholePeriodPaymentBinding
-import com.pin.recommend.model.viewmodel.WholePeriodPaymentViewModel
+import com.pin.recommend.viewmodel.WholePeriodPaymentViewModel
 
 class WholePeriodPaymentActivity : AppCompatActivity() {
 
     companion object {
-        const val INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER = "com.pin.recommend.WholePeriodPaymentActivity.INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER"
+        const val INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER =
+            "com.pin.recommend.WholePeriodPaymentActivity.INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER"
     }
 
     private val viewModel by lazy {
@@ -32,7 +28,7 @@ class WholePeriodPaymentActivity : AppCompatActivity() {
 
         viewModel.setCharacterId(intent.getLongExtra(INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER, -1))
 
-        binding  = DataBindingUtil.setContentView(this, R.layout.activity_whole_period_payment)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_whole_period_payment)
         binding.lifecycleOwner = this
         binding.activity = this
         binding.vm = viewModel

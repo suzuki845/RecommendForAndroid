@@ -3,13 +3,10 @@ package com.pin.recommend.adapter
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout.VERTICAL
 import android.widget.LinearLayout.VISIBLE
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -18,18 +15,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pin.recommend.EditPaymentActivity
 import com.pin.recommend.R
-import com.pin.recommend.adapter.VerticalRecyclerViewAdapter.HorizontalRecycleViewHolder
 import com.pin.recommend.model.entity.Payment
 import com.pin.recommend.model.entity.PaymentAndTag
-import com.pin.recommend.model.viewmodel.PaymentDetailsViewModel
+import com.pin.recommend.viewmodel.PaymentDetailsViewModel
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.Date
 
 
 class DateSeparatedPaymentAdapter(
-        fragment: Fragment,
-        private val onDelete: (Payment) -> Unit
+    fragment: Fragment,
+    private val onDelete: (Payment) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val paymentDetailsViewModel: PaymentDetailsViewModel by lazy {
         ViewModelProvider(fragment.requireActivity()).get(PaymentDetailsViewModel::class.java)
@@ -45,7 +40,7 @@ class DateSeparatedPaymentAdapter(
     private var _isEditMode = false
     var isEditMode
         get() = _isEditMode
-        set(value){
+        set(value) {
             _isEditMode = value
             notifyDataSetChanged()
         }
@@ -55,7 +50,8 @@ class DateSeparatedPaymentAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.row_date_separated, parent, false)
+        val itemView: View =
+            LayoutInflater.from(parent.context).inflate(R.layout.row_date_separated, parent, false)
 
         return PaymentRecycleViewHolder(itemView)
     }
@@ -86,7 +82,8 @@ class DateSeparatedPaymentAdapter(
         var dateView: TextView = itemView.findViewById(R.id.date)
 
         init {
-            val linearLayoutManager = LinearLayoutManager(itemView.context, LinearLayoutManager.VERTICAL, false)
+            val linearLayoutManager =
+                LinearLayoutManager(itemView.context, LinearLayoutManager.VERTICAL, false)
             paymentRecyclerView.layoutManager = linearLayoutManager
             paymentRecyclerView.adapter = paymentRecyclerViewAdapter
         }
@@ -111,26 +108,29 @@ class DateSeparatedPaymentAdapter(
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.row_date_separated_content, parent, false)
+            val itemView: View = LayoutInflater.from(parent.context)
+                .inflate(R.layout.row_date_separated_content, parent, false)
 
             return ViewItemHolder(itemView)
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val paymentAndTag = paymentAndTags[position]
-            if(paymentAndTag.payment.type == 0){
-                (holder as ViewItemHolder).amountView.text = "Pay: " + paymentAndTag.payment.amount.toInt().toString() + "円"
+            if (paymentAndTag.payment.type == 0) {
+                (holder as ViewItemHolder).amountView.text =
+                    "Pay: " + paymentAndTag.payment.amount.toInt().toString() + "円"
                 holder.amountView.setTextColor(Color.RED)
-            }else{
-                (holder as ViewItemHolder).amountView.text = "貯金: " + paymentAndTag.payment.amount.toInt().toString() + "円"
+            } else {
+                (holder as ViewItemHolder).amountView.text =
+                    "貯金: " + paymentAndTag.payment.amount.toInt().toString() + "円"
                 holder.amountView.setTextColor(Color.BLUE)
             }
             holder.tagView.text = "タグ: " + (paymentAndTag.tag?.tagName ?: "")
             holder.memoView.text = "メモ: " + paymentAndTag.payment.getShortComment(20)
 
-            if(isEditMode){
+            if (isEditMode) {
                 holder.deleteView.visibility = VISIBLE
-            }else{
+            } else {
                 holder.deleteView.visibility = GONE
             }
             holder.deleteView.setOnClickListener(View.OnClickListener {
@@ -149,7 +149,7 @@ class DateSeparatedPaymentAdapter(
             var amountView: TextView = itemView.findViewById(R.id.amount)
             var tagView: TextView = itemView.findViewById(R.id.tag)
             var memoView: TextView = itemView.findViewById(R.id.memo)
-            var deleteView: View =  itemView.findViewById(R.id.delete)
+            var deleteView: View = itemView.findViewById(R.id.delete)
         }
     }
 

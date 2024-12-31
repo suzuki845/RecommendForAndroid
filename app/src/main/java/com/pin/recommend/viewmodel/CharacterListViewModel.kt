@@ -1,4 +1,4 @@
-package com.pin.recommend.model.viewmodel
+package com.pin.recommend.viewmodel
 
 import android.app.Application
 import android.content.Intent
@@ -19,9 +19,11 @@ data class CharacterListViewState
     val errorMessage: String? = null,
 )
 
-class CharacterListViewModel(val application: Application) : AndroidViewModel(application) {
+class CharacterListViewModel(application: Application) : AndroidViewModel(application) {
     private val characterDao: RecommendCharacterDao =
         AppDatabase.getDatabase(application).recommendCharacterDao()
+
+    private val _application = application
 
     val deleteMode = MutableStateFlow(false)
 
@@ -46,10 +48,10 @@ class CharacterListViewModel(val application: Application) : AndroidViewModel(ap
                 .invoke(character, getApplication())
             val updateWidgetRequest =
                 Intent("android.appwidget.action.APPWIDGET_UPDATE").setClassName(/* TODO: provide the application ID. For example: */
-                    application.packageName,
+                    _application.packageName,
                     "com.pin.recommend.widget.ContentWidgetProvider"
                 )
-            application.sendBroadcast(updateWidgetRequest)
+            _application.sendBroadcast(updateWidgetRequest)
         } catch (e: Exception) {
             _state.value = CharacterListViewState(
                 characters = state.value.characters,

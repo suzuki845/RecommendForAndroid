@@ -12,8 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityCreateEventBinding
-import com.pin.recommend.model.viewmodel.CreateEventViewModel
 import com.pin.recommend.util.TimeUtil
+import com.pin.recommend.viewmodel.CreateEventViewModel
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
 import java.util.Calendar

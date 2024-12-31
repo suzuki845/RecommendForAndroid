@@ -1,57 +1,18 @@
 package com.pin.recommend
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.DatePickerDialog.OnDateSetListener
-import android.app.ProgressDialog
-import android.content.Intent
-import android.graphics.Color
-import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.ListView
-import android.widget.ScrollView
-import android.widget.SeekBar
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.PopupMenu
-import androidx.appcompat.widget.Toolbar
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.pin.imageutil.BitmapUtility
-import com.pin.recommend.CreateAnniversaryActivity.Companion.INTENT_CREATE_ANNIVERSARY
-import com.pin.recommend.EditAnniversaryActivity.Companion.INTENT_EDIT_ANNIVERSARY
-import com.pin.recommend.adapter.AnniversariesDraftAdapter
-import com.pin.recommend.adapter.FontAdapter
-import com.pin.recommend.databinding.ActivityEditCharacterBinding
-import com.pin.recommend.dialog.ColorPickerDialogFragment
-import com.pin.recommend.dialog.DialogActionListener
-import com.pin.recommend.model.CharacterEditor
-import com.pin.recommend.model.entity.CharacterWithAnniversaries
-import com.pin.recommend.model.entity.CustomAnniversary
-import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
-import com.pin.recommend.util.PermissionRequests
-import com.pin.recommend.util.Progress
-import com.pin.util.DisplaySizeCheck
-import com.pin.util.PermissionChecker
-import com.pin.util.admob.AdMobAdaptiveBannerManager
-import com.pin.util.admob.Interstitial
-import com.pin.util.admob.InterstitialAdStateAction
-import com.pin.util.admob.reward.RemoveAdReward
-import com.soundcloud.android.crop.Crop
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Calendar
 
+class EditCharacterActivity : AppCompatActivity() {
+    companion object {
+        @JvmField
+        val INTENT_EDIT_CHARACTER = "com.pin.recommend.EditCharacterActivity.INTENT_EDIT_CHARACTER"
+        val REQUEST_CODE_CREATE_ANNIVERSARY = 2983179
+        val REQUEST_CODE_EDIT_ANNIVERSARY = 3982432
+    }
 
+}
+
+/*
 class EditCharacterActivity : AppCompatActivity() {
 
     companion object {
@@ -182,6 +143,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         initializeToolbar(toolbar)
+
     }
 
     private fun initializeToolbar(toolbar: Toolbar) {
@@ -191,7 +153,7 @@ class EditCharacterActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        adMobManager.checkAndLoad()
+        //adMobManager.checkAndLoad()
     }
 
     fun onSetBackgroundColor(v: View?) {
@@ -490,5 +452,5 @@ class EditCharacterActivity : AppCompatActivity() {
         }
     }
 
-
 }
+*/

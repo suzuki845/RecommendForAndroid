@@ -5,9 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Typeface
-import androidx.core.graphics.drawable.toBitmapOrNull
 import com.pin.imageutil.BitmapUtility
-import com.pin.recommend.R
 import com.pin.recommend.model.entity.CharacterWithAnniversaries
 import com.pin.recommend.model.entity.CustomAnniversary
 import com.pin.recommend.model.entity.RecommendCharacter
@@ -17,6 +15,9 @@ import java.util.Date
 
 enum class CharacterEditAction {
     Init,
+    AddAnniversary,
+    ReplaceAnniversary,
+    RemoveAnniversary,
     Save,
 }
 
@@ -30,7 +31,7 @@ data class CharacterEditState(
     val status: CharacterEditStatus = CharacterEditStatus.Processing,
     val action: CharacterEditAction = CharacterEditAction.Init,
     val id: Long = 0,
-    val name: String? = null,
+    val name: String = "",
     val created: Date = Date(),
     val iconImage: Bitmap? = null,
     val beforeIconImageUri: String? = null,
@@ -45,20 +46,14 @@ data class CharacterEditState(
     val isZeroDayStart: Boolean = false,
     val elapsedDateFormat: Int = 0,
     val fontFamily: String = "デフォルト",
-    val typeface: Typeface? = null,
     val anniversaries: List<CustomAnniversary.Draft> = listOf(),
     val errorMessage: String? = null
 ) {
     companion object {
-        val defaultBackgroundColor = Color.parseColor("#00ffffff")
+        val defaultBackgroundColor = Color.parseColor("#77ffffff")
         val defaultBackgroundImageOpacity = 1f
         val defaultTextColor = Color.parseColor("#ff000000")
         val defaultTextShadowColor = Color.parseColor("#00000000")
-    }
-
-    fun iconWithDefault(context: Context): Bitmap? {
-        if (iconImage != null) return iconImage
-        return context.getDrawable(R.drawable.ic_person_300dp)?.toBitmapOrNull()
     }
 
     fun typeface(context: Context): Typeface? {
@@ -97,7 +92,7 @@ class CharacterEditor(val context: Context) {
 
     val state: StateFlow<CharacterEditState> = _state
 
-    fun setName(v: String?) {
+    fun setName(v: String) {
         _state.value = _state.value.copy(name = v)
     }
 
@@ -105,11 +100,11 @@ class CharacterEditor(val context: Context) {
         _state.value = _state.value.copy(created = v)
     }
 
-    fun setIconImage(v: Bitmap) {
+    fun setIconImage(v: Bitmap?) {
         _state.value = _state.value.copy(iconImage = v)
     }
 
-    fun setBackgroundImage(v: Bitmap) {
+    fun setBackgroundImage(v: Bitmap?) {
         _state.value = _state.value.copy(backgroundImage = v)
     }
 
@@ -137,22 +132,26 @@ class CharacterEditor(val context: Context) {
         _state.value = _state.value.copy(aboveText = v)
     }
 
-    fun isZeroDayStart(v: Boolean) {
+    fun setIsZeroDayStart(v: Boolean) {
         _state.value = _state.value.copy(isZeroDayStart = v)
     }
 
-    fun elapsedDateFormat(v: Int) {
+    fun setElapsedDateFormat(v: Int) {
         _state.value = _state.value.copy(elapsedDateFormat = v)
     }
 
-    fun fontFamily(v: String) {
+    fun setFontFamily(v: String) {
         _state.value = _state.value.copy(fontFamily = v)
     }
 
     fun addAnniversary(anniversary: CustomAnniversary.Draft) {
         val list = _state.value.anniversaries.toMutableList()
         list.add(anniversary)
-        _state.value = _state.value.copy(anniversaries = list)
+        _state.value = _state.value.copy(
+            anniversaries = list,
+            action = CharacterEditAction.AddAnniversary,
+            status = CharacterEditStatus.Success
+        )
     }
 
     fun replaceAnniversary(anniversary: CustomAnniversary.Draft) {
@@ -161,16 +160,28 @@ class CharacterEditor(val context: Context) {
         if (index != -1) {
             list[index] = anniversary
         }
-        _state.value = _state.value.copy(anniversaries = list)
+        _state.value = _state.value.copy(
+            anniversaries = list,
+            action = CharacterEditAction.ReplaceAnniversary,
+            status = CharacterEditStatus.Success
+        )
     }
 
     fun removeAnniversary(pos: Int) {
         val list = _state.value.anniversaries.toMutableList()
         list.removeAt(pos)
-        _state.value = _state.value.copy(anniversaries = list)
+        _state.value = _state.value.copy(
+            anniversaries = list,
+            action = CharacterEditAction.RemoveAnniversary,
+            status = CharacterEditStatus.Success
+        )
     }
 
-    fun setEntity(id: Long) {
+    fun resetError() {
+        _state.value = _state.value.copy(errorMessage = null)
+    }
+
+    fun setEntityById(id: Long) {
         val entity = db.recommendCharacterDao().findByIdCharacterWithAnniversaries(id)
         if (entity != null) {
             setEntity(entity)
@@ -180,10 +191,10 @@ class CharacterEditor(val context: Context) {
     fun setEntity(entity: CharacterWithAnniversaries? = null) {
         _state.value = CharacterEditState(
             id = entity?.id ?: 0,
-            name = entity?.character?.name,
+            name = entity?.character?.name ?: "",
             created = entity?.character?.created ?: Date(),
-            aboveText = entity?.character?.aboveText ?: "",
-            belowText = entity?.character?.belowText ?: "",
+            aboveText = entity?.character?.aboveText ?: "を推して",
+            belowText = entity?.character?.belowText ?: "になりました",
             homeTextColor = entity?.character?.homeTextColor ?: CharacterEditState.defaultTextColor,
             homeTextShadowColor = entity?.character?.homeTextShadowColor
                 ?: CharacterEditState.defaultTextShadowColor,
@@ -204,6 +215,12 @@ class CharacterEditor(val context: Context) {
 
     fun save() {
         try {
+            if (_state.value.status == CharacterEditStatus.Processing &&
+                _state.value.action == CharacterEditAction.Save
+            ) {
+                return
+            }
+
             _state.value = _state.value.copy(
                 action = CharacterEditAction.Save,
                 status = CharacterEditStatus.Processing
@@ -272,12 +289,20 @@ class CharacterEditor(val context: Context) {
                     db.customAnniversaryDao().insertAnniversary(it.toFinal())
                 }
 
-                _state.value = _state.value.copy(status = CharacterEditStatus.Success)
                 setEntity(null)
+
+                _state.value = _state.value.copy(
+                    action = CharacterEditAction.Save,
+                    status = CharacterEditStatus.Success
+                )
             }
         } catch (e: Exception) {
             _state.value =
-                _state.value.copy(status = CharacterEditStatus.Failure, errorMessage = e.message)
+                _state.value.copy(
+                    action = CharacterEditAction.Save,
+                    status = CharacterEditStatus.Failure,
+                    errorMessage = e.message
+                )
         }
     }
 }

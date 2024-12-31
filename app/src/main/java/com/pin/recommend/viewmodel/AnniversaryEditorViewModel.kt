@@ -1,4 +1,4 @@
-package com.pin.recommend.model.viewmodel
+package com.pin.recommend.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -15,15 +15,15 @@ class AnniversaryEditorViewModel(application: Application) : AndroidViewModel(ap
     val topText = model.topText
     val bottomText = model.bottomText
 
-    fun save(onComplete: (CustomAnniversary.Draft) -> Unit, onError: (Exception) -> Unit){
+    fun save(onComplete: (CustomAnniversary.Draft) -> Unit, onError: (Exception) -> Unit) {
         model.save(onComplete, onError)
     }
 
-    fun initialize(e: CustomAnniversary? = null){
+    fun initialize(e: CustomAnniversary? = null) {
         model.initialize(e)
     }
 
-    fun initialize(e: CustomAnniversary.Draft? = null){
+    fun initialize(e: CustomAnniversary.Draft? = null) {
         model.initialize(e)
     }
 

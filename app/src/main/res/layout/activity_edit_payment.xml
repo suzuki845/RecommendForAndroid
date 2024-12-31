@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.pin.recommend.model.viewmodel.DoubleConverter" />
-        <import type="com.pin.recommend.model.viewmodel.IntConverter" />
-        <import type="com.pin.recommend.model.viewmodel.DateConverter" />
+
+        <import type="com.pin.recommend.viewmodel.DoubleConverter" />
+
+        <import type="com.pin.recommend.viewmodel.IntConverter" />
+
+        <import type="com.pin.recommend.viewmodel.DateConverter" />
+
         <variable
             name="vm"
-            type="com.pin.recommend.model.viewmodel.EditPaymentViewModel" />
+            type="com.pin.recommend.viewmodel.EditPaymentViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

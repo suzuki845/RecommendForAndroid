@@ -1,48 +1,96 @@
 package com.pin.recommend
 
 import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.content.Intent
-import android.graphics.Color
+import android.content.res.AssetManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.ListView
-import android.widget.ScrollView
-import android.widget.SeekBar
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.PopupMenu
-import androidx.appcompat.widget.Toolbar
-import androidx.databinding.DataBindingUtil
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Switch
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.pin.imageutil.BitmapUtility
-import com.pin.recommend.adapter.AnniversariesDraftAdapter
+import com.pin.recommend.EditAnniversaryActivity.Companion.INTENT_EDIT_ANNIVERSARY
 import com.pin.recommend.adapter.FontAdapter
-import com.pin.recommend.databinding.ActivityCreateCharacterBinding
+import com.pin.recommend.composable.ComposableAdaptiveBanner
 import com.pin.recommend.dialog.ColorPickerDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
-import com.pin.recommend.model.CharacterEditor
+import com.pin.recommend.model.CharacterEditAction
+import com.pin.recommend.model.CharacterEditStatus
 import com.pin.recommend.model.entity.CustomAnniversary
-import com.pin.recommend.model.viewmodel.CharacterEditorViewModel
 import com.pin.recommend.util.PermissionRequests
-import com.pin.recommend.util.Progress
+import com.pin.recommend.util.toFormattedString
+import com.pin.recommend.view.DatePickerModal
+import com.pin.recommend.viewmodel.CharacterEditorViewModel
+import com.pin.recommend.viewmodel.CharacterEditorViewModelState
 import com.pin.util.DisplaySizeCheck
 import com.pin.util.PermissionChecker
-import com.pin.util.admob.AdMobAdaptiveBannerManager
 import com.pin.util.admob.reward.RemoveAdReward
 import com.soundcloud.android.crop.Crop
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.Instant
+import java.util.Date
+import java.util.Locale
 
 class CreateCharacterActivity : AppCompatActivity() {
     companion object {
@@ -61,135 +109,500 @@ class CreateCharacterActivity : AppCompatActivity() {
 
     private var id = -1L
 
-    private lateinit var binding: ActivityCreateCharacterBinding
-    private lateinit var listView: RecyclerView
-    private lateinit var scrollView: ScrollView
-
-    private lateinit var adMobManager: AdMobAdaptiveBannerManager
-    private lateinit var adViewContainer: ViewGroup
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit_character)
-
-        adViewContainer = findViewById(R.id.ad_container)
-
-        adMobManager =
-            AdMobAdaptiveBannerManager(
-                this,
-                adViewContainer,
-                getString(R.string.banner_id)
-            )
-        adMobManager.setAllowAdClickLimit(6)
-        adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
-        adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
         val reward = RemoveAdReward.getInstance(this)
         reward.isBetweenRewardTime.observe(
             this
         ) { isBetweenRewardTime ->
-            adMobManager.setEnable(!isBetweenRewardTime!!)
-            adMobManager.checkFirst()
         }
 
-        vm.initialize(null)
-
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_create_character)
-        binding.vm = vm
-        binding.lifecycleOwner = this
-
-        binding.imageOpacity.max = 100
-        binding.imageOpacity.progress = 100
-        binding.imageOpacity.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(
-                seekBar: SeekBar, progress: Int, fromUser: Boolean
-            ) {
-                val o = progress * 0.01f
-                vm.backgroundImageOpacity.value = o
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
-        })
-
-        binding.previewBackgroundImage.setOnLongClickListener {
-            setOnBackgroundRemove(it)
+        vm.setEntity(null)
+        setContent {
+            Body(vm, vm.state.collectAsState(CharacterEditorViewModelState()).value)
         }
-
-        binding.previewBackgroundColor.setOnLongClickListener {
-            onClearBackgroundColor(it)
-        }
-
-        binding.previewTextColor.setOnClickListener {
-            onSetTextColor(it)
-        }
-
-        binding.previewTextShadow.setOnClickListener {
-            onSetTextShadowColor(it)
-        }
-
-        scrollView = binding.scrollView
-
-        listView = binding.anniversaries
-        val adapter = AnniversariesDraftAdapter(this)
-        listView.adapter = adapter
-        adapter.setOnItemClickListener {
-            val intent = Intent(this, EditAnniversaryActivity::class.java)
-            intent.putExtra(EditAnniversaryActivity.INTENT_EDIT_ANNIVERSARY, it.toJson())
-            startActivityForResult(intent, REQUEST_CODE_EDIT_ANNIVERSARY)
-        }
-        vm.anniversaries.observeForever {
-            adapter.setItems(it)
-        }
-        listView.layoutManager = LinearLayoutManager(this)
-
-        val simpleItemTouchCallback: ItemTouchHelper.SimpleCallback = object :
-            ItemTouchHelper.SimpleCallback(
-                0,
-                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.DOWN or ItemTouchHelper.UP
-            ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
-                val position = viewHolder.adapterPosition
-                vm.removeAnniversary(position)
-                adapter.notifyDataSetChanged()
-            }
-        }
-        val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
-        itemTouchHelper.attachToRecyclerView(listView)
-
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        initializeToolbar(toolbar)
     }
+
+    @Composable
+    fun Body(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = androidx.compose.ui.graphics.Color.Black,
+                    title = {
+                        Text("作成")
+                    },
+                    navigationIcon = {
+                        TextButton({
+                            startActivity(Intent(this, GlobalSettingActivity::class.java))
+                        }) {
+                            Text("設定")
+                        }
+                    },
+                    actions = {
+                        TextButton({
+                            vm.save()
+                        }) {
+                            Text("保存")
+                        }
+                    },
+                )
+            },
+            bottomBar = {
+                ComposableAdaptiveBanner(adId = "ca-app-pub-3940256099942544/6300978111")
+            }
+        ) { padding ->
+            ErrorMessage(vm, state)
+            SaveSuccess(vm, state)
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth()
+            ) {
+                Form(vm, state)
+            }
+        }
+    }
+
+
+    @Composable
+    fun Form(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        val scrollState = rememberScrollState()
+        LaunchedEffect(state.anniversaries.size) {
+            if ((state.action == CharacterEditAction.AddAnniversary || state.action == CharacterEditAction.RemoveAnniversary) &&
+                state.status == CharacterEditStatus.Success
+            ) {
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
+        }
+
+        Column(
+            modifier = Modifier.verticalScroll(scrollState)
+        ) {
+            Name(vm, state)
+            Divider()
+            IconImage(vm, state)
+            Divider()
+            BackgroundImage(vm, state)
+            Divider()
+            BackgroundColor(vm, state)
+            Divider()
+            TextColor(vm, state)
+            Divider()
+            TextShadowColor(vm, state)
+            Divider()
+            OshiDate(vm, state)
+            Divider()
+            IsZeroDayStart(vm, state)
+            Divider()
+            AboveText(vm, state)
+            Divider()
+            BelowText(vm, state)
+            Divider()
+            Fonts(vm, state)
+            Divider()
+            AnniversaryList(vm, state)
+        }
+    }
+
+    @Composable
+    fun Section(content: @Composable () -> Unit) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Gray.copy(alpha = 0.5f))
+        ) {
+            content()
+        }
+    }
+
+    @Composable
+    fun Name(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        Column {
+            Section { Text("名前") }
+            TextField(modifier = Modifier.padding(4.dp), colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.White,
+            ), value = state.name, onValueChange = { vm.setName(it) })
+        }
+    }
+
+    @Composable
+    fun IconImage(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        val iconModifier = Modifier
+            .size(70.dp)
+            .clip(CircleShape)
+            .border(1.dp, Color.Black, CircleShape)
+            .clickable {
+                onSetIcon()
+            }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Section { Text("アイコン") }
+            Box(Modifier.padding(4.dp)) {
+                if (state.iconImage != null) {
+                    Image(
+                        modifier = iconModifier,
+                        bitmap = state.iconImage.asImageBitmap(),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_person_300dp),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                        modifier = iconModifier
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun BackgroundImage(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        val imageModifier = Modifier
+            .width(72.dp)
+            .height(128.dp)
+            .border(1.dp, Color.Black)
+            .clickable {
+                onSetBackground()
+            }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Section { Text("背景画像") }
+            Box(Modifier.padding(4.dp)) {
+                if (state.backgroundImage != null) {
+                    Image(
+                        bitmap = state.backgroundImage.asImageBitmap(),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                        modifier = imageModifier
+                    )
+                } else {
+                    Box(
+                        modifier = imageModifier.background(Color.White),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No Image",
+                            color = Color.DarkGray,
+                            style = TextStyle(fontSize = 12.sp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun BackgroundColor(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        val imageModifier = Modifier
+            .width(72.dp)
+            .height(72.dp)
+            .border(1.dp, Color.Black)
+            .clickable {
+                onSetBackgroundColor(vm, state)
+            }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Section { Text("背景色") }
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                if (state.backgroundColorToBitmap != null) {
+                    Image(
+                        modifier = imageModifier,
+                        bitmap = state.backgroundColorToBitmap.asImageBitmap(),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun TextColor(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        val imageModifier = Modifier
+            .width(72.dp)
+            .height(72.dp)
+            .border(1.dp, Color.Black)
+            .clickable {
+                onSetTextColor(vm, state)
+            }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Section { Text("テキスト色") }
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                if (state.homeTextColorToBitmap != null) {
+                    Image(
+                        modifier = imageModifier,
+                        bitmap = state.homeTextColorToBitmap.asImageBitmap(),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun TextShadowColor(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        val imageModifier = Modifier
+            .width(72.dp)
+            .height(72.dp)
+            .border(1.dp, Color.Black)
+            .clickable {
+                onSetTextShadowColor(vm, state)
+            }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Section { Text("テキストのドロップシャドウ色") }
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                if (state.homeTextShadowColorToBitmap != null) {
+                    Image(
+                        modifier = imageModifier,
+                        bitmap = state.homeTextShadowColorToBitmap.asImageBitmap(),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun convertMillisToDate(millis: Long): String {
+        val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        return formatter.format(java.util.Date(millis))
+    }
+
+    @Composable
+    fun OshiDate(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        var showModal by remember { mutableStateOf(false) }
+
+        Column {
+            Section { Text("推し始めた日") }
+            TextField(
+                readOnly = true,
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White,
+                ),
+                value = convertMillisToDate(state.created.toInstant().toEpochMilli()),
+                onValueChange = { },
+                placeholder = { Text("MM/DD/YYYY") },
+                trailingIcon = {
+                    Icon(Icons.Default.DateRange, contentDescription = "Select date")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerInput(state.created) {
+                        awaitEachGesture {
+                            awaitFirstDown(pass = PointerEventPass.Initial)
+                            val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                            if (upEvent != null) {
+                                showModal = true
+                            }
+                        }
+                    }
+            )
+        }
+        if (showModal) {
+            DatePickerModal(
+                onDateSelected = {
+                    if (it != null) {
+                        vm.setCreated(Date.from(Instant.ofEpochMilli(it)))
+                    }
+                },
+                onDismiss = { showModal = false }
+            )
+        }
+    }
+
+    @Composable
+    fun IsZeroDayStart(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        Column {
+            Section { Text("0日からカウント") }
+            Switch(
+                checked = state.isZeroDayStart,
+                onCheckedChange = {
+                    vm.setIsZeroDayStart(it)
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun AboveText(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        Column {
+            Section { Text("上のテキスト") }
+            TextField(modifier = Modifier.padding(4.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White,
+                ), value = state.aboveText, onValueChange = { vm.setAboveText(it) })
+        }
+    }
+
+
+    @Composable
+    fun BelowText(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        Column {
+            Section { Text("上のテキスト") }
+            TextField(
+                modifier = Modifier.padding(4.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White,
+                ), value = state.belowText, onValueChange = { vm.setBelowText(it) })
+        }
+    }
+
+
+    @Composable
+    fun AnniversaryList(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        Column {
+            Section {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.height(30.dp)
+                ) {
+                    Text("記念日の追加")
+                    Spacer(Modifier.weight(1f))
+                    TextButton(contentPadding = PaddingValues(0.dp), onClick = {
+                        vm.setIsDeleteModeAnniversary(!state.isDeleteModeAnniversary)
+                    }) {
+                        Text(if (state.isDeleteModeAnniversary) "完了" else "削除")
+                    }
+                    TextButton(contentPadding = PaddingValues(0.dp), onClick = {
+                        onAddAnniversary(vm, state)
+                    }) {
+                        Text("追加")
+                    }
+                }
+            }
+            Column {
+                repeat(state.anniversaries.size) {
+                    state.anniversaries.getOrNull(it)?.let { item ->
+                        AnniversaryItem(item, state)
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun AnniversaryItem(item: CustomAnniversary.Draft, state: CharacterEditorViewModelState) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clickable {
+                    val intent = Intent(this, EditAnniversaryActivity::class.java)
+                    intent.putExtra(INTENT_EDIT_ANNIVERSARY, item.toJson())
+                    startActivityForResult(intent, REQUEST_CODE_EDIT_ANNIVERSARY)
+                }
+        ) {
+            Column {
+                Text(item.name)
+                Text(item.date.toFormattedString())
+            }
+            Spacer(Modifier.weight(1f))
+            if (state.isDeleteModeAnniversary) {
+                IconButton({
+                    vm.removeAnniversary(state.anniversaries.indexOf(item))
+                }) {
+                    Icon(Icons.Filled.Delete, contentDescription = "")
+                }
+            }
+            IconButton({}) {
+                Icon(Icons.Filled.ChevronRight, contentDescription = "")
+            }
+        }
+    }
+
+    private fun getFontFamily(
+        assets: AssetManager,
+        state: CharacterEditorViewModelState
+    ): FontFamily? {
+        if (state.fontFamily == "Default") return null
+        if (state.fontFamily == "default") return null
+        if (state.fontFamily == "デフォルト") return null
+
+        return FontFamily(
+            Font(
+                assetManager = assets,
+                path = "fonts/" + state.fontFamily + ".ttf"
+            )
+        )
+    }
+
+    @Composable
+    fun Fonts(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        Column {
+            Section { Text("フォント") }
+            TextField(
+                textStyle = TextStyle(
+                    fontFamily = getFontFamily(LocalContext.current.assets, state)
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White,
+                ),
+                readOnly = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerInput(state.fontFamily) {
+                        awaitEachGesture {
+                            awaitFirstDown(pass = PointerEventPass.Initial)
+                            val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                            if (upEvent != null) {
+                                onShowFontDialog(vm, state)
+                            }
+                        }
+                    },
+                value = state.fontFamily,
+                onValueChange = {},
+            )
+        }
+    }
+
+    @Composable
+    fun ErrorMessage(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        if (state.errorMessage != null) {
+            AlertDialog(
+                onDismissRequest = { vm.resetError() },
+                title = { Text("Error") },
+                text = { Text(state.errorMessage) },
+                confirmButton = {
+                    TextButton(onClick = { vm.resetError() }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun SaveSuccess(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
+        println("CharacterEditState.Action:${state.action}, Status:${state.status}")
+        if (state.action == CharacterEditAction.Save && state.status == CharacterEditStatus.Success) {
+            finish()
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()
-        adMobManager.checkAndLoad()
     }
 
-    fun save() {
-        vm.save(Progress({
-            val updateWidgetRequest =
-                Intent("android.appwidget.action.APPWIDGET_UPDATE").setClassName(/* TODO: provide the application ID. For example: */
-                    packageName,
-                    "com.pin.recommend.widget.ContentWidgetProvider"
-                )
-            sendBroadcast(updateWidgetRequest)
-        }, {
-            finish()
-        }, { e ->
-            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-        }))
-    }
-
-    fun onAddAnniversary(v: View) {
-        if ((vm.anniversaries.value?.size ?: 0) >= 2) {
+    private fun onAddAnniversary(
+        vm: CharacterEditorViewModel,
+        state: CharacterEditorViewModelState
+    ) {
+        if ((state.anniversaries.size) >= 2) {
             Toast.makeText(this, "記念日は2個以上設定できません。", Toast.LENGTH_LONG).show()
             return
         }
@@ -198,7 +611,10 @@ class CreateCharacterActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_CODE_CREATE_ANNIVERSARY)
     }
 
-    fun onShowFontDialog(view: View?) {
+    private fun onShowFontDialog(
+        vm: CharacterEditorViewModel,
+        state: CharacterEditorViewModelState
+    ) {
         val adapter = FontAdapter(this)
         val listView = ListView(this)
         listView.adapter = adapter
@@ -210,43 +626,14 @@ class CreateCharacterActivity : AppCompatActivity() {
 
         val dialog = builder.create()
         listView.setOnItemClickListener { parent, view, pos, id ->
-            vm.fontFamily.value = adapter.getItem(pos).name
+            vm.setFontFamily(adapter.getItem(pos).name)
             dialog.cancel()
         }
 
         dialog.show()
     }
 
-    fun onShowDatePickerDialog(view: View?) {
-        val calendar = Calendar.getInstance()
-        val year = calendar[Calendar.YEAR]
-        val month = calendar[Calendar.MONTH]
-        val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-        val datePickerDialog =
-            DatePickerDialog(
-                this,
-                DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT && !dialog.isShown) {
-                        return@OnDateSetListener
-                        //api19はクリックするとonDateSetが２回呼ばれるため
-                    }
-                    val newCalender = Calendar.getInstance()
-                    newCalender[year, month] = dayOfMonth
-                    val date = newCalender.time
-                    vm.created.value = date
-                }, year, month, dayOfMonth
-            )
-        datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
-        datePickerDialog.show()
-    }
-
-
-    private fun initializeToolbar(toolbar: Toolbar) {
-        toolbar.title = "作成"
-        setSupportActionBar(toolbar)
-    }
-
-    fun onSetIcon(v: View?) {
+    private fun onSetIcon() {
         if (!PermissionChecker.requestPermissions(
                 this, MyApplication.REQUEST_PICK_IMAGE, PermissionRequests().requestImages()
             )
@@ -260,23 +647,7 @@ class CreateCharacterActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_PICK_ICON)
     }
 
-    fun setOnBackgroundRemove(v: View?): Boolean {
-        val popup = PopupMenu(this, binding.previewBackgroundImage)
-        val inflater = popup.menuInflater
-        inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.remove -> {
-                    vm.backgroundImage.value = null
-                }
-            }
-            false
-        }
-        popup.show()
-        return true
-    }
-
-    fun onSetBackground(v: View?) {
+    private fun onSetBackground() {
         if (!PermissionChecker.requestPermissions(
                 this, MyApplication.REQUEST_PICK_IMAGE, PermissionRequests().requestImages()
             )
@@ -290,60 +661,51 @@ class CreateCharacterActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_PICK_BACKGROUND)
     }
 
-    fun onSetTextColor(v: View) {
+    private fun onSetTextColor(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
         val dialog = ColorPickerDialogFragment(object :
             DialogActionListener<ColorPickerDialogFragment> {
             override fun onCancel() {}
             override fun onDecision(dialog: ColorPickerDialogFragment?) {
                 dialog?.let {
-                    vm.homeTextColor.value = it.color
+                    vm.setHomeTextColor(it.color)
                 }
             }
         })
-        dialog.setDefaultColor(vm.homeTextColor.value ?: CharacterEditor.defaultTextColor)
+        dialog.setDefaultColor(state.homeTextColor)
         dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
     }
 
-    fun onSetBackgroundColor(v: View?) {
+    private fun onSetBackgroundColor(
+        vm: CharacterEditorViewModel,
+        state: CharacterEditorViewModelState
+    ) {
         val dialog =
             ColorPickerDialogFragment(object : DialogActionListener<ColorPickerDialogFragment> {
                 override fun onDecision(dialog: ColorPickerDialogFragment) {
-                    vm.backgroundColor.value = dialog.color
+                    vm.setBackgroundColor(dialog.color)
                 }
 
                 override fun onCancel() {}
             })
-        dialog.setDefaultColor(vm.backgroundColor.value ?: CharacterEditor.defaultBackgroundColor)
+        dialog.setDefaultColor(state.backgroundColor)
         dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
     }
 
-    private fun onClearBackgroundColor(v: View?): Boolean {
-        val popup = PopupMenu(this, binding.previewBackgroundColor)
-        val inflater = popup.menuInflater
-        inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.remove -> {
-                    vm.backgroundColor.value = Color.parseColor("#77FFFFFF")
-                }
-            }
-            false
-        }
-        popup.show()
-        return true
-    }
 
-    fun onSetTextShadowColor(v: View) {
+    private fun onSetTextShadowColor(
+        vm: CharacterEditorViewModel,
+        state: CharacterEditorViewModelState
+    ) {
         val dialog = ColorPickerDialogFragment(object :
             DialogActionListener<ColorPickerDialogFragment> {
             override fun onCancel() {}
             override fun onDecision(dialog: ColorPickerDialogFragment?) {
                 dialog?.let {
-                    vm.homeTextShadowColor.value = it.color
+                    vm.setHomeTextShadowColor(it.color)
                 }
             }
         })
-        dialog.setDefaultColor(vm.homeTextShadowColor.value ?: Color.parseColor("#00000000"))
+        dialog.setDefaultColor(state.homeTextShadowColor)
         dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
     }
 
@@ -369,22 +731,16 @@ class CreateCharacterActivity : AppCompatActivity() {
             intent.putExtra(Constants.PICK_IMAGE, true)
         }
 
-        if (requestCode == EditCharacterActivity.REQUEST_CODE_CREATE_ANNIVERSARY && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_CREATE_ANNIVERSARY && resultCode == RESULT_OK) {
             result?.let {
                 it.getStringExtra(CreateAnniversaryActivity.INTENT_CREATE_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
                     vm.addAnniversary(anniversary)
-                    scrollView.post {
-                        scrollView.fullScroll(View.FOCUS_DOWN)
-                    }
-                    binding.root.requestFocus()
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
                 }
             }
         }
 
-        if (requestCode == EditCharacterActivity.REQUEST_CODE_EDIT_ANNIVERSARY && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_EDIT_ANNIVERSARY && resultCode == RESULT_OK) {
             result?.let {
                 it.getStringExtra(EditAnniversaryActivity.INTENT_EDIT_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
@@ -407,7 +763,7 @@ class CreateCharacterActivity : AppCompatActivity() {
             val bitmap = BitmapUtility.decodeUri(
                 this, uri, 500, 500
             )
-            vm.iconImage.value = bitmap
+            vm.setIconImage(bitmap)
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT).show()
         }
@@ -424,26 +780,11 @@ class CreateCharacterActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK) {
             val uri = Crop.getOutput(result)
             val bitmap = BitmapUtility.decodeUri(this, uri)
-            vm.backgroundImage.value = bitmap
+            vm.setBackgroundImage(bitmap)
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT).show()
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_edit_character, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_save -> {
-                save()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 
 }

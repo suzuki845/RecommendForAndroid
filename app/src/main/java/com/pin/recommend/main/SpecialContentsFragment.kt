@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.pin.recommend.BadgeGachaActivity
 import com.pin.recommend.StringContentGachaActivity
 import com.pin.recommend.databinding.FragmentSpecialContentsBinding
-import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
+import com.pin.recommend.viewmodel.CharacterDetailsViewModel
 
 class SpecialContentsFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null

@@ -25,9 +25,9 @@ import com.pin.recommend.adapter.PickStoryPictureAdapter
 import com.pin.recommend.databinding.ActivityCreateStoryBinding
 import com.pin.recommend.main.StoryListFragment
 import com.pin.recommend.model.entity.StoryPicture
-import com.pin.recommend.model.viewmodel.StoryEditorViewModel
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
+import com.pin.recommend.viewmodel.StoryEditorViewModel
 import com.pin.util.PermissionChecker
 import com.pin.util.admob.AdMobAdaptiveBannerManager
 import com.pin.util.admob.Interstitial

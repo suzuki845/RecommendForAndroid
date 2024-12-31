@@ -1,4 +1,4 @@
-package com.pin.recommend.model.viewmodel
+package com.pin.recommend.viewmodel
 
 import android.app.Application
 import android.graphics.Typeface

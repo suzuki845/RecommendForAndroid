@@ -18,7 +18,7 @@ import com.pin.imageutil.insertImage
 import com.pin.recommend.databinding.ActivityBadgeGachaBinding
 import com.pin.recommend.main.SpecialContentsFragment
 import com.pin.recommend.model.CharacterDetails
-import com.pin.recommend.model.viewmodel.BadgeGachaViewModel
+import com.pin.recommend.viewmodel.BadgeGachaViewModel
 import com.pin.util.SimpleDialogFragment
 import com.pin.util.admob.RewardAdStateAction
 import com.pin.util.admob.reward.Reward

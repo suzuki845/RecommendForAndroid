@@ -2,12 +2,17 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
         <import type="android.view.View" />
+
         <variable
             name="is_edit_mode"
             type="java.lang.Boolean" />
-        <import type="com.pin.recommend.model.viewmodel.IntConverter" />
-        <import type="com.pin.recommend.model.viewmodel.DateConverter" />
+
+        <import type="com.pin.recommend.viewmodel.IntConverter" />
+
+        <import type="com.pin.recommend.viewmodel.DateConverter" />
+
         <variable
             name="anniversary"
             type="com.pin.recommend.model.entity.CustomAnniversary.Draft" />

@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.switchMap
 import com.pin.recommend.Constants.PREF_KEY_IS_LOCKED
 import com.pin.recommend.model.AppDatabase
-import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
 import com.pin.recommend.util.PrefUtil
+import com.pin.recommend.viewmodel.CharacterDetailsViewModel
 import com.pin.util.admob.reward.RemoveAdReward
 
 class MainActivity : AppCompatActivity() {

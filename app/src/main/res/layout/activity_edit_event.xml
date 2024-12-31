@@ -4,11 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="com.pin.recommend.model.viewmodel.IntConverter" />
-        <import type="com.pin.recommend.model.viewmodel.DateConverter" />
+
+        <import type="com.pin.recommend.viewmodel.IntConverter" />
+
+        <import type="com.pin.recommend.viewmodel.DateConverter" />
+
         <variable
             name="vm"
-            type="com.pin.recommend.model.viewmodel.EditEventViewModel" />
+            type="com.pin.recommend.viewmodel.EditEventViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

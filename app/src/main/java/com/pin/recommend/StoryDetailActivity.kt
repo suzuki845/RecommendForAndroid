@@ -16,7 +16,7 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.pin.recommend.adapter.PickStoryPictureAdapter
-import com.pin.recommend.model.viewmodel.StoryDetailsViewModel
+import com.pin.recommend.viewmodel.StoryDetailsViewModel
 import com.pin.util.admob.AdMobAdaptiveBannerManager
 import com.pin.util.admob.reward.RemoveAdReward
 

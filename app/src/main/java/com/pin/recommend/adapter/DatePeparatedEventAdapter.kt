@@ -15,15 +15,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pin.recommend.R
 import com.pin.recommend.model.entity.Event
-import com.pin.recommend.model.viewmodel.EventDetailsViewModel
+import com.pin.recommend.viewmodel.EventDetailsViewModel
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.Date
 
 
 class DateSeparatedEventAdapter(
-        fragment: Fragment,
-        private val onDelete: (Event) -> Unit
+    fragment: Fragment,
+    private val onDelete: (Event) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val eventDetailsViewModel: EventDetailsViewModel by lazy {
         ViewModelProvider(fragment.requireActivity()).get(EventDetailsViewModel::class.java)
@@ -33,13 +32,13 @@ class DateSeparatedEventAdapter(
 
     private var onSectionClickListener: ((Date) -> Unit)? = null
 
-    fun setOnSectionClickListener(listener: (Date) -> Unit){
+    fun setOnSectionClickListener(listener: (Date) -> Unit) {
         this.onSectionClickListener = listener
     }
 
     private var onSectionAddClickListener: ((Date) -> Unit)? = null
 
-    fun setOnSectionAddClickListener(listener: (Date) -> Unit){
+    fun setOnSectionAddClickListener(listener: (Date) -> Unit) {
         this.onSectionAddClickListener = listener
     }
 
@@ -54,7 +53,7 @@ class DateSeparatedEventAdapter(
         notifyDataSetChanged()
     }
 
-    fun setEvents(items: Map<Date, List<Event>>){
+    fun setEvents(items: Map<Date, List<Event>>) {
         events = items
         notifyDataSetChanged()
     }
@@ -62,7 +61,7 @@ class DateSeparatedEventAdapter(
     private var _isEditMode = false
     var isEditMode
         get() = _isEditMode
-        set(value){
+        set(value) {
             _isEditMode = value
             notifyDataSetChanged()
         }
@@ -71,12 +70,13 @@ class DateSeparatedEventAdapter(
         return dates.size
     }
 
-    fun getSectionItemPosition(date: Date): Int{
+    fun getSectionItemPosition(date: Date): Int {
         return dates.indexOf(date);
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.row_date_separated_event, parent, false)
+        val itemView: View = LayoutInflater.from(parent.context)
+            .inflate(R.layout.row_date_separated_event, parent, false)
 
         return EventRecycleViewHolder(itemView)
     }
@@ -108,7 +108,8 @@ class DateSeparatedEventAdapter(
         var addEventView: ImageButton = itemView.findViewById(R.id.add_event)
 
         init {
-            val linearLayoutManager = LinearLayoutManager(itemView.context, LinearLayoutManager.VERTICAL, false)
+            val linearLayoutManager =
+                LinearLayoutManager(itemView.context, LinearLayoutManager.VERTICAL, false)
             eventRecyclerView.layoutManager = linearLayoutManager
             eventRecyclerView.adapter = eventRecyclerViewAdapter
         }
@@ -133,7 +134,8 @@ class DateSeparatedEventAdapter(
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.row_date_separated_content_event, parent, false)
+            val itemView: View = LayoutInflater.from(parent.context)
+                .inflate(R.layout.row_date_separated_content_event, parent, false)
 
             return ViewItemHolder(itemView)
         }
@@ -143,20 +145,20 @@ class DateSeparatedEventAdapter(
             (holder as ViewItemHolder)
             holder.titleView.text = event.title
 
-            if(isEditMode && event.id != -1L){
+            if (isEditMode && event.id != -1L) {
                 holder.deleteView.visibility = VISIBLE
-            }else{
+            } else {
                 holder.deleteView.visibility = GONE
             }
             holder.deleteView.setOnClickListener(View.OnClickListener {
                 onDelete(event)
             })
-            onEventClickListener?.let {listener ->
-                if(event.id != -1L){//予定がある場合
-                    holder.containerView.setOnClickListener {listener(event)}
+            onEventClickListener?.let { listener ->
+                if (event.id != -1L) {//予定がある場合
+                    holder.containerView.setOnClickListener { listener(event) }
                     val color = ContextCompat.getColor(holder.context, R.color.blue_600);
                     holder.titleView.setTextColor(color)
-                }else{
+                } else {
                     val color = ContextCompat.getColor(holder.context, R.color.grey_900);
                     holder.titleView.setTextColor(color)
                 }
@@ -168,7 +170,7 @@ class DateSeparatedEventAdapter(
             var context: Context = itemView.context
             var containerView: View = itemView.findViewById(R.id.container)
             var titleView: TextView = itemView.findViewById(R.id.title)
-            var deleteView: View =  itemView.findViewById(R.id.delete)
+            var deleteView: View = itemView.findViewById(R.id.delete)
         }
     }
 

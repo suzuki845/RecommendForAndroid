@@ -1,22 +1,17 @@
-package com.pin.recommend.model.viewmodel
+package com.pin.recommend.viewmodel
 
 import android.app.Activity
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
-import androidx.appcompat.widget.Toolbar
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.graphics.drawable.DrawableCompat
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.BindingAdapter
-import com.pin.recommend.MyApplication
 import com.pin.recommend.R
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.RecommendCharacter
-import java.lang.RuntimeException
 
 
 object DataBindingAdapters {
@@ -50,17 +45,25 @@ object DataBindingAdapters {
 
     @JvmStatic
     @BindingAdapter("android:accountToolbar", "android:characterToolbar", "android:activity")
-    fun setToolbar(toolbar: Toolbar, account: Account?, character: RecommendCharacter?, activity: Activity){
+    fun setToolbar(
+        toolbar: Toolbar,
+        account: Account?,
+        character: RecommendCharacter?,
+        activity: Activity
+    ) {
     }
 
     @JvmStatic
     @BindingAdapter("android:homeText")
-    fun setHomeText(textView: TextView, character: RecommendCharacter?){
+    fun setHomeText(textView: TextView, character: RecommendCharacter?) {
         character?.getHomeTextColor()?.let { textView.setTextColor(it) }
-        character?.getHomeTextShadowColor()?.let{ textView.setShadowLayer(4f, 0f, 0f, it) }
+        character?.getHomeTextShadowColor()?.let { textView.setShadowLayer(4f, 0f, 0f, it) }
         try {
             if (character?.fontFamily != null && character.fontFamily != "default") {
-                val font = Typeface.createFromAsset(textView.context.assets, "fonts/" + character.fontFamily + ".ttf")
+                val font = Typeface.createFromAsset(
+                    textView.context.assets,
+                    "fonts/" + character.fontFamily + ".ttf"
+                )
                 textView.typeface = font
             } else {
                 textView.typeface = null

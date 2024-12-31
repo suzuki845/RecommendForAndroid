@@ -25,9 +25,9 @@ import com.pin.recommend.adapter.PickStoryPictureAdapter
 import com.pin.recommend.databinding.ActivityEditStoryBinding
 import com.pin.recommend.model.entity.StoryPicture
 import com.pin.recommend.model.entity.StoryWithPictures
-import com.pin.recommend.model.viewmodel.StoryEditorViewModel
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.Progress
+import com.pin.recommend.viewmodel.StoryEditorViewModel
 import com.pin.util.PermissionChecker
 import com.pin.util.admob.AdMobAdaptiveBannerManager
 import com.pin.util.admob.Interstitial
@@ -154,7 +154,11 @@ class EditStoryActivity : AppCompatActivity() {
                 val bitmap = BitmapUtility.decodeUri(this, uri, 500, 500)
                 val count = pickStoryPictureAdapter.itemCount
                 if (count >= 3) {
-                    Toast.makeText(this@EditStoryActivity, "３つ以上は選択出来ません", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        this@EditStoryActivity,
+                        "３つ以上は選択出来ません",
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                     return
                 }

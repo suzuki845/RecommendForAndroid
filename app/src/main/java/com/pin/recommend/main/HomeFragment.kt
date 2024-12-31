@@ -1,15 +1,22 @@
 package com.pin.recommend.main
 
-import android.os.Bundle
-import androidx.lifecycle.ViewModelProviders
-import android.text.SpannableString
 import android.content.Intent
-import android.view.*
+import android.os.Bundle
+import android.text.SpannableString
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.pin.recommend.*
+import androidx.lifecycle.ViewModelProviders
+import com.pin.recommend.EditCharacterActivity
+import com.pin.recommend.R
+import com.pin.recommend.ScreenShotActivity
 import com.pin.recommend.databinding.FragmentCharacterDetailBinding
-import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
+import com.pin.recommend.viewmodel.CharacterDetailsViewModel
 import java.text.SimpleDateFormat
 
 /**

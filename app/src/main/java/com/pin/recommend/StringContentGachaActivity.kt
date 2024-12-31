@@ -18,8 +18,8 @@ import com.pin.recommend.databinding.ActivityStringContentGachaBinding
 import com.pin.recommend.main.SpecialContentsFragment
 import com.pin.recommend.model.CharacterDetails
 import com.pin.recommend.model.gacha.GachaItemAssetsRepository
-import com.pin.recommend.model.viewmodel.StringContentGachaViewModel
 import com.pin.recommend.util.PlaceholderParser
+import com.pin.recommend.viewmodel.StringContentGachaViewModel
 import com.pin.util.SimpleDialogFragment
 import com.pin.util.admob.RewardAdStateAction
 import com.pin.util.admob.reward.RemoveAdReward

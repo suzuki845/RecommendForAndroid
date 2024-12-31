@@ -6,13 +6,13 @@
 
     <data>
 
-        <import type="com.pin.recommend.model.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.viewmodel.IntConverter" />
 
-        <import type="com.pin.recommend.model.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.viewmodel.DateConverter" />
 
         <variable
             name="vm"
-            type="com.pin.recommend.model.viewmodel.AnniversaryEditorViewModel" />
+            type="com.pin.recommend.viewmodel.AnniversaryEditorViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

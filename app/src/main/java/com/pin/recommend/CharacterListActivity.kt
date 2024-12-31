@@ -46,7 +46,7 @@ import com.pin.recommend.composable.ComposableAdaptiveBanner
 import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.model.entity.RecommendCharacter
-import com.pin.recommend.model.viewmodel.CharacterListViewModel
+import com.pin.recommend.viewmodel.CharacterListViewModel
 import java.util.Calendar
 
 class CharacterListActivity : AppCompatActivity() {
@@ -107,11 +107,14 @@ class CharacterListActivity : AppCompatActivity() {
                 ComposableAdaptiveBanner(adId = "ca-app-pub-3940256099942544/6300978111")
             }
         ) { padding ->
-            Modifier
-                .padding(padding)
-                .fillMaxWidth()
             ErrorMessage()
-            ListView()
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth()
+            ) {
+                ListView()
+            }
         }
     }
 

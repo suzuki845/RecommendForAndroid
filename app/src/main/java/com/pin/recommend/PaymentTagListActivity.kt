@@ -9,7 +9,6 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -20,26 +19,26 @@ import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
 import com.pin.recommend.model.entity.Account
 import com.pin.recommend.model.entity.PaymentTag
-import com.pin.recommend.model.viewmodel.PaymentTagViewModel
-import java.util.*
+import java.util.Date
 
 
-class PaymentTagListActivity: AppCompatActivity() {
+class PaymentTagListActivity : AppCompatActivity() {
 
     companion object {
-        const val INTENT_PAYMENT_TYPE = "com.pin.recommend.PaymentTagListActivity.INTENT_PAYMENT_TYPE"
+        const val INTENT_PAYMENT_TYPE =
+            "com.pin.recommend.PaymentTagListActivity.INTENT_PAYMENT_TYPE"
     }
 
     private lateinit var toolbar: Toolbar
 
     private val viewModel by lazy {
-        ViewModelProvider(this).get(PaymentTagViewModel::class.java)
+        ViewModelProvider(this).get(com.pin.recommend.viewmodel.PaymentTagViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = DataBindingUtil.setContentView<ActivityPaymentTagListBinding>(
-                this, R.layout.activity_payment_tag_list
+            this, R.layout.activity_payment_tag_list
         )
         toolbar = findViewById(R.id.toolbar)
 
@@ -56,13 +55,15 @@ class PaymentTagListActivity: AppCompatActivity() {
 
         with(binding) {
             listview.adapter = PaymentTagAdapter(applicationContext, onDelete = {
-                val dialog = DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
-                    override fun onDecision(dialog: DeleteDialogFragment) {
-                        viewModel.deleteTag(it)
-                    }
-                    override fun onCancel() {
-                    }
-                })
+                val dialog =
+                    DeleteDialogFragment(object : DialogActionListener<DeleteDialogFragment> {
+                        override fun onDecision(dialog: DeleteDialogFragment) {
+                            viewModel.deleteTag(it)
+                        }
+
+                        override fun onCancel() {
+                        }
+                    })
                 dialog.show(supportFragmentManager, DeleteDialogFragment.Tag)
             })
             lifecycleOwner = this@PaymentTagListActivity
@@ -85,11 +86,19 @@ class PaymentTagListActivity: AppCompatActivity() {
             builder.setView(input)
             builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
                 val name = input.text.toString()
-                val tag = PaymentTag(id = 0, createdAt = Date(), updatedAt = Date(), tagName = name, type = viewModel.type.value
-                        ?: 0)
+                val tag = PaymentTag(
+                    id = 0,
+                    createdAt = Date(),
+                    updatedAt = Date(),
+                    tagName = name,
+                    type = viewModel.type.value
+                        ?: 0
+                )
                 viewModel.insertTag(tag)
             })
-            builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
+            builder.setNegativeButton(
+                "Cancel",
+                DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
 
             builder.show()
         })
@@ -97,7 +106,7 @@ class PaymentTagListActivity: AppCompatActivity() {
 
 
     private fun initializeToolbar(account: Account?) {
-         setSupportActionBar(toolbar)
+        setSupportActionBar(toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -119,6 +128,7 @@ class PaymentTagListActivity: AppCompatActivity() {
                 viewModel.isEditMode.value = viewModel.isEditMode.value != true
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

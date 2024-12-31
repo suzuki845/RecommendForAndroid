@@ -15,7 +15,7 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.pin.recommend.main.SectionsPagerAdapter
 import com.pin.recommend.model.CharacterDetails
-import com.pin.recommend.model.viewmodel.CharacterDetailsViewModel
+import com.pin.recommend.viewmodel.CharacterDetailsViewModel
 import com.pin.util.admob.AdMobAdaptiveBannerManager
 import com.pin.util.admob.reward.RemoveAdReward
 
@@ -161,7 +161,11 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
             } else {
                 pinningView.setIcon(R.drawable.pin_fill)
                 detailsVM.pinning()
-                Toast.makeText(this@CharacterDetailActivity, "トップページ に固定しました", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    this@CharacterDetailActivity,
+                    "トップページ に固定しました",
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
             false

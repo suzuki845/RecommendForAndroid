@@ -7,12 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.databinding.ActivityWholePeriodSavingsBinding
-import com.pin.recommend.model.viewmodel.WholePeriodPaymentViewModel
+import com.pin.recommend.viewmodel.WholePeriodPaymentViewModel
 
 class WholePeriodSavingsActivity : AppCompatActivity() {
 
     companion object {
-        const val INTENT_WHOLE_PERIOD_SAVINGS_CHARACTER = "com.pin.recommend.WholePeriodSavingsActivity.INTENT_WHOLE_PERIOD_SAVINGS_CHARACTER"
+        const val INTENT_WHOLE_PERIOD_SAVINGS_CHARACTER =
+            "com.pin.recommend.WholePeriodSavingsActivity.INTENT_WHOLE_PERIOD_SAVINGS_CHARACTER"
     }
 
     private val viewModel by lazy {
@@ -26,7 +27,7 @@ class WholePeriodSavingsActivity : AppCompatActivity() {
 
         viewModel.setCharacterId(intent.getLongExtra(INTENT_WHOLE_PERIOD_SAVINGS_CHARACTER, -1))
 
-        binding  = DataBindingUtil.setContentView(this, R.layout.activity_whole_period_savings)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_whole_period_savings)
         binding.lifecycleOwner = this
         binding.activity = this
         binding.vm = viewModel

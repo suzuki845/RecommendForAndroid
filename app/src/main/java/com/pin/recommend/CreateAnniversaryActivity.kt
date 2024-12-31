@@ -14,8 +14,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.pin.recommend.databinding.ActivityCreateAnniversaryBinding
-import com.pin.recommend.model.viewmodel.AnniversaryEditorViewModel
-import java.util.*
+import com.pin.recommend.viewmodel.AnniversaryEditorViewModel
+import java.util.Calendar
 
 class CreateAnniversaryActivity : AppCompatActivity(), ViewModelStoreOwner {
 
