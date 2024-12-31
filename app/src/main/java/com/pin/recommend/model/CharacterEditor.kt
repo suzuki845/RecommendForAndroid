@@ -129,7 +129,7 @@ class CharacterEditor(val context: Context) {
     }
 
     fun setBelowText(v: String) {
-        _state.value = _state.value.copy(aboveText = v)
+        _state.value = _state.value.copy(belowText = v)
     }
 
     fun setIsZeroDayStart(v: Boolean) {

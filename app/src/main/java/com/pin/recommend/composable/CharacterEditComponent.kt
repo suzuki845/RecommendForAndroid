@@ -459,7 +459,7 @@ fun AboveText(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState
 @Composable
 fun BelowText(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
     Column {
-        Section { Text("上のテキスト") }
+        Section { Text("下のテキスト") }
         TextField(
             modifier = Modifier.padding(4.dp),
             colors = TextFieldDefaults.textFieldColors(
