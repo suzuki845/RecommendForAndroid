@@ -1,18 +1,27 @@
 package com.pin.recommend
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.ViewModelProvider
+import com.pin.imageutil.BitmapUtility
+import com.pin.recommend.CreateAnniversaryActivity.Companion.INTENT_CREATE_ANNIVERSARY
+import com.pin.recommend.EditAnniversaryActivity.Companion.INTENT_EDIT_ANNIVERSARY
+import com.pin.recommend.composable.Body
+import com.pin.recommend.model.entity.CharacterWithAnniversaries
+import com.pin.recommend.model.entity.CustomAnniversary
+import com.pin.recommend.viewmodel.CharacterEditorViewModel
+import com.pin.recommend.viewmodel.CharacterEditorViewModelState
+import com.pin.util.DisplaySizeCheck
+import com.pin.util.admob.reward.RemoveAdReward
+import com.soundcloud.android.crop.Crop
+import java.io.File
 
-class EditCharacterActivity : AppCompatActivity() {
-    companion object {
-        @JvmField
-        val INTENT_EDIT_CHARACTER = "com.pin.recommend.EditCharacterActivity.INTENT_EDIT_CHARACTER"
-        val REQUEST_CODE_CREATE_ANNIVERSARY = 2983179
-        val REQUEST_CODE_EDIT_ANNIVERSARY = 3982432
-    }
 
-}
-
-/*
 class EditCharacterActivity : AppCompatActivity() {
 
     companion object {
@@ -25,295 +34,45 @@ class EditCharacterActivity : AppCompatActivity() {
     private val REQUEST_PICK_ICON = 2000
     private val REQUEST_PICK_BACKGROUND = 2001
 
-    private val FORMAT = SimpleDateFormat("yyyy年MM月dd日")
-
     private val vm: CharacterEditorViewModel by lazy {
         ViewModelProvider(this).get(CharacterEditorViewModel::class.java)
     }
-
-    private var id = -1L
-
-    private lateinit var binding: ActivityEditCharacterBinding
-    private lateinit var listView: RecyclerView
-    private lateinit var scrollView: ScrollView
-
-    private lateinit var adMobManager: AdMobAdaptiveBannerManager
-    private lateinit var adViewContainer: ViewGroup
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_character)
 
-        adViewContainer = findViewById(R.id.ad_container)
-
-        adMobManager =
-            AdMobAdaptiveBannerManager(
-                this,
-                adViewContainer,
-                getString(R.string.banner_id)
-            )
-        adMobManager.setAllowAdClickLimit(6)
-        adMobManager.setAllowRangeOfAdClickByTimeAtMinute(3)
-        adMobManager.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
         val reward = RemoveAdReward.getInstance(this)
         reward.isBetweenRewardTime.observe(
             this
         ) { isBetweenRewardTime ->
-            adMobManager.setEnable(!isBetweenRewardTime!!)
-            adMobManager.checkFirst()
         }
 
         val json = intent.getStringExtra(INTENT_EDIT_CHARACTER) ?: ""
         val cwa =
             CharacterWithAnniversaries.fromJson(json)
+        vm.setEntity(cwa)
 
-        id = cwa.id
-        vm.initialize(cwa)
-
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_character)
-        binding.vm = vm
-        binding.lifecycleOwner = this
-
-        binding.imageOpacity.max = 100
-        binding.imageOpacity.progress = (cwa.character.backgroundImageOpacity * 100).toInt()
-        binding.imageOpacity.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(
-                seekBar: SeekBar, progress: Int, fromUser: Boolean
-            ) {
-                val o = progress * 0.01f
-                vm.backgroundImageOpacity.value = o
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
-        })
-
-        binding.previewBackgroundImage.setOnLongClickListener {
-            setOnBackgroundClear(it)
+        setContent {
+            Body(
+                title = "編集",
+                activity = this,
+                vm = vm,
+                state = vm.state.collectAsState(CharacterEditorViewModelState()).value,
+                characterId = cwa.id,
+                requestCodeIconImage = REQUEST_PICK_ICON,
+                requestCodeBackgroundImage = REQUEST_PICK_BACKGROUND,
+                requestCodeAddAnniversary = CreateCharacterActivity.REQUEST_CODE_CREATE_ANNIVERSARY,
+                requestCodeEditAnniversary = CreateCharacterActivity.REQUEST_CODE_EDIT_ANNIVERSARY
+            )
         }
-
-        binding.previewBackgroundColor.setOnLongClickListener {
-            setOnBackgroundColorClear(it)
-        }
-
-        binding.previewTextColor.setOnClickListener {
-            setOnTextColor(it)
-        }
-
-        binding.previewTextShadow.setOnClickListener {
-            setOnTextShadowColor(it)
-        }
-
-        scrollView = binding.scrollView
-
-        listView = binding.anniversaries
-        val adapter = AnniversariesDraftAdapter(this)
-        listView.adapter = adapter
-        adapter.setOnItemClickListener {
-            val intent = Intent(this, EditAnniversaryActivity::class.java)
-            intent.putExtra(INTENT_EDIT_ANNIVERSARY, it.toJson())
-            startActivityForResult(intent, REQUEST_CODE_EDIT_ANNIVERSARY)
-        }
-        vm.anniversaries.observeForever {
-            adapter.setItems(it)
-        }
-        listView.layoutManager = LinearLayoutManager(this)
-
-        val simpleItemTouchCallback: ItemTouchHelper.SimpleCallback = object :
-            ItemTouchHelper.SimpleCallback(
-                0,
-                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.DOWN or ItemTouchHelper.UP
-            ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
-                val position = viewHolder.adapterPosition
-                vm.removeAnniversary(position)
-                adapter.notifyDataSetChanged()
-            }
-        }
-        val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
-        itemTouchHelper.attachToRecyclerView(listView)
-
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        initializeToolbar(toolbar)
-
-    }
-
-    private fun initializeToolbar(toolbar: Toolbar) {
-        toolbar.title = "編集"
-        setSupportActionBar(toolbar)
     }
 
     override fun onResume() {
         super.onResume()
-        //adMobManager.checkAndLoad()
     }
 
-    fun onSetBackgroundColor(v: View?) {
-        val dialog =
-            ColorPickerDialogFragment(object :
-                DialogActionListener<ColorPickerDialogFragment> {
-                override fun onDecision(dialog: ColorPickerDialogFragment) {
-                    vm.backgroundColor.value = dialog.color
-                }
-
-                override fun onCancel() {}
-            })
-
-        dialog.setDefaultColor(vm.backgroundColor.value ?: CharacterEditor.defaultBackgroundColor)
-        dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
-    }
-
-    fun setOnBackgroundClear(v: View): Boolean {
-        val popup = PopupMenu(this, binding.previewBackgroundImage)
-        val inflater = popup.menuInflater
-        inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.remove -> {
-                    vm.backgroundImage.value = null
-                }
-            }
-            false
-        }
-        popup.show()
-        return true
-    }
-
-    fun setOnBackgroundColorClear(v: View): Boolean {
-        val popup = PopupMenu(this, binding.previewBackgroundColor)
-        val inflater = popup.menuInflater
-        inflater.inflate(R.menu.pic_story_picture_popup, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.remove -> {
-                    vm.backgroundColor.value = Color.WHITE
-                }
-            }
-            false
-        }
-        popup.show()
-        return true
-    }
-
-    fun setOnTextColor(v: View) {
-        val dialog = ColorPickerDialogFragment(object :
-            DialogActionListener<ColorPickerDialogFragment> {
-            override fun onCancel() {}
-            override fun onDecision(dialog: ColorPickerDialogFragment?) {
-                dialog?.let {
-                    vm.homeTextColor.value = it.color
-                }
-            }
-        })
-        dialog.setDefaultColor(vm.homeTextColor.value ?: CharacterEditor.defaultTextColor)
-        dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
-    }
-
-    fun setOnTextShadowColor(v: View) {
-        val dialog = ColorPickerDialogFragment(object :
-            DialogActionListener<ColorPickerDialogFragment> {
-            override fun onCancel() {}
-            override fun onDecision(dialog: ColorPickerDialogFragment?) {
-                dialog?.let {
-                    vm.homeTextShadowColor.value = it.color
-                }
-            }
-        })
-        vm.homeTextShadowColor.value?.let {
-            dialog.setDefaultColor(it)
-        }
-        dialog.show(supportFragmentManager, ColorPickerDialogFragment.TAG)
-    }
-
-    fun onAddAnniversary(v: View) {
-        if ((vm.anniversaries.value?.size ?: 0) >= 2) {
-            Toast.makeText(this, "記念日は2個以上設定できません。", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        val intent = Intent(this, CreateAnniversaryActivity::class.java)
-        intent.putExtra(CreateAnniversaryActivity.INTENT_CHARACTER_ID, id)
-        startActivityForResult(intent, REQUEST_CODE_CREATE_ANNIVERSARY)
-    }
-
-    fun onShowFontDialog(view: View?) {
-        val adapter = FontAdapter(this)
-        val listView = ListView(this)
-        listView.adapter = adapter
-        val builder: AlertDialog.Builder =
-            AlertDialog.Builder(this).setTitle("選択してくだい。").setView(listView)
-        builder.setNegativeButton("キャンセル") { d, _ ->
-            d.cancel()
-        }
-
-        val dialog = builder.create()
-        listView.setOnItemClickListener { parent, view, pos, id ->
-            vm.fontFamily.value = adapter.getItem(pos).name
-            dialog.cancel()
-        }
-
-        dialog.show()
-    }
-
-    fun onShowDatePickerDialog(view: View?) {
-        val calendar = Calendar.getInstance()
-        val year = calendar[Calendar.YEAR]
-        val month = calendar[Calendar.MONTH]
-        val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-        val datePickerDialog =
-            DatePickerDialog(this, OnDateSetListener { dialog, year, month, dayOfMonth ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT && !dialog.isShown) {
-                    return@OnDateSetListener
-                    //api19はクリックするとonDateSetが２回呼ばれるため
-                }
-                val newCalender = Calendar.getInstance()
-                newCalender[year, month] = dayOfMonth
-                val date = newCalender.time
-                vm.created.value = date
-            }, year, month, dayOfMonth)
-        datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
-        datePickerDialog.show()
-    }
-
-
-    fun onSetIcon(v: View?) {
-        if (!PermissionChecker.requestPermissions(
-                this, MyApplication.REQUEST_PICK_IMAGE, PermissionRequests().requestImages()
-            )
-        ) {
-            return
-        }
-
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "image/*"
-        startActivityForResult(intent, REQUEST_PICK_ICON)
-    }
-
-    fun onSetBackground(v: View?) {
-        if (!PermissionChecker.requestPermissions(
-                this, MyApplication.REQUEST_PICK_IMAGE, PermissionRequests().requestImages()
-            )
-        ) {
-            return
-        }
-
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "image/*"
-        startActivityForResult(intent, REQUEST_PICK_BACKGROUND)
-    }
-
-    private
-    var pickMode = 0
+    private var pickMode = 0
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
@@ -344,12 +103,6 @@ class EditCharacterActivity : AppCompatActivity() {
                 it.getStringExtra(INTENT_CREATE_ANNIVERSARY)?.let {
                     val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
                     vm.addAnniversary(anniversary)
-                    scrollView.post {
-                        scrollView.fullScroll(View.FOCUS_DOWN)
-                    }
-                    binding.root.requestFocus()
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
                 }
             }
         }
@@ -377,7 +130,7 @@ class EditCharacterActivity : AppCompatActivity() {
             val bitmap = BitmapUtility.decodeUri(
                 this, uri, 500, 500
             )
-            vm.iconImage.value = bitmap
+            vm.setIconImage(bitmap)
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT)
                 .show()
@@ -392,65 +145,15 @@ class EditCharacterActivity : AppCompatActivity() {
     }
 
     private fun handleCropBackground(resultCode: Int, result: Intent) {
-        println("test!!! handleCropBackground")
         if (resultCode == RESULT_OK) {
             val uri = Crop.getOutput(result)
             val bitmap = BitmapUtility.decodeUri(this, uri)
-            vm.backgroundImage.value = bitmap
-            println("test!!! handleCropBackground")
+            vm.setBackgroundImage(bitmap)
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).message, Toast.LENGTH_SHORT)
                 .show()
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_edit_character, menu)
-        return true
-    }
-
-    private fun save() {
-        val ad = Interstitial(resources.getString(R.string.interstitial_f_id))
-        val progress = ProgressDialog(this).apply {
-            setTitle("少々お待ちください...")
-            setCancelable(false)
-        }
-        ad.show(this, InterstitialAdStateAction({
-            progress.show()
-        }, {
-            progress.dismiss()
-        }, {
-            progress.dismiss()
-            saveInner()
-        }, {
-            saveInner()
-        }, {
-            progress.dismiss()
-            saveInner()
-        }))
-    }
-
-    private fun saveInner() {
-        vm.save(Progress({
-            val updateWidgetRequest = Intent("android.appwidget.action.APPWIDGET_UPDATE")
-            sendBroadcast(updateWidgetRequest)
-        }, {
-            finish()
-        }, { e ->
-            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-        }))
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_save -> {
-                save()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 
 }
-*/

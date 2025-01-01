@@ -32,8 +32,6 @@ class CreateCharacterActivity : AppCompatActivity() {
         ViewModelProvider(this).get(CharacterEditorViewModel::class.java)
     }
 
-    private var id = -1L
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val reward = RemoveAdReward.getInstance(this)
@@ -50,7 +48,7 @@ class CreateCharacterActivity : AppCompatActivity() {
                 activity = this,
                 vm = vm,
                 state = vm.state.collectAsState(CharacterEditorViewModelState()).value,
-                characterId = id,
+                characterId = -1L,
                 requestCodeIconImage = REQUEST_PICK_ICON,
                 requestCodeBackgroundImage = REQUEST_PICK_BACKGROUND,
                 requestCodeAddAnniversary = REQUEST_CODE_CREATE_ANNIVERSARY,
