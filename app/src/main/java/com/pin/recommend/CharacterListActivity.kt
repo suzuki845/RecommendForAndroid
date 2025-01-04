@@ -41,7 +41,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
-import com.pin.recommend.adapter.CharactersAdapter
 import com.pin.recommend.composable.ComposableAdaptiveBanner
 import com.pin.recommend.dialog.DeleteDialogFragment
 import com.pin.recommend.dialog.DialogActionListener
@@ -50,9 +49,6 @@ import com.pin.recommend.viewmodel.CharacterListViewModel
 import java.util.Calendar
 
 class CharacterListActivity : AppCompatActivity() {
-    private val charactersAdapter: CharactersAdapter by lazy {
-        CharactersAdapter(this, vm)
-    }
     private val vm: CharacterListViewModel by lazy {
         ViewModelProvider(this)[CharacterListViewModel::class.java]
     }

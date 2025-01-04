@@ -421,6 +421,7 @@ fun OshiDate(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState)
     }
     if (showModal) {
         DatePickerModal(
+            initialValue = state.created,
             onDateSelected = {
                 if (it != null) {
                     vm.setCreated(Date.from(Instant.ofEpochMilli(it)))

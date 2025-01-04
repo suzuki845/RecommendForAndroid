@@ -68,10 +68,6 @@ class EditCharacterActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     private var pickMode = 0
     override fun onActivityResult(
         requestCode: Int,
