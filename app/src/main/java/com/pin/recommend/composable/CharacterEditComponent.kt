@@ -116,7 +116,7 @@ fun Body(
             )
         },
         bottomBar = {
-            ComposableAdaptiveBanner(adId = "ca-app-pub-3940256099942544/6300978111")
+            ComposableAdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
         }
     ) { padding ->
         ErrorMessage(vm, state)

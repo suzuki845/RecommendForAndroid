@@ -100,7 +100,7 @@ class CharacterListActivity : AppCompatActivity() {
                 )
             },
             bottomBar = {
-                ComposableAdaptiveBanner(adId = "ca-app-pub-3940256099942544/6300978111")
+                ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
             }
         ) { padding ->
             ErrorMessage()
