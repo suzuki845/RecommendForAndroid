@@ -4,13 +4,13 @@
 
     <data>
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
         <variable
             name="vm"
-            type="com.pin.recommend.viewmodel.CreatePaymentViewModel" />
+            type="com.pin.recommend.ui.payment.PaymentCreateViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

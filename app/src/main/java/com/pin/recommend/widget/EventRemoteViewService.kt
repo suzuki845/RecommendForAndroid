@@ -6,7 +6,7 @@ import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.pin.recommend.R
-import com.pin.recommend.model.entity.Event
+import com.pin.recommend.domain.entity.Event
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

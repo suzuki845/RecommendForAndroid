@@ -5,11 +5,11 @@
 
         <import type="android.view.View" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DoubleConverter" />
+        <import type="com.pin.recommend.ui.databinding.DoubleConverter" />
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
         <variable
             name="is_edit_mode"
@@ -17,7 +17,7 @@
 
         <variable
             name="payment_and_tag"
-            type="com.pin.recommend.model.entity.PaymentAndTag" />
+            type="com.pin.recommend.domain.entity.PaymentAndTag" />
     </data>
 
     <LinearLayout

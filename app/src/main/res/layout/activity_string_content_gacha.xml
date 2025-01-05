@@ -6,13 +6,13 @@
 
         <variable
             name="state"
-            type="com.pin.recommend.model.CharacterDetails.State" />
+            type="com.pin.recommend.domain.model.CharacterDetails.State" />
 
         <import type="android.view.View" />
 
         <variable
             name="gachaVM"
-            type="com.pin.recommend.viewmodel.StringContentGachaViewModel" />
+            type="com.pin.recommend.ui.gacha.StringContentGachaViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

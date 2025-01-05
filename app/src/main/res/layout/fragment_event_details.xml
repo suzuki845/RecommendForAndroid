@@ -5,26 +5,26 @@
 
     <data>
 
-        <import type="com.pin.recommend.viewmodel.DoubleConverter" />
+        <import type="com.pin.recommend.ui.databinding.DoubleConverter" />
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateMonthConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateMonthConverter" />
 
         <variable
             name="owner"
-            type="com.pin.recommend.main.EventDetailsFragment" />
+            type="com.pin.recommend.ui.main.EventDetailsFragment" />
 
         <variable
             name="vm"
-            type="com.pin.recommend.viewmodel.EventDetailsViewModel" />
+            type="com.pin.recommend.ui.event.EventDetailsViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:background="#88ffffff"
-        tools:context=".main.EventDetailsFragment"
+        tools:context=".ui.main.EventDetailsFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

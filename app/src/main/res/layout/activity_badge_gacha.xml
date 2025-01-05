@@ -6,13 +6,13 @@
 
         <variable
             name="state"
-            type="com.pin.recommend.model.CharacterDetails.State" />
+            type="com.pin.recommend.domain.model.CharacterDetails.State" />
 
         <import type="android.view.View" />
 
         <variable
             name="gachaVM"
-            type="com.pin.recommend.viewmodel.BadgeGachaViewModel" />
+            type="com.pin.recommend.ui.gacha.GachaBadgeViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -84,7 +84,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 
-                        <com.pin.recommend.view.ToteBagView
+                        <com.pin.recommend.ui.component.ToteBagView
                             android:id="@+id/toteBagView"
                             android:layout_width="300dp"
                             android:layout_height="300dp"

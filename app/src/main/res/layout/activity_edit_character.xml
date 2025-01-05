@@ -4,15 +4,15 @@
 
     <data>
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
-        <import type="com.pin.recommend.viewmodel.ColorConverter" />
+        <import type="com.pin.recommend.ui.databinding.ColorConverter" />
 
         <variable
             name="vm"
-            type="com.pin.recommend.viewmodel.CharacterEditorViewModel" />
+            type="com.pin.recommend.ui.character.CharacterEditorViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -21,7 +21,7 @@
 
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".EditCharacterActivity">
+        tools:context=".ui.character.CharacterEditActivity">
         <!--
                 <com.google.android.material.appbar.AppBarLayout
                     android:layout_width="match_parent"

@@ -14,10 +14,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RemoteViews
 import androidx.core.graphics.drawable.toBitmap
-import com.pin.recommend.MainActivity
 import com.pin.recommend.R
-import com.pin.recommend.view.ToteBagView
-import com.pin.recommend.view.toBitmap
+import com.pin.recommend.ui.MainActivity
+import com.pin.recommend.ui.component.ToteBagView
+import com.pin.recommend.ui.component.toBitmap
 import java.util.Random
 
 

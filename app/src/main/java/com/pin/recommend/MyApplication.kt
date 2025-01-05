@@ -9,7 +9,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
-import com.pin.recommend.model.AccountModel
+import com.pin.recommend.domain.model.CharacterPinningManager
+import com.pin.recommend.ui.MainActivity
+import com.pin.recommend.ui.passcode.PassCodeConfirmationActivity
 import com.pin.recommend.util.PrefUtil
 import com.pin.util.admob.reward.RemoveAdReward
 import com.pin.util.admob.reward.UserDidEarnRewardCounter
@@ -23,7 +25,7 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
     private var isNeedPassCodeConfirmation = true
     override fun onCreate() {
         super.onCreate()
-        AccountModel(this).initialize()
+        CharacterPinningManager(this).initialize()
         PrefUtil.setSharedPreferences(applicationContext)
         registerActivityLifecycleCallbacks(this as ActivityLifecycleCallbacks)
         var appStartCount = PrefUtil.getInt(Constants.APP_START_COUNT)

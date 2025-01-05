@@ -1,8 +1,8 @@
 package com.pin.recommend.widget
 
 import android.content.Context
-import com.pin.recommend.model.AppDatabase
-import com.pin.recommend.model.entity.CharacterWithRelations
+import com.pin.recommend.domain.dao.AppDatabase
+import com.pin.recommend.domain.entity.CharacterWithRelations
 import com.pin.recommend.util.PrefUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -9,13 +9,13 @@
             name="is_edit_mode"
             type="java.lang.Boolean" />
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
         <variable
             name="anniversary"
-            type="com.pin.recommend.model.entity.CustomAnniversary.Draft" />
+            type="com.pin.recommend.domain.entity.CustomAnniversary.Draft" />
     </data>
 
     <LinearLayout

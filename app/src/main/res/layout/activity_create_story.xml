@@ -5,22 +5,22 @@
 
     <data>
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
-        <import type="com.pin.recommend.viewmodel.ColorConverter" />
+        <import type="com.pin.recommend.ui.databinding.ColorConverter" />
 
         <variable
             name="vm"
-            type="com.pin.recommend.viewmodel.StoryEditorViewModel" />
+            type="com.pin.recommend.ui.story.StoryEditorViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".CreateStoryActivity">
+        tools:context=".ui.story.CreateStoryActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"

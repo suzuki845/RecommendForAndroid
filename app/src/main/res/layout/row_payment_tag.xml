@@ -8,7 +8,7 @@
             type="java.lang.Boolean"/>
         <variable
             name="tag"
-            type="com.pin.recommend.model.entity.PaymentTag" />
+            type="com.pin.recommend.domain.entity.PaymentTag" />
     </data>
 
     <LinearLayout

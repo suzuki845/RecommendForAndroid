@@ -4,26 +4,26 @@
 
     <data>
 
-        <import type="com.pin.recommend.viewmodel.DoubleConverter" />
+        <import type="com.pin.recommend.ui.databinding.DoubleConverter" />
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateMonthConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateMonthConverter" />
 
         <variable
             name="owner"
-            type="com.pin.recommend.main.PaymentDetailsFragment" />
+            type="com.pin.recommend.ui.main.PaymentDetailsFragment" />
 
         <variable
             name="vm"
-            type="com.pin.recommend.viewmodel.PaymentDetailsViewModel" />
+            type="com.pin.recommend.ui.payment.PaymentDetailsViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:background="#88ffffff"
-        tools:context=".main.PaymentDetailsFragment"
+        tools:context=".ui.main.PaymentDetailsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

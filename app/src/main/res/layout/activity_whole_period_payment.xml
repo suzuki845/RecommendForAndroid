@@ -5,11 +5,11 @@
 
     <data>
 
-        <import type="com.pin.recommend.viewmodel.DoubleConverter" />
+        <import type="com.pin.recommend.ui.databinding.DoubleConverter" />
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
         <variable
             name="activity"
@@ -17,13 +17,13 @@
 
         <variable
             name="vm"
-            type="com.pin.recommend.viewmodel.WholePeriodPaymentViewModel" />
+            type="com.pin.recommend.ui.payment.PaymentWholePeriodViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".WholePeriodPaymentActivity">
+        tools:context=".ui.payment.PaymentWholePeriodActivity">
 
         <ImageView
             android:id="@+id/background"

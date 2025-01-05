@@ -39,55 +39,55 @@
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <activity
-            android:name=".CreateAnniversaryActivity"
+            android:name=".ui.anniversary.AnniversaryCreateActivity"
             android:exported="false"
             android:label="記念日の作成"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".EditAnniversaryActivity"
+            android:name=".ui.anniversary.AnniversaryEditActivity"
             android:exported="false"
             android:label="記念日の編集"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ScreenShotActivity"
+            android:name=".ui.anniversary.AnniversaryScreenShotActivity"
             android:label="スクリーンショット"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".GlobalSettingActivity"
+            android:name=".ui.globalsetting.GlobalSettingActivity"
             android:label="@string/title_activity_global_setting"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".EditCharacterActivity"
+            android:name=".ui.character.CharacterEditActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SlideShowActivity"
+            android:name=".ui.story.StorySlideShowActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".PaymentTagListActivity"
+            android:name=".ui.payment.PaymentTagListActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CreatePaymentActivity"
+            android:name=".ui.payment.PaymentCreateActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".EditPaymentActivity"
+            android:name=".ui.payment.PaymentEditActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".WholePeriodPaymentActivity"
+            android:name=".ui.payment.PaymentWholePeriodActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".WholePeriodSavingsActivity"
+            android:name=".ui.payment.SavingsWholePeriodActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CreateEventActivity"
+            android:name=".ui.event.EventCreateActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".EditEventActivity"
+            android:name=".ui.event.EventEditActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".BadgeGachaActivity"
+            android:name=".ui.gacha.GachaBadgeActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -97,40 +97,40 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EditStoryActivity"
+            android:name=".ui.story.StoryEditActivity"
             android:label="EditStoryActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".StoryDetailActivity"
+            android:name=".ui.story.StoryDetailActivity"
             android:label="@string/title_activity_story_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CreateStoryActivity"
+            android:name=".ui.story.CreateStoryActivity"
             android:label="@string/title_activity_create_story"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
         <activity
-            android:name=".CreateCharacterActivity"
+            android:name=".ui.character.CharacterCreateActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CharacterListActivity"
+            android:name=".ui.character.CharacterListActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CharacterDetailActivity"
+            android:name=".ui.character.CharacterDetailActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".StringContentGachaActivity"
+            android:name=".ui.gacha.GachaStringContentActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".PassCodeSetActivity"
+            android:name=".ui.passcode.PassCodeSetActivity"
             android:screenOrientation="behind"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".PassCodeConfirmationActivity"
+            android:name=".ui.passcode.PassCodeConfirmationActivity"
             android:screenOrientation="behind"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".NotificationDialogActivity"
+            android:name=".ui.component.NotificationDialogActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="behind"
             android:theme="@style/Translucent" />

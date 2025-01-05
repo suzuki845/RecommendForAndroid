@@ -5,13 +5,13 @@
 
     <data>
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
         <variable
             name="vm"
-            type="com.pin.recommend.viewmodel.AnniversaryEditorViewModel" />
+            type="com.pin.recommend.ui.anniversary.AnniversaryEditorViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:context=".EditAnniversaryActivity">
+            tools:context=".ui.anniversary.AnniversaryEditActivity">
 
             <ScrollView
                 android:layout_width="match_parent"

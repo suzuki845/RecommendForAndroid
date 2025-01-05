@@ -5,19 +5,19 @@
 
     <data>
 
-        <import type="com.pin.recommend.viewmodel.IntConverter" />
+        <import type="com.pin.recommend.ui.databinding.IntConverter" />
 
-        <import type="com.pin.recommend.viewmodel.DateConverter" />
+        <import type="com.pin.recommend.ui.databinding.DateConverter" />
 
-        <import type="com.pin.recommend.viewmodel.ColorConverter" />
+        <import type="com.pin.recommend.ui.databinding.ColorConverter" />
 
         <variable
             name="vm"
-            type="com.pin.recommend.viewmodel.CharacterDetailsViewModel" />
+            type="com.pin.recommend.ui.character.CharacterDetailsViewModel" />
 
         <variable
             name="fragment"
-            type="com.pin.recommend.main.HomeFragment" />
+            type="com.pin.recommend.ui.main.CharacterDetailsFragment" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
