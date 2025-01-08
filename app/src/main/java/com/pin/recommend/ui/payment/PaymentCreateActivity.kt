@@ -10,10 +10,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ListView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityCreatePaymentBinding
@@ -21,6 +19,7 @@ import com.pin.recommend.ui.adapter.PaymentTagAdapter
 import com.pin.recommend.util.TimeUtil
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
+import kotlinx.coroutines.flow.onEach
 import java.util.Calendar
 
 
@@ -31,7 +30,7 @@ class PaymentCreateActivity : AppCompatActivity() {
             "com.pin.recommend.CreatePaymentActivity.INTENT_CREATE_PAYMENT"
     }
 
-    private val viewModel: PaymentCreateViewModel by lazy {
+    private val vm: PaymentCreateViewModel by lazy {
         ViewModelProvider(this)[PaymentCreateViewModel::class.java]
     }
 
@@ -45,30 +44,31 @@ class PaymentCreateActivity : AppCompatActivity() {
 
         val characterId = intent.getLongExtra(INTENT_CREATE_PAYMENT, -1);
         if (characterId != -1L) {
-            viewModel.characterId.value = characterId
+            vm.setCharacterId(characterId)
         }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_create_payment)
-        binding.vm = viewModel
+        binding.vm = vm
         binding.lifecycleOwner = this
 
         tagAdapter = PaymentTagAdapter(this, onDelete = {})
-        viewModel.tags.observe(this@PaymentCreateActivity, Observer {
-            tagAdapter.setList(it)
-        })
+        vm.subscribe(this)
+        vm.state.onEach { state ->
+            tagAdapter.setList(state.tags)
+        }
 
         binding.toolbar.title = "Pay & 貯金の追加"
         setSupportActionBar(binding.toolbar)
     }
 
     fun onPayType(view: View) {
-        var type = if (view.id == R.id.pay) 0 else 1
-        viewModel.type.value = type
+        val type = if (view.id == R.id.pay) 0 else 1
+        vm.setType(type)
     }
 
     fun toTagListActivity(view: View?) {
         val intent = Intent(this, PaymentTagListActivity::class.java);
-        intent.putExtra(PaymentTagListActivity.INTENT_PAYMENT_TYPE, viewModel.type.value ?: 0)
+        intent.putExtra(PaymentTagListActivity.INTENT_PAYMENT_TYPE, vm.state.value.type ?: 0)
         startActivity(intent)
     }
 
@@ -86,7 +86,7 @@ class PaymentCreateActivity : AppCompatActivity() {
         val dialog = builder.create()
         listView.setOnItemClickListener { parent, view, pos, id ->
             val tag = tagAdapter.getItem(pos)
-            viewModel.tag.value = tag
+            vm.setTag(tag)
             dialog.cancel()
         }
 
@@ -96,7 +96,7 @@ class PaymentCreateActivity : AppCompatActivity() {
 
     fun onShowDatePickerDialog(view: View?) {
         val calendar = Calendar.getInstance()
-        calendar.time = viewModel.date.value
+        calendar.time = vm.state.value.date
         val year = calendar[Calendar.YEAR]
         val month = calendar[Calendar.MONTH]
         val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
@@ -113,8 +113,7 @@ class PaymentCreateActivity : AppCompatActivity() {
                 newCalender[year, month] = dayOfMonth
                 TimeUtil.resetTime(newCalender)
                 val date = newCalender.time
-                viewModel.date.value = date
-
+                vm.setDate(date)
             },
             year,
             month,
@@ -150,12 +149,7 @@ class PaymentCreateActivity : AppCompatActivity() {
     }
 
     private fun saveInner() {
-        if (!viewModel.createPayment()) {
-            Toast.makeText(this, "保存できませんでした。", Toast.LENGTH_SHORT)
-                .show()
-        } else {
-            finish()
-        }
+        vm.save()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

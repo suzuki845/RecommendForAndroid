@@ -1,82 +1,76 @@
 package com.pin.recommend.ui.payment
 
 import android.app.Application
+import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.LifecycleOwner
 import com.pin.recommend.R
-import com.pin.recommend.domain.dao.AppDatabase
-import com.pin.recommend.domain.dao.PaymentDao
-import com.pin.recommend.domain.dao.PaymentTagDao
 import com.pin.recommend.domain.entity.PaymentAndTag
-import kotlinx.coroutines.launch
+import com.pin.recommend.domain.entity.PaymentTag
+import com.pin.recommend.domain.model.PaymentEditor
+import com.pin.recommend.domain.model.PaymentEditorState
+import java.util.Date
+
+
+data class PaymentEditViewModelState(
+    private val modelState: PaymentEditorState = PaymentEditorState(),
+) {
+    val action = modelState.action
+    val status = modelState.status
+    val id = modelState.id
+    val characterId = modelState.characterId
+    val type = modelState.type
+    val date = modelState.date
+    val amount = modelState.amount
+    val memo = modelState.memo
+    val selectedTag = modelState.selectedTag
+    val tags = modelState.tags
+    val errorMessage = modelState.errorMessage
+
+    fun payColor(context: Context) {
+        if (modelState.type == 0) {
+            ContextCompat.getColor(context, R.color.blue_600)
+        } else {
+            ContextCompat.getColor(context, R.color.grey_600)
+        }
+    }
+
+    fun savingsColor(context: Context) {
+        if (modelState.type != 0) {
+            ContextCompat.getColor(context, R.color.blue_600)
+        } else {
+            ContextCompat.getColor(context, R.color.grey_600)
+        }
+    }
+}
 
 class PaymentEditViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val paymentDao: PaymentDao = AppDatabase.getDatabase(application).paymentDao()
-    private val tagDao: PaymentTagDao = AppDatabase.getDatabase(application).paymentTagDao()
+    private val model = PaymentEditor(application)
 
-    private val _tags = tagDao.findTrackedAll()
+    val state = model.state
 
-    fun load(id: Long) {
-        viewModelScope.launch {
-            paymentAndTag.value = paymentDao.findByIdPaymentAndTag(id)
-        }
-    }
+    val subscribe: (LifecycleOwner) -> Unit = model::subscribe
 
-    val paymentAndTag = MutableLiveData<PaymentAndTag>()
+    val setEntityById: (Long) -> Unit = model::setEntityById
 
-    val tags
-        get() = paymentAndTag.switchMap { paymentAndTag ->
-            _tags.map { paymentTags ->
-                paymentTags.filter {
-                    it.type == paymentAndTag.payment.type
-                }
-            }
-        }
+    val setEntity: (PaymentAndTag?) -> Unit = model::setEntity
 
+    val setType: (Int) -> Unit = model::setType
 
-    val payColor = paymentAndTag.map {
-        if (it.payment.type == 0) {
-            ContextCompat.getColor(application, R.color.blue_600)
-        } else {
-            ContextCompat.getColor(application, R.color.grey_600)
-        }
-    }
+    val setCharacterId: (Long) -> Unit = model::setCharacterId
 
-    val savingsColor = paymentAndTag.map {
-        if (it.payment.type != 0) {
-            ContextCompat.getColor(application, R.color.blue_600)
-        } else {
-            ContextCompat.getColor(application, R.color.grey_600)
-        }
-    }
+    val setDate: (Date) -> Unit = model::setDate
 
-    val selectedTag = paymentAndTag.switchMap { current ->
-        tags.map { list ->
-            list.find { tag ->
-                current.tag?.id.let { id -> id == tag.id }
-            }
-        }
-    }
+    val setAmount: (Int) -> Unit = model::setAmount
 
+    val setMemo: (String) -> Unit = model::setMemo
 
-    fun updatePayment(): Boolean {
+    val setTag: (PaymentTag?) -> Unit = model::setTag
 
-        //Log.d("UPDATE!! amount", paymentAndTag.value?.payment?.amount.toString())
-        //Log.d("UPDATE!! updatedAt", paymentAndTag.value?.payment?.updatedAt.toString())
-        //Log.d("UPDATE!! memo", paymentAndTag.value?.payment?.memo.toString())
-
-        val paymentAndTag = paymentAndTag.value
-        val payment = paymentAndTag?.payment
-        //val date = TimeUtil.resetDate( Date())
-        //payment?.updatedAt = date
-        payment?.paymentTagId = selectedTag.value?.id
-        return payment?.let { paymentDao.updatePayment(it) } != 0
-    }
-
+    val save: () -> Unit = model::save
 
 }
+
+

@@ -1,95 +1,74 @@
 package com.pin.recommend.ui.payment
 
 import android.app.Application
+import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.LifecycleOwner
 import com.pin.recommend.R
-import com.pin.recommend.domain.dao.AppDatabase
-import com.pin.recommend.domain.dao.PaymentDao
-import com.pin.recommend.domain.dao.PaymentTagDao
-import com.pin.recommend.domain.entity.Payment
+import com.pin.recommend.domain.entity.PaymentAndTag
 import com.pin.recommend.domain.entity.PaymentTag
-import com.pin.recommend.util.TimeUtil
+import com.pin.recommend.domain.model.PaymentEditor
+import com.pin.recommend.domain.model.PaymentEditorState
 import java.util.Date
+
+data class PaymentCreateViewModelState(
+    private val modelState: PaymentEditorState = PaymentEditorState(),
+) {
+    val action = modelState.action
+    val status = modelState.status
+    val id = modelState.id
+    val characterId = modelState.characterId
+    val type = modelState.type
+    val date = modelState.date
+    val amount = modelState.amount
+    val memo = modelState.memo
+    val selectedTag = modelState.selectedTag
+    val tags = modelState.tags
+    val errorMessage = modelState.errorMessage
+
+    fun payColor(context: Context) {
+        if (modelState.type == 0) {
+            ContextCompat.getColor(context, R.color.blue_600)
+        } else {
+            ContextCompat.getColor(context, R.color.grey_600)
+        }
+    }
+
+    fun savingsColor(context: Context) {
+        if (modelState.type != 0) {
+            ContextCompat.getColor(context, R.color.blue_600)
+        } else {
+            ContextCompat.getColor(context, R.color.grey_600)
+        }
+    }
+}
 
 class PaymentCreateViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val paymentDao: PaymentDao = AppDatabase.getDatabase(application).paymentDao()
-    private val tagDao: PaymentTagDao = AppDatabase.getDatabase(application).paymentTagDao()
+    private val model = PaymentEditor(application)
 
-    private val _tags = tagDao.findTrackedAll()
+    val state = model.state
 
-    val tags
-        get() = (type).switchMap { payType ->
-            _tags.map { paymentTags ->
-                paymentTags.filter {
-                    it.type == payType
-                }
-            }
-        }
+    val subscribe: (LifecycleOwner) -> Unit = model::subscribe
 
-    val type = MutableLiveData(0)
+    val setEntityById: (Long) -> Unit = model::setEntityById
 
-    val payColor = type.map {
-        if (it == 0) {
-            ContextCompat.getColor(application, R.color.blue_600)
-        } else {
-            ContextCompat.getColor(application, R.color.grey_600)
-        }
-    }
+    val setEntity: (PaymentAndTag?) -> Unit = model::setEntity
 
-    val savingsColor = type.map {
-        if (it != 0) {
-            ContextCompat.getColor(application, R.color.blue_600)
-        } else {
-            ContextCompat.getColor(application, R.color.grey_600)
-        }
-    }
+    val setType: (Int) -> Unit = model::setType
 
-    val characterId = MutableLiveData<Long?>()
+    val setCharacterId: (Long) -> Unit = model::setCharacterId
 
-    val date = MutableLiveData<Date>(Date())
+    val setDate: (Date) -> Unit = model::setDate
 
-    val amount = MutableLiveData<Int>(0)
+    val setAmount: (Int) -> Unit = model::setAmount
 
-    val memo = MutableLiveData<String>("")
+    val setMemo: (String) -> Unit = model::setMemo
 
-    val tag = MutableLiveData<PaymentTag?>()
+    val setTag: (PaymentTag?) -> Unit = model::setTag
 
-    val selectedTag = tags.switchMap { list ->
-        tag.map { selected ->
-            list.find {
-                selected?.id.let { id -> id == it.id }
-            }
-        }
-    }
-
-
-    fun createPayment(): Boolean {
-        val characterId = characterId.value ?: return false
-        val date = TimeUtil.resetDate(date.value ?: Date())
-        //print("test!! $date")
-        val amount = (amount.value ?: 0).toDouble()
-        val memo = memo.value
-        val selectedTag = selectedTag.value
-        val type = type.value ?: 0
-        val newPayment = Payment(
-            id = 0,
-            characterId = characterId,
-            type = type,
-            amount = amount,
-            memo = memo,
-            paymentTagId = selectedTag?.id,
-            createdAt = date,
-            updatedAt = date
-        )
-        val r = paymentDao.insertPayment(newPayment) != 0L
-        return r;
-    }
-
+    val save: () -> Unit = model::save
 
 }
 

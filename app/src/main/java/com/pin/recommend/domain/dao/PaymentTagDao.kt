@@ -1,7 +1,11 @@
 package com.pin.recommend.domain.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 import com.pin.recommend.domain.entity.PaymentTag
 
 @Dao
@@ -25,9 +29,9 @@ interface PaymentTagDao {
     fun findById(id: Long): PaymentTag?
 
     @Query("SELECT * FROM PaymentTag WHERE id = :id")
-    fun findByTrackedId(id: Long): LiveData<PaymentTag?>
+    fun watchById(id: Long): LiveData<PaymentTag?>
 
     @Query("SELECT * FROM PaymentTag")
-    fun findTrackedAll(): LiveData<List<PaymentTag>>
+    fun watchAll(): LiveData<List<PaymentTag>>
 
 }
