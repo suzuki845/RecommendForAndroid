@@ -10,7 +10,7 @@ class CharacterPinningManager(
 ) {
     private val db = AppDatabase.getDatabase(context)
 
-    val entity = db.accountDao().watchById(Account.ACCOUNT_ID).map {
+    val account = db.accountDao().watchById(Account.ACCOUNT_ID).map {
         if (it == null) {
             val a = Account()
             AppDatabase.executor.execute { db.accountDao().insertAccount(a) }
@@ -30,7 +30,7 @@ class CharacterPinningManager(
     }
 
     fun pinning(id: Long) {
-        entity.value?.let {
+        account.value?.let {
             val dao = db.accountDao()
             it.fixedCharacterId = id
             AppDatabase.executor.execute { dao.updateAccount(it) }
@@ -38,7 +38,7 @@ class CharacterPinningManager(
     }
 
     fun unpinning() {
-        entity.value?.let {
+        account.value?.let {
             val dao = db.accountDao()
             it.fixedCharacterId = null
             AppDatabase.executor.execute { dao.updateAccount(it) }

@@ -19,7 +19,7 @@ import java.util.LinkedList
 
 class CharacterDetails(
     private val context: Context,
-    private val accountModel: CharacterPinningManager,
+    private val pinningManager: CharacterPinningManager,
 ) {
 
     private val db = AppDatabase.getDatabase(context)
@@ -28,7 +28,7 @@ class CharacterDetails(
 
     private val _displayOnHomeAnniversaries = MutableLiveData<List<AnniversaryInterface>>(listOf())
 
-    val cwa = combine2(id, accountModel.entity) { id, account ->
+    val cwa = combine2(id, pinningManager.account) { id, account ->
         return@combine2 db.recommendCharacterDao().watchByIdCharacterWithAnniversaries(
             (id ?: account?.fixedCharacterId) ?: -1
         )
@@ -44,7 +44,7 @@ class CharacterDetails(
             .watchByCharacterIdStoryWithPictures(it.id, it.storySortOrder == 1)
     }
 
-    private val account = accountModel.entity
+    private val account = pinningManager.account
 
     private val displayOnHomeAnniversary = _displayOnHomeAnniversaries.map {
         val a = it.firstOrNull()
@@ -98,12 +98,12 @@ class CharacterDetails(
 
     fun pinning() {
         id.value?.let {
-            accountModel.pinning(it)
+            pinningManager.pinning(it)
         }
     }
 
     fun unpinning() {
-        accountModel.unpinning()
+        pinningManager.unpinning()
     }
 
     fun updateStorySortOrder(order: Int) {

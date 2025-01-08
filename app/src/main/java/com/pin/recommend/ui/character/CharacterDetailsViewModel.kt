@@ -27,7 +27,7 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
 
     val id = characterDetails.id
 
-    val account = accountModel.entity
+    val account = accountModel.account
 
     val editModeStories = MutableLiveData<Boolean>()
 
