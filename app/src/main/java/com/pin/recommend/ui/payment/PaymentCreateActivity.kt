@@ -32,7 +32,7 @@ class PaymentCreateActivity : AppCompatActivity() {
     }
 
     private val viewModel: PaymentCreateViewModel by lazy {
-        ViewModelProvider(this).get(PaymentCreateViewModel::class.java)
+        ViewModelProvider(this)[PaymentCreateViewModel::class.java]
     }
 
     private lateinit var binding: ActivityCreatePaymentBinding
@@ -43,7 +43,7 @@ class PaymentCreateActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        var characterId = intent.getLongExtra(INTENT_CREATE_PAYMENT, -1);
+        val characterId = intent.getLongExtra(INTENT_CREATE_PAYMENT, -1);
         if (characterId != -1L) {
             viewModel.characterId.value = characterId
         }
