@@ -261,7 +261,7 @@ fun Tag(
         Section {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.height(30.dp)
+                modifier = Modifier.height(22.dp)
             ) {
                 Text("タグ")
                 Spacer(Modifier.weight(1f))
@@ -275,7 +275,7 @@ fun Tag(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(PaddingValues(start = 16.dp, top = 8.dp))
+                .padding(PaddingValues(start = 16.dp, top = 16.dp))
                 .clickable {
                     onShowTagDialog(activity = activity, vm = vm, state = state)
                 }

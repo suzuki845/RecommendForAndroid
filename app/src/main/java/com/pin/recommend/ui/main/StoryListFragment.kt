@@ -138,7 +138,7 @@ class StoryListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.edit_mode -> {
-                if (vm.editModeStories.value!!) {
+                if (vm.editModeStories.value == true) {
                     vm.editModeStories.value = false
                 } else {
                     vm.editModeStories.value = true
