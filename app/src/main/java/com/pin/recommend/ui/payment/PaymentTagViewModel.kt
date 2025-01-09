@@ -15,7 +15,7 @@ class PaymentTagViewModel(application: Application) : AndroidViewModel(applicati
 
     private val tagDao: PaymentTagDao = AppDatabase.getDatabase(application).paymentTagDao()
 
-    private val _tags = tagDao.findTrackedAll()
+    private val _tags = tagDao.watchAll()
 
     private val allTags = _tags
 

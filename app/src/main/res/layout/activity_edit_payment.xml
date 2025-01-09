@@ -12,7 +12,11 @@
 
         <variable
             name="vm"
-            type="com.pin.recommend.ui.payment.PaymentEditViewModel" />
+            type="com.pin.recommend.ui.payment.PaymentEditorViewModel" />
+
+        <variable
+            name="state"
+            type="com.pin.recommend.ui.payment.PaymentEditorViewModelState" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -76,7 +80,6 @@
                             android:gravity="center"
                             android:onClick="onPayType"
                             android:text="Pay"
-                            android:textColor='@{vm.payColor}'
                             android:textSize="20sp" />
 
                         <TextView
@@ -87,7 +90,6 @@
                             android:gravity="center"
                             android:onClick="onPayType"
                             android:text="貯金"
-                            android:textColor='@{vm.savingsColor}'
                             android:textSize="20sp" />
                     </LinearLayout>
 
@@ -114,7 +116,6 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:minHeight="46dp"
-                            android:text="@{DateConverter.toString(vm.paymentAndTag.payment.updatedAt)}"
                             android:textSize="20sp" />
 
                     </LinearLayout>
@@ -138,8 +139,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number"
-                            android:minHeight="46dp"
-                            android:text="@={IntConverter.toString(vm.paymentAndTag.payment.toIntAmount)}" />
+                            android:minHeight="46dp" />
 
                     </LinearLayout>
 
@@ -162,8 +162,7 @@
                             android:id="@+id/memo"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:minHeight="46dp"
-                            android:text="@={vm.paymentAndTag.payment.memo}" />
+                            android:minHeight="46dp" />
                     </LinearLayout>
 
 
@@ -190,7 +189,6 @@
                             android:gravity="left|center_vertical"
                             android:minHeight="46dp"
                             android:onClick="onShowTagDialog"
-                            android:text="@{vm.selectedTag.tagName}"
                             android:textSize="20sp" />
 
                         <View

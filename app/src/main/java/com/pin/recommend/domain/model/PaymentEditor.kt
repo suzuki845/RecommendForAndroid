@@ -25,7 +25,11 @@ data class PaymentEditorState(
     val selectedTag: PaymentTag? = null,
     val tags: List<PaymentTag> = listOf(),
     val errorMessage: String? = null
-)
+) {
+    val paymentTags get() = tags.filter { it.type == 0 }
+    val savingsTags get() = tags.filter { it.type == 1 }
+    val currentTags get() = if (type == 0) paymentTags else savingsTags
+}
 
 enum class PaymentEditorAction {
     Init,
@@ -50,6 +54,10 @@ class PaymentEditor(val context: Context) {
         tagDao.watchAll().observe(owner) {
             _state.value = _state.value.copy(tags = it)
         }
+    }
+
+    fun setId(id: Long) {
+        _state.value = _state.value.copy(id = id)
     }
 
     fun setEntityById(id: Long) {
@@ -103,6 +111,10 @@ class PaymentEditor(val context: Context) {
         _state.value = _state.value.copy(selectedTag = tag)
     }
 
+    fun resetError() {
+        _state.value = _state.value.copy(errorMessage = null)
+    }
+
     fun save() {
         try {
             val s = _state.value.copy(
@@ -134,10 +146,12 @@ class PaymentEditor(val context: Context) {
             }
 
             _state.value = _state.value.copy(
+                action = PaymentEditorAction.Save,
                 status = PaymentEditorStatus.Success,
             )
         } catch (e: Exception) {
             _state.value = _state.value.copy(
+                action = PaymentEditorAction.Save,
                 status = PaymentEditorStatus.Failure,
                 errorMessage = e.message
             )

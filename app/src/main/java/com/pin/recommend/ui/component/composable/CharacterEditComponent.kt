@@ -197,16 +197,6 @@ fun Form(
     }
 }
 
-@Composable
-fun Section(content: @Composable () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Gray.copy(alpha = 0.5f))
-    ) {
-        content()
-    }
-}
 
 @Composable
 fun Name(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
