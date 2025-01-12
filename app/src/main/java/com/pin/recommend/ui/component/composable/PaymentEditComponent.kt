@@ -226,7 +226,8 @@ fun Amount(
             value = state.amount.toString(),
             onValueChange = { newValue ->
                 if (newValue.all { it.isDigit() }) {
-                    vm.setAmount(newValue.toInt())
+                    val newAmount = newValue.toIntOrNull() ?: 0
+                    vm.setAmount(newAmount)
                 }
             })
     }
