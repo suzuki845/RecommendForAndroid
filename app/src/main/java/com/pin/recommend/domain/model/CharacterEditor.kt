@@ -83,6 +83,8 @@ data class CharacterEditState(
     val homeTextShadowColorToBitmap: Bitmap?
         get() =
             colorIntToBitmap(homeTextShadowColor)
+
+    val isNewEntity: Boolean get() = id == 0L
 }
 
 class CharacterEditor(val context: Context) {

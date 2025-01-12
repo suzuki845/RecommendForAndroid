@@ -51,6 +51,7 @@ data class CharacterEditorViewModelState(
 
     val typeFace: (Context) -> Typeface? = modelState::typeface
 
+    val isNewEntity = modelState.isNewEntity
 }
 
 

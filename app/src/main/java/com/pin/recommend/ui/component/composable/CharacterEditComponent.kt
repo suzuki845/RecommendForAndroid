@@ -1,6 +1,7 @@
 package com.pin.recommend.ui.component.composable
 
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.res.AssetManager
 import android.widget.ListView
@@ -80,6 +81,8 @@ import com.pin.recommend.ui.component.DialogActionListener
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.toFormattedString
 import com.pin.util.PermissionChecker
+import com.pin.util.admob.Interstitial
+import com.pin.util.admob.InterstitialAdStateAction
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
@@ -108,7 +111,7 @@ fun Body(
                 },
                 actions = {
                     TextButton({
-                        vm.save()
+                        save(activity, vm, state)
                     }) {
                         Text("保存")
                     }
@@ -738,3 +741,33 @@ private fun onSetTextShadowColor(
     dialog.setDefaultColor(state.homeTextShadowColor)
     dialog.show(activity.supportFragmentManager, ColorPickerDialogFragment.TAG)
 }
+
+private fun save(
+    activity: AppCompatActivity,
+    vm: CharacterEditorViewModel,
+    state: CharacterEditorViewModelState
+) {
+    if (state.isNewEntity) {
+        vm.save()
+    } else {
+        val ad = Interstitial(activity.resources.getString(R.string.interstitial_f_id))
+        val progress = ProgressDialog(activity).apply {
+            setTitle("少々お待ちください...")
+            setCancelable(false)
+        }
+        ad.show(activity, InterstitialAdStateAction({
+            progress.show()
+        }, {
+            progress.dismiss()
+        }, {
+            progress.dismiss()
+            vm.save()
+        }, {
+            vm.save()
+        }, {
+            progress.dismiss()
+            vm.save()
+        }))
+    }
+}
+
