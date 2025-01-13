@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 enum class StoryDetailsViewModelAction {
     Init,
-    SetEntity
+    SetEntity,
 }
 
 enum class StoryDetailsViewModelStatus {

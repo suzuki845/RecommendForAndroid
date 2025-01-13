@@ -1,69 +1,73 @@
 package com.pin.recommend.ui.story
 
 import android.os.Bundle
-import android.view.ViewGroup
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import com.bumptech.glide.request.RequestOptions
-import com.glide.slider.library.SliderLayout
-import com.glide.slider.library.slidertypes.TextSliderView
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.pin.recommend.R
 import com.pin.recommend.domain.entity.StoryWithPictures
-import com.pin.util.admob.AdMobAdaptiveBannerManager
-import com.pin.util.admob.reward.RemoveAdReward
+import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.Slideshow
+import java.io.File
 
 
 class StorySlideShowActivity : AppCompatActivity() {
-    private lateinit var toolbar: Toolbar
-    private lateinit var sliderView: SliderLayout
-    private lateinit var story: StoryWithPictures
-    private var initPosition = 0
-    private var adMobManager: AdMobAdaptiveBannerManager? = null
-    private var adViewContainer: ViewGroup? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_slide_show)
-        adViewContainer = findViewById(R.id.ad_container)
-        adMobManager =
-            AdMobAdaptiveBannerManager(
-                this,
-                adViewContainer,
-                getString(R.string.banner_id)
-            )
-        adMobManager!!.setAllowAdClickLimit(6)
-        adMobManager!!.setAllowRangeOfAdClickByTimeAtMinute(3)
-        adMobManager!!.setAllowAdLoadByElapsedTimeAtMinute(24 * 60 * 14)
-        val reward = RemoveAdReward.getInstance(this)
-        reward.isBetweenRewardTime.observe(this) { isBetweenRewardTime ->
-            adMobManager!!.setEnable(!isBetweenRewardTime!!)
-            adMobManager!!.checkFirst()
-        }
-        toolbar = findViewById(R.id.toolbar)
 
         val json = intent.getStringExtra(StoryDetailActivity.INTENT_SLIDE_SHOW) ?: ""
-        story = StoryWithPictures.fromJson(json)
-        initPosition = intent.getIntExtra(StoryDetailActivity.INTENT_SLIDE_SHOW_CURRENT_POSITION, 0)
+        val story = StoryWithPictures.fromJson(json)
+        val initPosition =
+            intent.getIntExtra(StoryDetailActivity.INTENT_SLIDE_SHOW_CURRENT_POSITION, 0)
 
-        sliderView = findViewById(R.id.slider)
-        sliderView.stopAutoCycle()
-        val requestOptions = RequestOptions()
-        for (picture in story.pictures) {
-            val textSliderView = TextSliderView(this)
-            textSliderView
-                .image(picture.getFile(this))
-                .setRequestOption(requestOptions)
-                .setProgressBarVisible(true)
-            sliderView.addSlider(textSliderView)
+        val self = this
+        setContent {
+            Body(
+                story.pictures.map { it.getFile(self) },
+                initPosition
+            )
         }
-        sliderView.currentPosition = initPosition
-
-        toolbar.title = "スライドショー"
-        setSupportActionBar(toolbar)
     }
 
-
-    override fun onResume() {
-        super.onResume()
-        adMobManager!!.checkAndLoad()
+    @Composable
+    fun Body(images: List<File>, pos: Int) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = Color.Black,
+                    title = {
+                        Text("スライドショー")
+                    },
+                )
+            },
+            bottomBar = {
+                Column {
+                    ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
+                }
+            }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth()
+            ) {
+                Slideshow(
+                    images = images,
+                    currentIndex = pos
+                )
+            }
+        }
     }
+
 }
