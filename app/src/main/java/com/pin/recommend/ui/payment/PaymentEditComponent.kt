@@ -1,4 +1,4 @@
-package com.pin.recommend.ui.component.composable
+package com.pin.recommend.ui.payment
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
@@ -44,9 +44,8 @@ import com.pin.recommend.R
 import com.pin.recommend.domain.model.PaymentEditorAction
 import com.pin.recommend.domain.model.PaymentEditorStatus
 import com.pin.recommend.ui.adapter.PaymentTagAdapter
-import com.pin.recommend.ui.payment.PaymentEditorViewModel
-import com.pin.recommend.ui.payment.PaymentEditorViewModelState
-import com.pin.recommend.ui.payment.PaymentTagListActivity
+import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.Section
 import com.pin.recommend.util.TimeUtil
 import com.pin.recommend.util.toFormattedString
 import com.pin.util.admob.Interstitial
@@ -377,18 +376,12 @@ private fun save(
         progress.dismiss()
     }, {
         progress.dismiss()
-        saveInner(vm)
+        vm.save()
     }, {
-        saveInner(vm)
+        vm.save()
     }, {
         progress.dismiss()
-        saveInner(vm)
+        vm.save()
     }))
-}
-
-private fun saveInner(
-    vm: PaymentEditorViewModel,
-) {
-    vm.save()
 }
 

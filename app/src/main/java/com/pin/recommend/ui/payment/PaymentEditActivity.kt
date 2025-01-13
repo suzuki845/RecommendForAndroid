@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityEditPaymentBinding
 import com.pin.recommend.ui.adapter.PaymentTagAdapter
-import com.pin.recommend.ui.component.composable.Body
 
 class PaymentEditActivity : AppCompatActivity() {
 

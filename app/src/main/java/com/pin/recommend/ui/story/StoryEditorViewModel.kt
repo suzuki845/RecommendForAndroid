@@ -5,19 +5,43 @@ import androidx.lifecycle.AndroidViewModel
 import com.pin.recommend.domain.entity.StoryPicture
 import com.pin.recommend.domain.entity.StoryWithPictures
 import com.pin.recommend.domain.model.StoryEditor
-import com.pin.recommend.util.Progress
+import com.pin.recommend.domain.model.StoryEditorState
+import kotlinx.coroutines.flow.map
+import java.util.Date
+
+class StoryEditorViewModelState(state: StoryEditorState = StoryEditorState()) {
+    val action = state.action
+    val status = state.status
+    val id = state.id
+    val characterId = state.characterId
+    val comment = state.comment
+    val created = state.created
+    val pictures = state.pictures
+    val beforePictures = state.beforePictures
+    val isNewEntity = state.isNewEntity
+    val errorMessage = state.errorMessage
+}
 
 class StoryEditorViewModel(application: Application) : AndroidViewModel(application) {
 
-    val model = StoryEditor(application)
-    val id = model.id
-    val characterId = model.characterId
-    val comment = model.comment
-    val created = model.created
-    val pictures = model.pictures
+    private val model = StoryEditor(application)
 
-    fun initialize(e: StoryWithPictures? = null) {
-        model.initialize(e)
+    val state = model.state.map { StoryEditorViewModelState(it) }
+
+    fun setEntity(e: StoryWithPictures? = null) {
+        model.setEntity(e)
+    }
+
+    fun setCharacterId(characterId: Long) {
+        model.setCharacterId(characterId)
+    }
+
+    fun setCreated(date: Date) {
+        model.setCreated(date)
+    }
+
+    fun setComment(comment: String) {
+        model.setComment(comment)
     }
 
     fun addPicture(p: StoryPicture.Draft) {
@@ -32,8 +56,12 @@ class StoryEditorViewModel(application: Application) : AndroidViewModel(applicat
         model.removePicture(pos)
     }
 
-    fun save(p: Progress) {
-        model.save(p)
+    fun resetError() {
+        model.resetError()
+    }
+
+    fun save() {
+        model.save()
     }
 
 }

@@ -99,14 +99,16 @@
         <activity
             android:name=".ui.story.StoryEditActivity"
             android:label="EditStoryActivity"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.story.StoryDetailActivity"
             android:label="@string/title_activity_story_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.story.CreateStoryActivity"
+            android:name=".ui.story.StoryCreateActivity"
             android:label="@string/title_activity_create_story"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
         <activity

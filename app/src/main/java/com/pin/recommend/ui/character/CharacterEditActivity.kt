@@ -15,7 +15,6 @@ import com.pin.recommend.domain.entity.CharacterWithAnniversaries
 import com.pin.recommend.domain.entity.CustomAnniversary
 import com.pin.recommend.ui.anniversary.AnniversaryCreateActivity.Companion.INTENT_CREATE_ANNIVERSARY
 import com.pin.recommend.ui.anniversary.AnniversaryEditActivity.Companion.INTENT_EDIT_ANNIVERSARY
-import com.pin.recommend.ui.component.composable.Body
 import com.pin.util.DisplaySizeCheck
 import com.pin.util.admob.reward.RemoveAdReward
 import com.soundcloud.android.crop.Crop

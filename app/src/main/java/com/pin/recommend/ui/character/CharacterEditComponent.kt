@@ -1,4 +1,4 @@
-package com.pin.recommend.ui.component.composable
+package com.pin.recommend.ui.character
 
 import android.app.AlertDialog
 import android.app.ProgressDialog
@@ -73,11 +73,11 @@ import com.pin.recommend.ui.adapter.FontAdapter
 import com.pin.recommend.ui.anniversary.AnniversaryCreateActivity
 import com.pin.recommend.ui.anniversary.AnniversaryEditActivity
 import com.pin.recommend.ui.anniversary.AnniversaryEditActivity.Companion.INTENT_EDIT_ANNIVERSARY
-import com.pin.recommend.ui.character.CharacterEditorViewModel
-import com.pin.recommend.ui.character.CharacterEditorViewModelState
 import com.pin.recommend.ui.component.ColorPickerDialogFragment
 import com.pin.recommend.ui.component.DatePickerModal
 import com.pin.recommend.ui.component.DialogActionListener
+import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.Section
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.toFormattedString
 import com.pin.util.PermissionChecker

@@ -13,7 +13,6 @@ import com.pin.recommend.Constants
 import com.pin.recommend.domain.entity.CustomAnniversary
 import com.pin.recommend.ui.anniversary.AnniversaryCreateActivity
 import com.pin.recommend.ui.anniversary.AnniversaryEditActivity
-import com.pin.recommend.ui.component.composable.Body
 import com.pin.util.DisplaySizeCheck
 import com.pin.util.admob.reward.RemoveAdReward
 import com.soundcloud.android.crop.Crop

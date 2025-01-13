@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.R
-import com.pin.recommend.ui.component.composable.Body
 
 
 class PaymentCreateActivity : AppCompatActivity() {

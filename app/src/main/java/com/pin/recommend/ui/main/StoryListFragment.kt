@@ -23,7 +23,8 @@ import com.pin.recommend.R
 import com.pin.recommend.domain.entity.RecommendCharacter
 import com.pin.recommend.ui.adapter.VerticalRecyclerViewAdapter
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
-import com.pin.recommend.ui.story.CreateStoryActivity
+import com.pin.recommend.ui.story.StoryCreateActivity
+import com.pin.recommend.ui.story.StoryCreateActivity.Companion.INTENT_CHARACTER_ID
 
 class StoryListFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
@@ -147,9 +148,9 @@ class StoryListFragment : Fragment() {
             }
 
             R.id.create -> {
-                val intent = Intent(activity, CreateStoryActivity::class.java)
+                val intent = Intent(activity, StoryCreateActivity::class.java)
                 val characterId = vm.id.value
-                intent.putExtra(INTENT_CREATE_STORY, characterId)
+                intent.putExtra(INTENT_CHARACTER_ID, characterId)
                 startActivity(intent)
             }
         }
@@ -159,7 +160,6 @@ class StoryListFragment : Fragment() {
     companion object {
         private const val ARG_SECTION_NUMBER = "section_number"
         const val INTENT_STORY = "com.pin.recommend.StoryFragment.INTENT_STORY"
-        const val INTENT_CREATE_STORY = "com.pin.recommend.StoryFragment.INTENT_CREATE_STORY"
 
         @JvmStatic
         fun newInstance(index: Int): StoryListFragment {

@@ -184,6 +184,8 @@ dependencies {
 
     implementation 'androidx.compose.material:material-icons-extended:x.x.x'
 
+    implementation "com.google.accompanist:accompanist-insets:0.30.1"
+
     /*
        composeで使うライブラリ群:end
     */

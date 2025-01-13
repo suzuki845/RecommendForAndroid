@@ -115,7 +115,7 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
         }
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, StoryDetailActivity::class.java)
-            intent.putExtra(StoryDetailActivity.INTENT_STORY, story?.id)
+            intent.putExtra(StoryDetailActivity.INTENT_STORY_DETAILS, story.toJson())
             holder.itemView.context.startActivity(intent)
         }
         holder.bindViewHolder(story)
@@ -175,7 +175,7 @@ class VerticalRecyclerViewAdapter(fragment: Fragment, character: RecommendCharac
             holder.picture.setImageBitmap(bitmap)
             holder.picture.setOnClickListener {
                 val intent = Intent(context, StoryDetailActivity::class.java)
-                intent.putExtra(StoryDetailActivity.INTENT_STORY, story?.id)
+                intent.putExtra(StoryDetailActivity.INTENT_STORY_DETAILS, story?.toJson())
                 holder.itemView.context.startActivity(intent)
             }
         }

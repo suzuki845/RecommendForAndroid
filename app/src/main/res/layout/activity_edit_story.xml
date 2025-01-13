@@ -53,7 +53,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:layout_margin="6dp"
-                    android:text="@{DateConverter.toString(vm.created)}"
                     android:onClick="onShowDatePickerDialog"
                     android:textColor="@color/colorPrimary" />
 
@@ -74,7 +73,6 @@
 
                         <EditText
                             android:id="@+id/comment"
-                            android:text='@={vm.comment}'
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="left|top"
