@@ -6,8 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.R
-import com.pin.recommend.databinding.ActivityEditPaymentBinding
-import com.pin.recommend.ui.adapter.PaymentTagAdapter
 
 class PaymentEditActivity : AppCompatActivity() {
 
@@ -18,10 +16,6 @@ class PaymentEditActivity : AppCompatActivity() {
     private val vm: PaymentEditorViewModel by lazy {
         ViewModelProvider(this)[PaymentEditorViewModel::class.java]
     }
-
-    private lateinit var binding: ActivityEditPaymentBinding
-
-    private lateinit var tagAdapter: PaymentTagAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

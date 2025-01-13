@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModelProvider
 import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.Constants
-import com.pin.recommend.R
 import com.pin.recommend.domain.entity.CharacterWithAnniversaries
 import com.pin.recommend.domain.entity.CustomAnniversary
 import com.pin.recommend.ui.anniversary.AnniversaryCreateActivity.Companion.INTENT_CREATE_ANNIVERSARY
@@ -39,7 +38,6 @@ class CharacterEditActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit_character)
 
         val reward = RemoveAdReward.getInstance(this)
         reward.isBetweenRewardTime.observe(
