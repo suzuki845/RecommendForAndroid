@@ -1,70 +1,130 @@
 package com.pin.recommend.domain.model
 
-import androidx.lifecycle.MutableLiveData
 import com.pin.recommend.domain.entity.CustomAnniversary
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
 import java.util.UUID
 
+enum class AnniversaryEditorAction {
+    Init,
+    Create,
+    Update,
+}
+
+enum class AnniversaryEditorStatus {
+    Processing,
+    Success,
+    Failure,
+}
+
+data class AnniversaryEditorState(
+    val action: AnniversaryEditorAction = AnniversaryEditorAction.Init,
+    val status: AnniversaryEditorStatus = AnniversaryEditorStatus.Processing,
+    val id: Long = 0L,
+    val characterId: Long = -1L,
+    val uuid: String = UUID.randomUUID().toString(),
+    val name: String = "",
+    val date: Date = Date(),
+    val topText: String = "",
+    val bottomText: String = "",
+    val errorMessage: String? = null,
+) {
+    fun toDraft(): CustomAnniversary.Draft {
+        return CustomAnniversary.Draft(
+            id,
+            characterId,
+            date,
+            uuid,
+            name,
+            topText,
+            bottomText
+        )
+    }
+}
+
 class AnniversaryEditor {
 
-    val id = MutableLiveData<Long?>(null)
-    val characterId = MutableLiveData<Long?>(null)
-    val uuid = MutableLiveData<String?>(null)
-    val name = MutableLiveData<String?>()
-    val date = MutableLiveData(Date())
-    val topText = MutableLiveData("")
-    val bottomText = MutableLiveData("")
+    private val _state = MutableStateFlow(AnniversaryEditorState())
 
-    fun initialize(e: CustomAnniversary? = null) {
-        characterId.value = e?.characterId
-        uuid.value = e?.uuid
-        name.value = e?.name
-        date.value = e?.date
-        topText.value = e?.topText
-        bottomText.value = e?.bottomText
+    val state: StateFlow<AnniversaryEditorState> = _state
+
+    fun setAction(a: AnniversaryEditorAction) {
+        _state.value = _state.value.copy(
+            action = a
+        )
     }
 
-    fun initialize(e: CustomAnniversary.Draft? = null) {
-        characterId.value = e?.characterId
-        uuid.value = e?.uuid
-        name.value = e?.name
-        date.value = e?.date
-        topText.value = e?.topText
-        bottomText.value = e?.bottomText
+    fun setEntity(e: CustomAnniversary.Draft? = null) {
+        _state.value = AnniversaryEditorState(
+            id = e?.id ?: 0,
+            uuid = e?.uuid ?: UUID.randomUUID().toString(),
+            characterId = e?.characterId ?: -1L,
+            name = e?.name ?: "",
+            date = e?.date ?: Date(),
+            topText = e?.topText ?: "",
+            bottomText = e?.bottomText ?: ""
+        )
     }
 
-    fun save(onComplete: (CustomAnniversary.Draft) -> Unit, onError: (e: Exception) -> Unit) {
+    fun setCharacterId(v: Long) {
+        _state.value = _state.value.copy(
+            characterId = v
+        )
+    }
+
+    fun setName(v: String) {
+        _state.value = _state.value.copy(
+            name = v
+        )
+    }
+
+    fun setDate(v: Date) {
+        _state.value = _state.value.copy(
+            date = v
+        )
+    }
+
+    fun setTopText(v: String) {
+        _state.value = _state.value.copy(
+            topText = v
+        )
+    }
+
+    fun setBottomText(v: String) {
+        _state.value = _state.value.copy(
+            bottomText = v
+        )
+    }
+
+    fun resetError() {
+        _state.value = _state.value.copy(
+            errorMessage = null
+        )
+    }
+
+    fun done() {
         try {
-            val id = id.value ?: 0
-            val characterId = characterId.value ?: throw Exception("foreign key is null")
-            val uuid = uuid.value ?: UUID.randomUUID().toString()
-            val date = date.value ?: throw Exception("date is null")
-            val name = name.value ?: throw Exception("記念日名がありません. name is null")
-            val topText = topText.value
-            val bottomText = bottomText.value
+            _state.value = _state.value.copy(
+                status = AnniversaryEditorStatus.Processing
+            )
+            val s = _state.value
+            if (s.characterId == -1L) {
+                throw Exception("foreign key is null")
+            }
+            if (s.name.isBlank()) {
+                throw Exception("記念日名がありません")
+            }
 
-            val drift = CustomAnniversary.Draft(
-                id,
-                characterId,
-                date,
-                uuid,
-                name,
-                topText,
-                bottomText
+            _state.value = _state.value.copy(
+                status = AnniversaryEditorStatus.Success,
             )
 
-            onComplete(drift)
-
-            this.id.value = null
-            this.characterId.value = null
-            this.uuid.value = null
-            this.date.value = null
-            this.name.value = null
-            this.topText.value = null
-            this.bottomText.value = null
         } catch (e: Exception) {
-            onError(e)
-            print("test!!" + e)
+            _state.value = _state.value.copy(
+                status = AnniversaryEditorStatus.Failure,
+                errorMessage = e.message
+            )
         }
     }
 }

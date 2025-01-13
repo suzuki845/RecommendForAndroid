@@ -93,8 +93,8 @@ class CharacterEditActivity : AppCompatActivity() {
 
         if (requestCode == REQUEST_CODE_CREATE_ANNIVERSARY && resultCode == RESULT_OK) {
             result?.let {
-                it.getStringExtra(INTENT_CREATE_ANNIVERSARY)?.let {
-                    val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
+                it.getStringExtra(INTENT_CREATE_ANNIVERSARY)?.let { json ->
+                    val anniversary = CustomAnniversary.Draft.fromJson(json)
                     vm.addAnniversary(anniversary)
                 }
             }
@@ -102,8 +102,8 @@ class CharacterEditActivity : AppCompatActivity() {
 
         if (requestCode == REQUEST_CODE_EDIT_ANNIVERSARY && resultCode == RESULT_OK) {
             result?.let {
-                it.getStringExtra(INTENT_EDIT_ANNIVERSARY)?.let {
-                    val anniversary = CustomAnniversary.Draft.fromJson(it ?: "")
+                it.getStringExtra(INTENT_EDIT_ANNIVERSARY)?.let { json ->
+                    val anniversary = CustomAnniversary.Draft.fromJson(json)
                     vm.replaceAnniversary(anniversary)
                 }
             }

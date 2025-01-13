@@ -1,20 +1,12 @@
 package com.pin.recommend.ui.anniversary
 
-import android.app.DatePickerDialog
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModelProvider
-import com.pin.recommend.R
-import com.pin.recommend.databinding.ActivityEditAnniversaryBinding
 import com.pin.recommend.domain.entity.CustomAnniversary
-import java.util.Calendar
+import com.pin.recommend.domain.model.AnniversaryEditorAction
 
 
 class AnniversaryEditActivity : AppCompatActivity() {
@@ -23,10 +15,8 @@ class AnniversaryEditActivity : AppCompatActivity() {
             "com.suzuki.Recommend.CreateAnniversaryActivity.INTENT_EDIT_ANNIVERSARY"
     }
 
-    private lateinit var binding: ActivityEditAnniversaryBinding
-
-    private val anniversaryVm: AnniversaryEditorViewModel by lazy {
-        ViewModelProvider(this).get(AnniversaryEditorViewModel::class.java)
+    private val vm: AnniversaryEditorViewModel by lazy {
+        ViewModelProvider(this)[AnniversaryEditorViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,71 +24,19 @@ class AnniversaryEditActivity : AppCompatActivity() {
 
         val json = intent.getStringExtra(INTENT_EDIT_ANNIVERSARY)
         val anniversary = CustomAnniversary.Draft.fromJson(json ?: "")
-        anniversaryVm.initialize(anniversary)
+        vm.setEntity(anniversary)
+        vm.setAction(AnniversaryEditorAction.Update)
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_anniversary)
-        binding.vm = anniversaryVm
-        binding.lifecycleOwner = this
-        binding.toolbar.title = "記念日の編集"
-        setSupportActionBar(binding.toolbar)
-    }
-
-    private fun save() {
-        anniversaryVm.save({
-            val resultIntent = Intent()
-            resultIntent.putExtra(INTENT_EDIT_ANNIVERSARY, it.toJson())
-            setResult(RESULT_OK, resultIntent)
-            finish()
-        }, {
-            Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_LONG).show()
-        })
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_edit_anniversary, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_save -> {
-                save()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    fun onShowDatePickerDialog(view: View?) {
-        val calendar = Calendar.getInstance()
-        val year = calendar[Calendar.YEAR]
-        val month = calendar[Calendar.MONTH]
-        val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-        val datePickerDialog = DatePickerDialog(
-            this,
-            DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
-                    !dialog.isShown
-                ) {
-                    return@OnDateSetListener
-                    //api19はクリックするとonDateSetが２回呼ばれるため
-                }
-                val newCalender = Calendar.getInstance()
-                newCalender[year, month] = dayOfMonth
-                val date = newCalender.time
-                anniversaryVm.date.value = date
-            }, year, month, dayOfMonth
-        )
-        anniversaryVm.date.value?.let {
-            val c = Calendar.getInstance().apply { time = it }
-            datePickerDialog.datePicker.updateDate(
-                c.get(Calendar.YEAR),
-                c.get(Calendar.MONTH),
-                c.get(Calendar.DAY_OF_MONTH)
+        val self = this
+        setContent {
+            Body(
+                "記念日の編集",
+                self,
+                vm,
+                vm.state.collectAsState(AnniversaryEditorViewModelState()).value
             )
         }
-        datePickerDialog.show()
     }
+
 
 }
