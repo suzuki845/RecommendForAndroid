@@ -2,9 +2,19 @@ package com.pin.recommend.util
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.Observer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 
+suspend fun <T> LiveData<T>.getValueSynchronously(): T? =
+    suspendCancellableCoroutine { continuation ->
+        val observer = Observer<T> {
+            continuation.resume(it) { /* Handle cancellation */ }
+        }
+        this.observeForever(observer)
+        continuation.invokeOnCancellation { this.removeObserver(observer) }
+    }
 
 fun <T> LiveData<T>.asStateFlow(initialValue: T): StateFlow<T> {
     val stateFlow = MutableStateFlow(initialValue) // 初期値として LiveData の最初の値を使う

@@ -3,6 +3,7 @@ package com.pin.recommend.domain.model
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.google.gson.Gson
 import com.pin.recommend.domain.dao.AppDatabase
@@ -129,13 +130,21 @@ class CharacterDetails(
 
     val state: StateFlow<CharacterDetailsState> = _state
 
+    fun observePinningCharacterId(owner: LifecycleOwner, callback: (Long?) -> Unit) {
+        pinningManager.account.map {
+            it.fixedCharacterId
+        }.observe(owner) { id ->
+            callback(id)
+        }
+    }
+
     fun setCharacterId(id: Long) {
         this.id.value = id
         eventModel.setCharacter(id)
         paymentModel.setCharacterId(id)
     }
 
-    fun subscribe(owner: LifecycleOwner) {
+    fun observe(owner: LifecycleOwner) {
         _dataStream.observe(owner) {
             _state.value = it
         }

@@ -65,12 +65,16 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
         )
     }
 
+    fun observePinningCharacterId(owner: LifecycleOwner, callback: (Long?) -> Unit) {
+        model.observePinningCharacterId(owner, callback)
+    }
+
     fun setCharacterId(id: Long) {
         model.setCharacterId(id)
     }
 
-    fun subscribe(owner: LifecycleOwner) {
-        model.subscribe(owner)
+    fun observe(owner: LifecycleOwner) {
+        model.observe(owner)
     }
 
     fun changeAnniversary() {

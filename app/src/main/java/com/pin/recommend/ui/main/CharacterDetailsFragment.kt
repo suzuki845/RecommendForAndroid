@@ -49,6 +49,7 @@ class CharacterDetailsFragment : Fragment() {
         binding = FragmentCharacterDetailBinding.inflate(inflater)
         binding.lifecycleOwner = requireActivity()
         binding.fragment = this
+        vm.observe(requireActivity())
         vm.state.asLiveData().observe(requireActivity()) {
             binding.state = it
         }

@@ -49,6 +49,7 @@ class PaymentDetailsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val characterId =
             requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+        vm.observe(this)
         vm.setCharacterId(characterId)
         vm.setCurrentPaymentDate(Date())
         adapter = DateSeparatedPaymentAdapter(this, onDelete = {
@@ -72,19 +73,17 @@ class PaymentDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentPaymentDetailsBinding.inflate(inflater, container, false)
+        binding.fragment = this
 
-        with(binding) {
-            lifecycleOwner = viewLifecycleOwner
-            vm?.state?.asLiveData()?.observe(viewLifecycleOwner) {
-                adapter.setList(it.payments.payments)
-                val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
-                paymentRecycleView.layoutManager = layoutManager
-                paymentRecycleView.adapter = adapter
-
-                adapter.isEditMode = it.isDeleteModePayments
-            }
-
+        vm.state.asLiveData().observe(viewLifecycleOwner) {
+            println("test!!! ${it.payments.payments.size}")
+            adapter.setList(it.payments.payments)
+            adapter.isEditMode = it.isDeleteModePayments
+            val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
+            binding.paymentRecycleView.layoutManager = layoutManager
+            binding.paymentRecycleView.adapter = adapter
         }
+        binding.lifecycleOwner = viewLifecycleOwner
 
         return binding.root
     }

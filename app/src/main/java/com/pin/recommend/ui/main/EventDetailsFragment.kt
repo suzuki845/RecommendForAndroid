@@ -36,6 +36,7 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener
 import com.prolificinteractive.materialcalendarview.spans.DotSpan
 import java.util.Calendar
+import java.util.Date
 
 
 class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedListener,
@@ -58,6 +59,10 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         super.onCreate(savedInstanceState)
         val characterId =
             requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+        vm.observe(this)
+        vm.setCharacterId(characterId)
+        vm.setCurrentPaymentDate(Date())
+
         adapter = DateSeparatedEventAdapter(this, onDelete = {
             val dialog =
                 DeleteDialogFragment(object :
@@ -84,7 +89,7 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentEventDetailsBinding.inflate(inflater, container, false)
 
         calendarView = binding.calendarView

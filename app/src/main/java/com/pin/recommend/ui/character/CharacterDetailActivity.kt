@@ -18,6 +18,8 @@ import com.pin.recommend.R
 import com.pin.recommend.ui.main.SectionsPagerAdapter
 import com.pin.util.admob.AdMobAdaptiveBannerManager
 import com.pin.util.admob.reward.RemoveAdReward
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener {
     private lateinit var backgroundImage: ImageView
@@ -67,7 +69,7 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
 
         val id = intent.getLongExtra(INTENT_CHARACTER, -1)
         vm.setCharacterId(id)
-        vm.subscribe(this)
+        vm.observe(this)
         vm.state.asLiveData().observe(this) {
             initializeBackground(it)
             initializeToolbar(it)
@@ -178,12 +180,14 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
     }
 
     override fun onBackPressed() {
-        val isPinning = vm.state.asLiveData().value?.isPinning ?: false
-
-        if (isPinning) {
-            moveTaskToBack(true)
-        } else {
-            super.onBackPressed()
+        runBlocking {
+            val isPinning = vm.state.first().isPinning
+            println("pinning!!! ${isPinning}")
+            if (isPinning) {
+                moveTaskToBack(true)
+            } else {
+                super.onBackPressed()
+            }
         }
     }
 

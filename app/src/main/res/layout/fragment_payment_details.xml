@@ -13,6 +13,10 @@
         <import type="com.pin.recommend.ui.databinding.DateMonthConverter" />
 
         <variable
+            name="fragment"
+            type="com.pin.recommend.ui.main.PaymentDetailsFragment" />
+
+        <variable
             name="vm"
             type="com.pin.recommend.ui.character.CharacterDetailsViewModel" />
 
@@ -44,7 +48,7 @@
 
                 <ImageButton
                     android:id="@+id/prev_month"
-                    android:onClick="@{() -> vm.prevPaymentMonth()}"
+                    android:onClick="@{() -> fragment.onPrevMonth()}"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_baseline_chevron_left_32"
                     android:layout_width="wrap_content"
@@ -61,7 +65,7 @@
 
                 <ImageButton
                     android:id="@+id/next_month"
-                    android:onClick="@{() -> vm.nextPaymentMonth()}"
+                    android:onClick="@{() -> fragment.onNextMonth()}"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_baseline_chevron_right_32"
                     android:layout_width="wrap_content"

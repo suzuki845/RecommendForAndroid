@@ -4,10 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.switchMap
 import com.pin.recommend.Constants.PREF_KEY_IS_LOCKED
-import com.pin.recommend.domain.dao.AppDatabase
 import com.pin.recommend.ui.character.CharacterDetailActivity
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.character.CharacterListActivity
@@ -28,26 +25,13 @@ class MainActivity : AppCompatActivity() {
         val intents = ArrayList<Intent>()
         intents.add(characterListIntent)
 
-        val fixedCharacter = vm.state.asLiveData().switchMap { input ->
-            val characterDao = AppDatabase.getDatabase(this@MainActivity)
-                .recommendCharacterDao()
-            var fixedCharacterId: Long? = -1L
-            if (input != null) {
-                fixedCharacterId = input.fixedCharacterId
-            }
-            if (fixedCharacterId == null) {
-                fixedCharacterId = -1L
-            }
-            characterDao.watchById(fixedCharacterId)
-        }
-
-        fixedCharacter.observe(this) { character ->
-            if (character != null) {
+        vm.observePinningCharacterId(this) { pinningId ->
+            if (pinningId != null) {
                 val characterDetailIntent =
                     Intent(this@MainActivity, CharacterDetailActivity::class.java)
                 characterDetailIntent.putExtra(
                     CharacterDetailActivity.INTENT_CHARACTER,
-                    character.id
+                    pinningId
                 )
                 intents.add(characterDetailIntent)
             }
