@@ -76,7 +76,6 @@ class PaymentDetailsFragment : Fragment() {
         binding.fragment = this
 
         vm.state.asLiveData().observe(viewLifecycleOwner) {
-            println("test!!! ${it.payments.payments.size}")
             adapter.setList(it.payments.payments)
             adapter.isEditMode = it.isDeleteModePayments
             val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)

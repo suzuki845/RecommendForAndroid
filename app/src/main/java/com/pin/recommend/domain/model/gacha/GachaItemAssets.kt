@@ -110,7 +110,7 @@ class EncountOshiGachaAsset : GachaItemAsset<String> {
     override val title = "\uD83C\uDFEA0.1％の確率で近所のコンビニで推しと遭遇するガチャ"
 
     override val items: List<GachaItem<String>> = listOf(
-        GachaItem(name = "", probability = 0.1, content = "遭遇しました🎊"),
+        GachaItem(name = "", probability = 0.1, content = "遭遇しました!!!"),
         GachaItem(
             name = "",
             probability = 10.0,

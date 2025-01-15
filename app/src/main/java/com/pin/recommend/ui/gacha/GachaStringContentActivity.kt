@@ -46,9 +46,11 @@ class GachaStringContentActivity : AppCompatActivity() {
 
         val json = intent.getStringExtra(SpecialContentsFragment.INTENT_CHARACTER_STATE) ?: "";
         val state = CharacterDetailsViewModelState.fromJson(json)
+        vm.setCharacterDetailsViewModeState(state)
 
         val template = intent.getStringExtra(SpecialContentsFragment.INTENT_PLACE_HOLDER) ?: ""
         vm.setPlaceHolder(PlaceholderParser(template))
+
         binding.lifecycleOwner = this
         binding.vm = vm
         binding.state = state

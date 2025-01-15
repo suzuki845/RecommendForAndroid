@@ -45,6 +45,7 @@ class GachaBadgeActivity : AppCompatActivity() {
         val json = intent.getStringExtra(SpecialContentsFragment.INTENT_CHARACTER_STATE) ?: "";
         val state = CharacterDetailsViewModelState.fromJson(json)
         vm.characterId.value = state.character?.id
+        vm.setPrizeImage(state.appearance.iconImage)
 
         binding.lifecycleOwner = this
         binding.gachaVM = vm

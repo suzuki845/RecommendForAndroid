@@ -18,7 +18,8 @@ import com.pin.recommend.databinding.FragmentCharacterDetailBinding
 import com.pin.recommend.ui.anniversary.AnniversaryScreenShotActivity
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.character.CharacterEditActivity
-import java.text.SimpleDateFormat
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 /**
  * A placeholder fragment containing a simple view.
@@ -26,7 +27,7 @@ import java.text.SimpleDateFormat
 class CharacterDetailsFragment : Fragment() {
     private lateinit var pageViewModel: PageViewModel
     private val vm: CharacterDetailsViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(CharacterDetailsViewModel::class.java)
+        ViewModelProvider(requireActivity())[CharacterDetailsViewModel::class.java]
     }
     private lateinit var binding: FragmentCharacterDetailBinding
 
@@ -78,19 +79,20 @@ class CharacterDetailsFragment : Fragment() {
     }
 
     fun onDestinationScreenshotActivity(view: View) {
-        val intent = Intent(requireActivity(), AnniversaryScreenShotActivity::class.java);
-        intent.putExtra(
-            AnniversaryScreenShotActivity.INTENT_SCREEN_SHOT,
-            vm.state.asLiveData().value?.toJson()
-        )
-        startActivity(intent)
+        runBlocking {
+            val intent = Intent(requireActivity(), AnniversaryScreenShotActivity::class.java);
+            intent.putExtra(
+                AnniversaryScreenShotActivity.INTENT_SCREEN_SHOT,
+                vm.state.first().toJson()
+            )
+            startActivity(intent)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
         inflater.inflate(R.menu.change_anniversary, menu)
-
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
         val s = SpannableString("編集")
@@ -101,14 +103,15 @@ class CharacterDetailsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.edit_mode -> {
-                val intent = Intent(context, CharacterEditActivity::class.java)
-                val json = vm.state.asLiveData().value?.character?.toJson()
-                intent.putExtra(
-                    CharacterEditActivity.INTENT_EDIT_CHARACTER,
-                    json
-                )
-
-                startActivity(intent)
+                runBlocking {
+                    val intent = Intent(context, CharacterEditActivity::class.java)
+                    val json = vm.state.first().character?.toJson()
+                    intent.putExtra(
+                        CharacterEditActivity.INTENT_EDIT_CHARACTER,
+                        json
+                    )
+                    startActivity(intent)
+                }
                 return true
             }
 
@@ -121,7 +124,6 @@ class CharacterDetailsFragment : Fragment() {
     }
 
     companion object {
-        private val FORMAT = SimpleDateFormat("yyyy年MM月dd日")
         private const val ARG_SECTION_NUMBER = "section_number"
 
         @JvmStatic

@@ -8,11 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.asLiveData
 import com.pin.recommend.databinding.FragmentSpecialContentsBinding
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.gacha.GachaBadgeActivity
 import com.pin.recommend.ui.gacha.GachaStringContentActivity
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 class SpecialContentsFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
@@ -37,81 +38,95 @@ class SpecialContentsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSpecialContentsBinding.inflate(inflater)
         binding.lifecycleOwner = requireActivity()
 
         binding.onBadgeGachaAsset.setOnClickListener {
-            val intent = Intent(requireActivity(), GachaBadgeActivity::class.java)
-            intent.putExtra(
-                INTENT_SPECIAL_CONTENT_ID,
-                "BadgeGachaAsset"
-            )
-            intent.putExtra(
-                INTENT_CHARACTER_STATE,
-                vm.state.asLiveData().value?.toJson()
-            )
-            startActivity(intent)
+            runBlocking {
+                val intent = Intent(requireActivity(), GachaBadgeActivity::class.java)
+                intent.putExtra(
+                    INTENT_SPECIAL_CONTENT_ID,
+                    "BadgeGachaAsset"
+                )
+                intent.putExtra(
+                    INTENT_CHARACTER_STATE,
+                    vm.state.first().toJson()
+                )
+                startActivity(intent)
+            }
         }
         binding.onRelationshipWithOshiNextLifeGachaAsset.setOnClickListener {
-            val intent = Intent(requireActivity(), GachaStringContentActivity::class.java)
-            intent.putExtra(
-                INTENT_SPECIAL_CONTENT_ID,
-                "RelationshipWithOshiNextLifeGachaAsset"
-            )
-            intent.putExtra(
-                INTENT_CHARACTER_STATE,
-                vm.state.asLiveData().value?.toJson()
-            )
-            intent.putExtra(
-                INTENT_PLACE_HOLDER,
-                "あなたの来世は$0の\n$1"
-            )
-            startActivity(intent)
+            runBlocking {
+                val intent = Intent(requireActivity(), GachaStringContentActivity::class.java)
+                intent.putExtra(
+                    INTENT_SPECIAL_CONTENT_ID,
+                    "RelationshipWithOshiNextLifeGachaAsset"
+                )
+                intent.putExtra(
+                    INTENT_CHARACTER_STATE,
+                    vm.state.first().toJson()
+                )
+                intent.putExtra(
+                    INTENT_PLACE_HOLDER,
+                    "あなたの来世は$0の\n$1"
+                )
+                startActivity(intent)
+            }
         }
         binding.onEncountOshiGachaAsset.setOnClickListener {
-            val intent = Intent(requireActivity(), GachaStringContentActivity::class.java)
-            intent.putExtra(
-                INTENT_SPECIAL_CONTENT_ID,
-                "EncountOshiGachaAsset"
-            )
-            intent.putExtra(
-                INTENT_CHARACTER_STATE,
-                vm.state.asLiveData().value?.toJson()
-            )
-            startActivity(intent)
+            runBlocking {
+                val intent = Intent(requireActivity(), GachaStringContentActivity::class.java)
+                intent.putExtra(
+                    INTENT_SPECIAL_CONTENT_ID,
+                    "EncountOshiGachaAsset"
+                )
+                intent.putExtra(
+                    INTENT_CHARACTER_STATE,
+                    vm.state.first().toJson()
+                )
+                intent.putExtra(
+                    INTENT_PLACE_HOLDER,
+                    "あなたはコンビニで\n$0と\n$1"
+                )
+                startActivity(intent)
+            }
         }
         binding.onGoingOutGachaAsset.setOnClickListener {
-            val intent = Intent(requireActivity(), GachaStringContentActivity::class.java)
-            intent.putExtra(
-                INTENT_SPECIAL_CONTENT_ID,
-                "GoingOutGachaAsset"
-            )
-            intent.putExtra(
-                INTENT_CHARACTER_STATE,
-                vm.state.asLiveData().value?.toJson()
-            )
-            intent.putExtra(
-                INTENT_PLACE_HOLDER,
-                "あなたは$0と\n$1\nにおでかけ"
-            )
-            startActivity(intent)
+            runBlocking {
+                val intent = Intent(requireActivity(), GachaStringContentActivity::class.java)
+                intent.putExtra(
+                    INTENT_SPECIAL_CONTENT_ID,
+                    "GoingOutGachaAsset"
+                )
+                intent.putExtra(
+                    INTENT_CHARACTER_STATE,
+                    vm.state.first().toJson()
+                )
+                intent.putExtra(
+                    INTENT_PLACE_HOLDER,
+                    "あなたは$0と\n$1\nにおでかけ"
+                )
+                startActivity(intent)
+            }
         }
         binding.onReadFortunesGachaAsset.setOnClickListener {
-            val intent = Intent(requireActivity(), GachaStringContentActivity::class.java)
-            intent.putExtra(
-                INTENT_SPECIAL_CONTENT_ID,
-                "ReadFortunesGachaAsset"
-            )
-            intent.putExtra(
-                INTENT_CHARACTER_STATE,
-                vm.state.asLiveData().value?.toJson()
-            )
-            intent.putExtra(
-                INTENT_PLACE_HOLDER,
-                "今日のあなたと$0の運勢は\n$1"
-            )
-            startActivity(intent)
+            runBlocking {
+                val intent = Intent(requireActivity(), GachaStringContentActivity::class.java)
+                intent.putExtra(
+                    INTENT_SPECIAL_CONTENT_ID,
+                    "ReadFortunesGachaAsset"
+                )
+                intent.putExtra(
+                    INTENT_CHARACTER_STATE,
+                    vm.state.first().toJson()
+                )
+                intent.putExtra(
+                    INTENT_PLACE_HOLDER,
+                    "今日のあなたと$0の運勢は\n$1"
+                )
+                startActivity(intent)
+            }
         }
 
         return binding.root

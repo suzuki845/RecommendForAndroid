@@ -2,6 +2,7 @@ package com.pin.recommend.ui.gacha
 
 import android.app.Application
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.map
@@ -34,14 +35,18 @@ class GachaBadgeViewModel(application: Application) : AndroidViewModel(applicati
         model.reset()
     }
 
-    val notPrizeImage = BitmapFactory.decodeResource(
+    fun setPrizeImage(image: Bitmap?) {
+        model.setPrizeImage(image)
+    }
+
+    private val notPrizeImage = BitmapFactory.decodeResource(
         application.resources,
         R.drawable.ic_person_300dp
     )
 
     val resultImage = model.result.map {
         if (it?.name == "Prize") {
-            it?.content
+            it.content
         } else notPrizeImage
     }
 
