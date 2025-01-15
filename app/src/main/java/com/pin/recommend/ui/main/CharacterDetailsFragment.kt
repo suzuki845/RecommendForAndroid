@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.asLiveData
 import com.pin.recommend.R
 import com.pin.recommend.databinding.FragmentCharacterDetailBinding
 import com.pin.recommend.ui.anniversary.AnniversaryScreenShotActivity
@@ -24,7 +25,7 @@ import java.text.SimpleDateFormat
  */
 class CharacterDetailsFragment : Fragment() {
     private lateinit var pageViewModel: PageViewModel
-    private val detailsVM: CharacterDetailsViewModel by lazy {
+    private val vm: CharacterDetailsViewModel by lazy {
         ViewModelProvider(requireActivity()).get(CharacterDetailsViewModel::class.java)
     }
     private lateinit var binding: FragmentCharacterDetailBinding
@@ -44,17 +45,19 @@ class CharacterDetailsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentCharacterDetailBinding.inflate(inflater)
         binding.lifecycleOwner = requireActivity()
-        binding.vm = detailsVM
         binding.fragment = this
+        vm.state.asLiveData().observe(requireActivity()) {
+            binding.state = it
+        }
         otherInit()
         return binding.root
     }
 
     private fun otherInit() {
-        detailsVM.state.observe(requireActivity()) { it ->
+        vm.state.asLiveData().observe(requireActivity()) { it ->
             val a = it.appearance
             a.homeTextShadowColor?.let { s ->
                 binding.characterName.setShadowLayer(3f, 0f, 0f, s)
@@ -77,7 +80,7 @@ class CharacterDetailsFragment : Fragment() {
         val intent = Intent(requireActivity(), AnniversaryScreenShotActivity::class.java);
         intent.putExtra(
             AnniversaryScreenShotActivity.INTENT_SCREEN_SHOT,
-            detailsVM.state.value?.toJson()
+            vm.state.asLiveData().value?.toJson()
         )
         startActivity(intent)
     }
@@ -98,7 +101,7 @@ class CharacterDetailsFragment : Fragment() {
         when (item.itemId) {
             R.id.edit_mode -> {
                 val intent = Intent(context, CharacterEditActivity::class.java)
-                val json = detailsVM.cwa.value?.toJson()
+                val json = vm.state.asLiveData().value?.character?.toJson()
                 intent.putExtra(
                     CharacterEditActivity.INTENT_EDIT_CHARACTER,
                     json
@@ -109,8 +112,7 @@ class CharacterDetailsFragment : Fragment() {
             }
 
             R.id.change_anniversary -> {
-                detailsVM.changeAnniversary()
-
+                vm.changeAnniversary()
                 return true
             }
         }

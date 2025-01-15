@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import com.pin.recommend.Constants.PREF_KEY_IS_LOCKED
 import com.pin.recommend.domain.dao.AppDatabase
@@ -16,7 +17,7 @@ import com.pin.util.admob.reward.RemoveAdReward
 
 class MainActivity : AppCompatActivity() {
 
-    private val detailsVM: CharacterDetailsViewModel by lazy {
+    private val vm: CharacterDetailsViewModel by lazy {
         ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
     }
 
@@ -27,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         val intents = ArrayList<Intent>()
         intents.add(characterListIntent)
 
-        val fixedCharacter = detailsVM.account.switchMap { input ->
+        val fixedCharacter = vm.state.asLiveData().switchMap { input ->
             val characterDao = AppDatabase.getDatabase(this@MainActivity)
                 .recommendCharacterDao()
             var fixedCharacterId: Long? = -1L

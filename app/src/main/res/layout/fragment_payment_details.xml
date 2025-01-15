@@ -13,12 +13,13 @@
         <import type="com.pin.recommend.ui.databinding.DateMonthConverter" />
 
         <variable
-            name="owner"
-            type="com.pin.recommend.ui.main.PaymentDetailsFragment" />
+            name="vm"
+            type="com.pin.recommend.ui.character.CharacterDetailsViewModel" />
 
         <variable
-            name="vm"
-            type="com.pin.recommend.ui.payment.PaymentDetailsViewModel" />
+            name="state"
+            type="com.pin.recommend.ui.character.CharacterDetailsViewModelState" />
+
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -43,7 +44,7 @@
 
                 <ImageButton
                     android:id="@+id/prev_month"
-                    android:onClick="@{() -> owner.onPrevMonth()}"
+                    android:onClick="@{() -> vm.prevPaymentMonth()}"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_baseline_chevron_left_32"
                     android:layout_width="wrap_content"
@@ -54,13 +55,13 @@
                     android:gravity="center"
                     android:textSize="18dp"
                     android:layout_weight="1"
-                    android:text="@{DateMonthConverter.toString(vm.currentDate)}"
+                    android:text="@{DateMonthConverter.toString(state.events.selectedDate)}"
                     android:layout_width="0dp"
                     android:layout_height="match_parent" />
 
                 <ImageButton
                     android:id="@+id/next_month"
-                    android:onClick="@{() -> owner.onNextMonth()}"
+                    android:onClick="@{() -> vm.nextPaymentMonth()}"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_baseline_chevron_right_32"
                     android:layout_width="wrap_content"
@@ -75,7 +76,7 @@
                 <TextView
                     android:id="@+id/amount_month_payment"
                     android:layout_gravity="center"
-                    android:text='@{"今月のPayは"+IntConverter.toString(vm.monthlyPaymentAmount)+"円です"}'
+                    android:text='@{"今月のPayは"+IntConverter.toString(state.payments.totalPayment)+"円です"}'
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -83,14 +84,13 @@
                     android:textColor="@color/colorPrimary"
                     android:layout_gravity="center"
                     android:text="全期間のPayを見る"
-                    android:onClick="@{() -> owner.toWholePeriodPaymentAmountView()}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/amount_month_savings"
                     android:layout_gravity="center"
-                    android:text='@{"今月の貯金は"+IntConverter.toString(vm.monthlySavingsAmount)+"円です"}'
+                    android:text='@{"今月の貯金は"+IntConverter.toString(state.payments.totalSavings)+"円です"}'
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -98,7 +98,6 @@
                     android:textColor="@color/colorPrimary"
                     android:layout_gravity="center"
                     android:text="全期間の貯金を見る"
-                    android:onClick="@{() -> owner.toWholePeriodSavingsAmountView()}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>

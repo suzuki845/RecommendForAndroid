@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.asLiveData
 import com.pin.recommend.databinding.FragmentSpecialContentsBinding
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.gacha.GachaBadgeActivity
@@ -16,7 +17,7 @@ import com.pin.recommend.ui.gacha.GachaStringContentActivity
 class SpecialContentsFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
 
-    private val detailsVM: CharacterDetailsViewModel by lazy {
+    private val vm: CharacterDetailsViewModel by lazy {
         ViewModelProvider(requireActivity()).get(CharacterDetailsViewModel::class.java)
     }
 
@@ -48,7 +49,7 @@ class SpecialContentsFragment : Fragment() {
             )
             intent.putExtra(
                 INTENT_CHARACTER_STATE,
-                detailsVM.state.value?.toJson()
+                vm.state.asLiveData().value?.toJson()
             )
             startActivity(intent)
         }
@@ -60,7 +61,7 @@ class SpecialContentsFragment : Fragment() {
             )
             intent.putExtra(
                 INTENT_CHARACTER_STATE,
-                detailsVM.state.value?.toJson()
+                vm.state.asLiveData().value?.toJson()
             )
             intent.putExtra(
                 INTENT_PLACE_HOLDER,
@@ -76,7 +77,7 @@ class SpecialContentsFragment : Fragment() {
             )
             intent.putExtra(
                 INTENT_CHARACTER_STATE,
-                detailsVM.state.value?.toJson()
+                vm.state.asLiveData().value?.toJson()
             )
             startActivity(intent)
         }
@@ -88,7 +89,7 @@ class SpecialContentsFragment : Fragment() {
             )
             intent.putExtra(
                 INTENT_CHARACTER_STATE,
-                detailsVM.state.value?.toJson()
+                vm.state.asLiveData().value?.toJson()
             )
             intent.putExtra(
                 INTENT_PLACE_HOLDER,
@@ -104,7 +105,7 @@ class SpecialContentsFragment : Fragment() {
             )
             intent.putExtra(
                 INTENT_CHARACTER_STATE,
-                detailsVM.state.value?.toJson()
+                vm.state.asLiveData().value?.toJson()
             )
             intent.putExtra(
                 INTENT_PLACE_HOLDER,

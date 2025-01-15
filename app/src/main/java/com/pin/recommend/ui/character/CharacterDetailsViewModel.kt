@@ -2,53 +2,139 @@ package com.pin.recommend.ui.character
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LifecycleOwner
+import com.google.gson.Gson
+import com.pin.recommend.domain.entity.Event
+import com.pin.recommend.domain.entity.Payment
 import com.pin.recommend.domain.entity.Story
 import com.pin.recommend.domain.model.CharacterDetails
-import com.pin.recommend.domain.model.CharacterPinningManager
+import com.pin.recommend.domain.model.CharacterDetailsState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import java.util.Date
+
+data class CharacterDetailsViewModelState(
+    private val state: CharacterDetailsState = CharacterDetailsState(),
+    val isDeleteModeStories: Boolean = false,
+    val isDeleteModePayments: Boolean = false,
+    val isDeleteModeEvents: Boolean = false,
+) {
+    val character = state.character
+    val fixedCharacterId = state.fixedCharacterId
+    val isPinning = state.isPinning
+    val characterName = state.characterName
+    val appearance = state.appearance
+    val anniversaries = state.anniversaries
+    val currentAnniversary = state.currentAnniversary
+    val storySortOrder = state.storySortOrder
+    val stories = state.stories
+    val payments = state.payments
+    val events = state.events
+    val errorMessage = state.errorMessage
+    val action = state.action
+    val status = state.status
+
+    fun toJson(): String {
+        return Gson().toJson(this)
+    }
+
+    companion object {
+        fun fromJson(json: String): CharacterDetailsViewModelState {
+            return Gson().fromJson(json, CharacterDetailsViewModelState::class.java)
+        }
+    }
+
+}
 
 class CharacterDetailsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val characterDetails: CharacterDetails
-    private val accountModel = CharacterPinningManager(application)
+    private val model = CharacterDetails(application)
 
-    init {
-        characterDetails = CharacterDetails(application, accountModel)
-        characterDetails.initialize()
+    private val editModeStory = MutableStateFlow(false)
+
+    private val editModePayment = MutableStateFlow(false)
+
+    private val editModeEvent = MutableStateFlow(false)
+
+    val state = combine(model.state, editModeStory, editModePayment, editModeEvent) { a, b, c, d ->
+        CharacterDetailsViewModelState(
+            state = a,
+            isDeleteModeStories = b,
+            isDeleteModePayments = c,
+            isDeleteModeEvents = d
+        )
     }
 
-    val state = characterDetails.state
+    fun setCharacterId(id: Long) {
+        model.setCharacterId(id)
+    }
 
-    val cwa = characterDetails.cwa
-
-    val character = characterDetails.character
-
-    val stories = characterDetails.stories
-
-    val id = characterDetails.id
-
-    val account = accountModel.account
-
-    val editModeStories = MutableLiveData<Boolean>()
-
-    fun deleteStory(story: Story) {
-        characterDetails.deleteStory(story)
+    fun subscribe(owner: LifecycleOwner) {
+        model.subscribe(owner)
     }
 
     fun changeAnniversary() {
-        characterDetails.changeDisplayOnHomeAnniversary()
+        model.changeAnniversary()
     }
 
     fun pinning() {
-        characterDetails.pinning()
+        model.pinning()
     }
 
     fun unpinning() {
-        characterDetails.unpinning()
+        model.unpinning()
+    }
+
+    fun setCurrentPaymentDate(date: Date) {
+        model.setCurrentPaymentDate(date)
+    }
+
+    fun setCurrentEventDate(date: Date) {
+        model.setCurrentEventDate(date)
+    }
+
+    fun prevPaymentMonth() {
+        model.prevPaymentMonth()
+    }
+
+    fun nextPaymentMonth() {
+        model.nextPaymentMonth()
+    }
+
+    fun prevEventMonth() {
+        model.prevEventMonth()
+    }
+
+    fun nextEventMonth() {
+        model.nextEventMonth()
+    }
+
+    fun deleteStory(story: Story) {
+        model.deleteStory(story)
     }
 
     fun updateStorySortOrder(order: Int) {
-        characterDetails.updateStorySortOrder(order)
+        model.updateStorySortOrder(order)
+    }
+
+    fun deletePayment(payment: Payment) {
+        model.deletePayment(payment)
+    }
+
+    fun deleteEvent(event: Event) {
+        model.deleteEvent(event)
+    }
+
+    fun toggleEditModeStory() {
+        editModeStory.value = editModeStory.value != true
+    }
+
+    fun toggleEditModePayment() {
+        editModePayment.value = editModePayment.value != true
+    }
+
+    fun toggleEditModeEvent() {
+        editModeEvent.value = editModeEvent.value != true
     }
 
 }

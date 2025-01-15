@@ -12,8 +12,8 @@
         <import type="com.pin.recommend.ui.databinding.ColorConverter" />
 
         <variable
-            name="vm"
-            type="com.pin.recommend.ui.character.CharacterDetailsViewModel" />
+            name="state"
+            type="com.pin.recommend.ui.character.CharacterDetailsViewModelState" />
 
         <variable
             name="fragment"
@@ -34,7 +34,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="-200dp"
             android:background="@drawable/icon_background"
-            android:imageBitmap="@{vm.state.appearance.iconImage}"
+            android:imageBitmap="@{state.appearance.iconImage}"
             android:onClick="@{fragment.onDestinationScreenshotActivity}"
             android:src="@drawable/ic_person_300dp"
             app:civ_border_color="#eeeeee"
@@ -54,9 +54,9 @@
                 android:layout_gravity="center"
                 android:padding="4dp"
                 android:shadowRadius="3"
-                android:textColor="@{vm.state.appearance.homeTextColor}"
-                android:shadowColor="@{vm.state.appearance.homeTextShadowColor}"
-                android:text="@{vm.state.characterName}"
+                android:textColor="@{state.appearance.homeTextColor}"
+                android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                android:text="@{state.characterName}"
                 android:textSize="26sp" />
 
             <TextView
@@ -65,9 +65,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:shadowRadius="3"
-                android:textColor="@{vm.state.appearance.homeTextColor}"
-                android:shadowColor="@{vm.state.appearance.homeTextShadowColor}"
-                android:text="@{vm.state.anniversary.topText}"
+                android:textColor="@{state.appearance.homeTextColor}"
+                android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                android:text="@{state.currentAnniversary.topText}"
                 android:textSize="20sp" />
 
             <TextView
@@ -77,9 +77,9 @@
                 android:layout_gravity="center"
                 android:padding="4dp"
                 android:shadowRadius="3"
-                android:textColor="@{vm.state.appearance.homeTextColor}"
-                android:shadowColor="@{vm.state.appearance.homeTextShadowColor}"
-                android:text="@{vm.state.anniversary.elapsedDays}"
+                android:textColor="@{state.appearance.homeTextColor}"
+                android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                android:text="@{state.currentAnniversary.elapsedDays}"
                 android:textSize="34sp" />
 
             <TextView
@@ -89,9 +89,9 @@
                 android:layout_gravity="center"
                 android:padding="4dp"
                 android:shadowRadius="3"
-                android:textColor="@{vm.state.appearance.homeTextColor}"
-                android:shadowColor="@{vm.state.appearance.homeTextShadowColor}"
-                android:text="@{vm.state.anniversary.bottomText}"
+                android:textColor="@{state.appearance.homeTextColor}"
+                android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                android:text="@{state.currentAnniversary.bottomText}"
                 android:textSize="20sp" />
 
             <TextView
@@ -101,9 +101,9 @@
                 android:layout_gravity="center"
                 android:padding="4dp"
                 android:shadowRadius="3"
-                android:textColor="@{vm.state.appearance.homeTextColor}"
-                android:shadowColor="@{vm.state.appearance.homeTextShadowColor}"
-                android:text="@{vm.state.anniversary.message}"
+                android:textColor="@{state.appearance.homeTextColor}"
+                android:shadowColor="@{state.appearance.homeTextShadowColor}"
+                android:text="@{state.currentAnniversary.message}"
                 android:textSize="20sp" />
         </LinearLayout>
 

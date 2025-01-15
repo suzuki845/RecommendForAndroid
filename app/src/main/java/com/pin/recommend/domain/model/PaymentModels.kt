@@ -1,11 +1,15 @@
 package com.pin.recommend.domain.model
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import com.pin.recommend.domain.dao.AppDatabase
 import com.pin.recommend.domain.dao.PaymentDao
 import com.pin.recommend.domain.dao.RecommendCharacterDao
+import com.pin.recommend.domain.entity.Payment
+import com.pin.recommend.domain.entity.PaymentAndTag
 import com.pin.recommend.util.TimeUtil
 import java.util.Calendar
 import java.util.Date
@@ -47,6 +51,10 @@ class PaymentBetweenCharacterDatesModel(
         }
     }
 
+    fun delete(payment: Payment) {
+        paymentDao.deletePayment(payment)
+    }
+
     companion object
     class Section(
         val startDate: Date,
@@ -55,10 +63,13 @@ class PaymentBetweenCharacterDatesModel(
 
 }
 
-class CharacterMonthlyPaymentModel(
-    private val paymentDao: PaymentDao,
-    private val characterDao: RecommendCharacterDao
+class MonthlyPaymentModel(
+    context: Context
 ) {
+
+    private val db = AppDatabase.getDatabase(context)
+    private val paymentDao = db.paymentDao()
+    private val characterDao = db.recommendCharacterDao()
 
     private val paymentBetweenCharacterDatesModel by lazy {
         PaymentBetweenCharacterDatesModel(paymentDao, characterDao)
@@ -99,13 +110,11 @@ class CharacterMonthlyPaymentModel(
         setCurrentDate(calendar.time)
     }
 
-    val beginningAndEndOfTheMonth = _currentDate.map {
-        val startDay = TimeUtil.monthlyStartDate(it)
-        val endDay = TimeUtil.monthlyEndDate(it)
-        PaymentBetweenCharacterDatesModel.Section(startDay, endDay)
+    fun delete(payment: Payment) {
+        paymentBetweenCharacterDatesModel.delete(payment)
     }
 
-    val monthlyPayment = paymentBetweenCharacterDatesModel.groupingByDate
+    val monthlyPayment = paymentBetweenCharacterDatesModel.groupingByDate.map { MonthlyPayment(it) }
 
     val monthlyPaymentAmount = paymentBetweenCharacterDatesModel.groupingByDate.map { dates ->
         var amount = 0.0
@@ -180,4 +189,24 @@ class WholePeriodCharacterPaymentModel(
 
 }
 
+
+data class MonthlyPayment(
+    val payments: Map<Date, List<PaymentAndTag>> = mapOf()
+) {
+
+    val totalPayment
+        get() = payments.values
+            .flatten()
+            .map { it.payment }
+            .filter { it.type == 0 }
+            .sumOf { it.amount }.toInt()
+
+    val totalSavings
+        get() = payments.values
+            .flatten()
+            .map { it.payment }
+            .filter { it.type == 1 }
+            .sumOf { it.amount }.toInt()
+
+}
 

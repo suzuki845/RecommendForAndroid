@@ -1,9 +1,11 @@
 package com.pin.recommend.domain.model
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import com.pin.recommend.domain.dao.AppDatabase
 import com.pin.recommend.domain.dao.EventDao
 import com.pin.recommend.domain.dao.RecommendCharacterDao
 import com.pin.recommend.domain.entity.Event
@@ -13,6 +15,7 @@ import com.pin.recommend.util.TimeUtil
 import com.pin.recommend.util.combine2
 import java.util.Calendar
 import java.util.Date
+
 
 class EventBetweenDatesModel(
     private val eventDao: EventDao,
@@ -41,13 +44,20 @@ class EventBetweenDatesModel(
         }
     }
 
+    fun delete(event: Event) {
+        eventDao.deleteEvent(event)
+    }
+
 }
 
 
 class CharacterMonthlyEventModel(
-    private val eventDao: EventDao,
-    private val characterDao: RecommendCharacterDao
+    context: Context
 ) {
+
+    private val db = AppDatabase.getDatabase(context)
+    private val eventDao = db.eventDao()
+    private val characterDao = db.recommendCharacterDao()
 
     private val eventBetweenDatesModel by lazy {
         EventBetweenDatesModel(eventDao, characterDao)
@@ -91,7 +101,7 @@ class CharacterMonthlyEventModel(
         setCurrentDate(calendar.time)
     }
 
-    val monthInDays = currentDate.map {
+    private val monthInDays = currentDate.map {
         val startDate = TimeUtil.monthlyStartDate(it)
         val endDate = TimeUtil.monthlyEndDate(it)
 
@@ -107,7 +117,7 @@ class CharacterMonthlyEventModel(
         result
     }
 
-    val events = eventBetweenDatesModel.groupingByDate
+    private val events = eventBetweenDatesModel.groupingByDate
 
     val monthlyEvent = combine2(monthInDays, events) { days, events ->
         MonthlyEvent(days ?: listOf(), events ?: mapOf())
@@ -117,16 +127,21 @@ class CharacterMonthlyEventModel(
         SelectedMonthlyEvent(date ?: Date(), events ?: MonthlyEvent(listOf(), mapOf()))
     }
 
+    fun delete(event: Event) {
+        eventBetweenDatesModel.delete(event)
+    }
+
+
 }
 
 class SelectedMonthlyEvent(
-    val selectedDate: Date,
-    val monthlyEvent: MonthlyEvent
-) {}
+    val selectedDate: Date = Date(),
+    val monthlyEvent: MonthlyEvent = MonthlyEvent()
+)
 
 class MonthlyEvent(
-    val days: List<Date>,
-    val events: Map<Date, List<Event>>
+    val days: List<Date> = listOf(),
+    val events: Map<Date, List<Event>> = mapOf()
 ) {
     fun dayHasEvents(date: Date): Boolean {
         return events[date] != null

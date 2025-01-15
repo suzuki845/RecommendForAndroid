@@ -19,7 +19,7 @@ class EventDetailsViewModel(application: Application) : AndroidViewModel(applica
     private val characterDao: RecommendCharacterDao =
         AppDatabase.getDatabase(application).recommendCharacterDao()
     private val monthlyEventModel by lazy {
-        CharacterMonthlyEventModel(eventDao, characterDao)
+        CharacterMonthlyEventModel(application)
     }
 
     val isEditMode = MutableLiveData(false)

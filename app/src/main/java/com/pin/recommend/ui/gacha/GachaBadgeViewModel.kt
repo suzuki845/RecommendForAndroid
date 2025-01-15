@@ -7,7 +7,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.map
 import com.pin.recommend.R
 import com.pin.recommend.domain.dao.AppDatabase
-import com.pin.recommend.domain.model.CharacterDetails
 import com.pin.recommend.domain.model.gacha.BadgeGachaMachine
 
 class GachaBadgeViewModel(application: Application) : AndroidViewModel(application) {
@@ -18,12 +17,6 @@ class GachaBadgeViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private var characterDetailsState: CharacterDetails.State? = null
-
-    fun setCharacterDetailsState(state: CharacterDetails.State) {
-        this.characterDetailsState = state
-        model.setPrizeImage(state.appearance.iconImage)
-    }
 
     val title = model.title
 

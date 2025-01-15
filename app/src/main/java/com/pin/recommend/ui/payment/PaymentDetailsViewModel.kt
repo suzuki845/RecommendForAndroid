@@ -6,19 +6,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.pin.recommend.domain.dao.AppDatabase
 import com.pin.recommend.domain.dao.PaymentDao
-import com.pin.recommend.domain.dao.RecommendCharacterDao
 import com.pin.recommend.domain.entity.Payment
-import com.pin.recommend.domain.model.CharacterMonthlyPaymentModel
+import com.pin.recommend.domain.model.MonthlyPaymentModel
 import kotlinx.coroutines.launch
 import java.util.Date
 
 class PaymentDetailsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val paymentDao: PaymentDao = AppDatabase.getDatabase(application).paymentDao()
-    private val characterDao: RecommendCharacterDao =
-        AppDatabase.getDatabase(application).recommendCharacterDao()
     private val monthlyPaymentModel by lazy {
-        CharacterMonthlyPaymentModel(paymentDao, characterDao)
+        MonthlyPaymentModel(application)
     }
 
     val isEditMode = MutableLiveData(false)
@@ -43,10 +40,6 @@ class PaymentDetailsViewModel(application: Application) : AndroidViewModel(appli
 
     fun deletePayment(payment: Payment) = viewModelScope.launch {
         paymentDao.deletePayment(payment)
-    }
-
-    fun updatePayment(payment: Payment) = viewModelScope.launch {
-        paymentDao.updatePayment(payment)
     }
 
 

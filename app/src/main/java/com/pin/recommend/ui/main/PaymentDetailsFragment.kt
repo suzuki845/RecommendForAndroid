@@ -9,8 +9,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pin.recommend.R
@@ -21,7 +21,6 @@ import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.component.DeleteDialogFragment
 import com.pin.recommend.ui.component.DialogActionListener
 import com.pin.recommend.ui.payment.PaymentCreateActivity
-import com.pin.recommend.ui.payment.PaymentDetailsViewModel
 import com.pin.recommend.ui.payment.PaymentWholePeriodActivity
 import com.pin.recommend.ui.payment.SavingsWholePeriodActivity
 import java.util.Date
@@ -38,13 +37,8 @@ private const val ARG_PARAM2 = "param2"
  */
 class PaymentDetailsFragment : Fragment() {
 
-
-    private val paymentViewModel: PaymentDetailsViewModel by lazy {
-        ViewModelProvider(this).get(PaymentDetailsViewModel::class.java)
-    }
-
-    private val detailsVM: CharacterDetailsViewModel by lazy {
-        ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
+    private val vm: CharacterDetailsViewModel by lazy {
+        ViewModelProvider(this)[CharacterDetailsViewModel::class.java]
     }
 
     private lateinit var binding: FragmentPaymentDetailsBinding
@@ -55,14 +49,14 @@ class PaymentDetailsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val characterId =
             requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
-        paymentViewModel.setCharacterId(characterId)
-        paymentViewModel.setCurrentDate(Date())
+        vm.setCharacterId(characterId)
+        vm.setCurrentPaymentDate(Date())
         adapter = DateSeparatedPaymentAdapter(this, onDelete = {
             val dialog =
                 DeleteDialogFragment(object :
                     DialogActionListener<DeleteDialogFragment> {
                     override fun onDecision(dialog: DeleteDialogFragment) {
-                        paymentViewModel.deletePayment(it)
+                        vm.deletePayment(it)
                     }
 
                     override fun onCancel() {
@@ -76,41 +70,38 @@ class PaymentDetailsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPaymentDetailsBinding.inflate(inflater, container, false)
 
         with(binding) {
             lifecycleOwner = viewLifecycleOwner
-            vm = paymentViewModel
-            owner = this@PaymentDetailsFragment
-            paymentViewModel.monthlyPayment.observe(viewLifecycleOwner, Observer {
-                adapter.setList(it)
+            vm?.state?.asLiveData()?.observe(viewLifecycleOwner) {
+                adapter.setList(it.payments.payments)
                 val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
                 paymentRecycleView.layoutManager = layoutManager
                 paymentRecycleView.adapter = adapter
-            })
 
-            paymentViewModel.isEditMode.observe(viewLifecycleOwner, Observer {
-                adapter.isEditMode = it
-            })
+                adapter.isEditMode = it.isDeleteModePayments
+            }
+
         }
 
         return binding.root
     }
 
     fun onNextMonth() {
-        paymentViewModel.nextMonth()
+        vm.nextPaymentMonth()
     }
 
     fun onPrevMonth() {
-        paymentViewModel.prevMonth()
+        vm.prevPaymentMonth()
     }
 
     fun toWholePeriodPaymentAmountView() {
         val intent = Intent(requireContext(), PaymentWholePeriodActivity::class.java)
         intent.putExtra(
             PaymentWholePeriodActivity.INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER,
-            paymentViewModel.characterId.value
+            vm.state.asLiveData().value?.character?.id
         )
         startActivity(intent)
     }
@@ -119,7 +110,7 @@ class PaymentDetailsFragment : Fragment() {
         val intent = Intent(requireContext(), SavingsWholePeriodActivity::class.java)
         intent.putExtra(
             SavingsWholePeriodActivity.INTENT_WHOLE_PERIOD_SAVINGS_CHARACTER,
-            paymentViewModel.characterId.value
+            vm.state.asLiveData().value?.character?.id
         )
         startActivity(intent)
     }
@@ -128,20 +119,20 @@ class PaymentDetailsFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        paymentViewModel.isEditMode.observe(this, Observer<Boolean> { mode ->
-            if (mode) {
+        vm.state.asLiveData().observe(this) {
+            if (it.isDeleteModePayments) {
                 editMode.title = "完了"
             } else {
                 editMode.title = "編集"
             }
-        })
+        }
         inflater.inflate(R.menu.create, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.edit_mode -> {
-                paymentViewModel.isEditMode.value = paymentViewModel.isEditMode.value != true
+                vm.toggleEditModePayment()
                 return true
             }
 

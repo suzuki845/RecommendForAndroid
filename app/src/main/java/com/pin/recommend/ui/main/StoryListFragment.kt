@@ -12,9 +12,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -76,21 +76,23 @@ class StoryListFragment : Fragment() {
 
         verticalRecyclerViewAdapter = VerticalRecyclerViewAdapter(this, null)
 
-        vm.character.observe(requireActivity()) {
+        vm.state.asLiveData().observe(requireActivity()) {
             if (it == null) return@observe
-            sortView.setTextColor(it.getHomeTextColor())
+            sortView.setTextColor(it.appearance.homeTextColor)
             val isAsc = it.storySortOrder == 1
             if (isAsc) {
                 sortView.text = "並び順 : 登録日 古い順"
             } else {
                 sortView.text = "並び順 : 登録日 新しい順"
             }
-            initializeText(it)
-            verticalRecyclerViewAdapter.updateCharacter(it)
+            it.character?.let {
+                initializeText(it.character)
+            }
+            verticalRecyclerViewAdapter.updateCharacter(it.character?.character)
         }
 
-        vm.stories.observe(requireActivity()) {
-            verticalRecyclerViewAdapter.setList(it)
+        vm.state.asLiveData().observe(requireActivity()) {
+            verticalRecyclerViewAdapter.setList(it.stories)
         }
 
         recyclerView = root.findViewById(R.id.story_recycle_view)
@@ -105,9 +107,9 @@ class StoryListFragment : Fragment() {
         recyclerView.setHasFixedSize(false)
         recyclerView.adapter = verticalRecyclerViewAdapter
 
-        vm.editModeStories.observe(viewLifecycleOwner) { aBoolean ->
+        vm.state.asLiveData().observe(viewLifecycleOwner) {
             verticalRecyclerViewAdapter.setEditMode(
-                aBoolean!!
+                it.isDeleteModeStories
             )
         }
 
@@ -124,14 +126,14 @@ class StoryListFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_mode, menu)
         val editMode = menu.findItem(R.id.edit_mode)
-        vm.editModeStories.observe(this, Observer { mode ->
-            val s: SpannableString = if (mode) {
+        vm.state.asLiveData().observe(this) {
+            val s: SpannableString = if (it.isDeleteModeStories) {
                 SpannableString("完了")
             } else {
                 SpannableString("編集")
             }
             editMode.title = s
-        })
+        }
 
         inflater.inflate(R.menu.create, menu)
     }
@@ -139,17 +141,13 @@ class StoryListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.edit_mode -> {
-                if (vm.editModeStories.value == true) {
-                    vm.editModeStories.value = false
-                } else {
-                    vm.editModeStories.value = true
-                }
+                vm.toggleEditModeStory()
                 return true
             }
 
             R.id.create -> {
                 val intent = Intent(activity, StoryCreateActivity::class.java)
-                val characterId = vm.id.value
+                val characterId = vm.state.asLiveData().value?.character?.id
                 intent.putExtra(INTENT_CHARACTER_ID, characterId)
                 startActivity(intent)
             }

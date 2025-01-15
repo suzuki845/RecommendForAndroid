@@ -16,9 +16,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.pin.imageutil.insertImage
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityStringContentGachaBinding
-import com.pin.recommend.domain.model.CharacterDetails
 import com.pin.recommend.domain.model.gacha.GachaItemAssetsRepository
 import com.pin.recommend.domain.model.gacha.PlaceholderParser
+import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.main.SpecialContentsFragment
 import com.pin.util.SimpleDialogFragment
 import com.pin.util.admob.RewardAdStateAction
@@ -29,8 +29,8 @@ import com.pin.util.admob.reward.UserDidEarnRewardCounter
 
 class GachaStringContentActivity : AppCompatActivity() {
 
-    private val vm: StringContentGachaViewModel by lazy {
-        ViewModelProvider(this).get(StringContentGachaViewModel::class.java)
+    private val vm: GachaStringContentViewModel by lazy {
+        ViewModelProvider(this)[GachaStringContentViewModel::class.java]
     }
 
     private val binding: ActivityStringContentGachaBinding by lazy {
@@ -45,13 +45,12 @@ class GachaStringContentActivity : AppCompatActivity() {
         vm.setAsset(asset!!)
 
         val json = intent.getStringExtra(SpecialContentsFragment.INTENT_CHARACTER_STATE) ?: "";
-        val state = CharacterDetails.State.fromJson(json)
-        vm.setCharacterDetailsState(state)
+        val state = CharacterDetailsViewModelState.fromJson(json)
 
         val template = intent.getStringExtra(SpecialContentsFragment.INTENT_PLACE_HOLDER) ?: ""
         vm.setPlaceHolder(PlaceholderParser(template))
         binding.lifecycleOwner = this
-        binding.gachaVM = vm
+        binding.vm = vm
         binding.state = state
         binding.toolbar.title = "ガチャ"
 

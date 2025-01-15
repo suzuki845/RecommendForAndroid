@@ -22,7 +22,6 @@ data class Appearance(
 
     fun typeFace(context: Context): Typeface? {
         val typeface = fontFamily?.let {
-            if (it == null) return@let null
             if (it == "Default") return@let null
             if (it == "default") return@let null
             if (it == "デフォルト") return@let null

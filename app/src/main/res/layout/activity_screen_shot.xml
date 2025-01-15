@@ -14,7 +14,7 @@
 
         <variable
             name="state"
-            type="com.pin.recommend.domain.model.CharacterDetails.State" />
+            type="com.pin.recommend.ui.character.CharacterDetailsViewModelState" />
 
         <variable
             name="typeface"
@@ -105,7 +105,7 @@
                     android:textColor="@{state.appearance.homeTextColor}"
                     android:shadowColor="@{state.appearance.homeTextShadowColor}"
                     android:typeface="@{typeface}"
-                    android:text="@{state.anniversary.topText}"
+                    android:text="@{state.currentAnniversary.topText}"
                     android:textSize="20sp" />
 
                 <TextView
@@ -118,7 +118,7 @@
                     android:textColor="@{state.appearance.homeTextColor}"
                     android:shadowColor="@{state.appearance.homeTextShadowColor}"
                     android:typeface="@{typeface}"
-                    android:text="@{state.anniversary.elapsedDays}"
+                    android:text="@{state.currentAnniversary.elapsedDays}"
                     android:textSize="34sp" />
 
                 <TextView
@@ -131,7 +131,7 @@
                     android:textColor="@{state.appearance.homeTextColor}"
                     android:shadowColor="@{state.appearance.homeTextShadowColor}"
                     android:typeface="@{typeface}"
-                    android:text="@{state.anniversary.bottomText}"
+                    android:text="@{state.currentAnniversary.bottomText}"
                     android:textSize="20sp" />
 
                 <TextView
@@ -144,7 +144,7 @@
                     android:textColor="@{state.appearance.homeTextColor}"
                     android:shadowColor="@{state.appearance.homeTextShadowColor}"
                     android:typeface="@{typeface}"
-                    android:text="@{state.anniversary.message}"
+                    android:text="@{state.currentAnniversary.message}"
                     android:textSize="20sp" />
             </LinearLayout>
 

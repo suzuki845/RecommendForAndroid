@@ -11,10 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.pin.recommend.R
-import com.pin.recommend.domain.model.CharacterDetails
 import com.pin.recommend.ui.main.SectionsPagerAdapter
 import com.pin.util.admob.AdMobAdaptiveBannerManager
 import com.pin.util.admob.reward.RemoveAdReward
@@ -25,8 +25,8 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
     private lateinit var navigation: BottomNavigationView
     private lateinit var viewPager: ViewPager
 
-    private val detailsVM: CharacterDetailsViewModel by lazy {
-        ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
+    private val vm: CharacterDetailsViewModel by lazy {
+        ViewModelProvider(this)[CharacterDetailsViewModel::class.java]
     }
 
     private lateinit var adMobManager: AdMobAdaptiveBannerManager
@@ -66,8 +66,9 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         toolbar = findViewById(R.id.toolbar)
 
         val id = intent.getLongExtra(INTENT_CHARACTER, -1)
-        detailsVM.id.value = id
-        detailsVM.state.observe(this) {
+        vm.setCharacterId(id)
+        vm.subscribe(this)
+        vm.state.asLiveData().observe(this) {
             initializeBackground(it)
             initializeToolbar(it)
         }
@@ -124,19 +125,13 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         adMobManager.checkAndLoad()
     }
 
-    private fun initializeBackground(state: CharacterDetails.State) {
-        state.appearance?.backgroundColor?.let {
-            backgroundColor.setBackgroundColor(it)
-        }
-        state.appearance?.backgroundImageOpacity?.let {
-            backgroundColor.alpha = it
-        }
-        state.appearance.backgroundImage?.let {
-            backgroundImage.setImageDrawable(state.appearance?.backgroundImage?.toDrawable(resources))
-        }
+    private fun initializeBackground(state: CharacterDetailsViewModelState) {
+        backgroundColor.setBackgroundColor(state.appearance.backgroundColor)
+        backgroundColor.alpha = state.appearance.backgroundImageOpacity
+        backgroundImage.setImageDrawable(state.appearance.backgroundImage?.toDrawable(resources))
     }
 
-    private fun initializeToolbar(state: CharacterDetails.State) {
+    private fun initializeToolbar(state: CharacterDetailsViewModelState) {
         toolbar.title = state.characterName
         setSupportActionBar(toolbar)
     }
@@ -145,31 +140,33 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         menuInflater.inflate(R.menu.main, menu)
         val pinningView = menu.findItem(R.id.fix_home)
 
-        val isPinning = detailsVM.state.value?.isPinning ?: false
-
-        if (isPinning) {
-            pinningView.setIcon(R.drawable.pin_fill)
-        } else {
-            pinningView.setIcon(R.drawable.pin_outline)
-        }
-
-        pinningView.setOnMenuItemClickListener {
-            if (isPinning) {
-                pinningView.setIcon(R.drawable.pin_outline)
-                detailsVM.unpinning()
-                finish()
-            } else {
+        vm.state.asLiveData().observe(this) { state ->
+            if (state.isPinning) {
                 pinningView.setIcon(R.drawable.pin_fill)
-                detailsVM.pinning()
-                Toast.makeText(
-                    this@CharacterDetailActivity,
-                    "トップページ に固定しました",
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
+            } else {
+                pinningView.setIcon(R.drawable.pin_outline)
             }
-            false
+
+            pinningView.setOnMenuItemClickListener {
+                if (state.isPinning) {
+                    pinningView.setIcon(R.drawable.pin_outline)
+                    vm.unpinning()
+                    finish()
+                } else {
+                    pinningView.setIcon(R.drawable.pin_fill)
+                    vm.pinning()
+                    Toast.makeText(
+                        this@CharacterDetailActivity,
+                        "トップページ に固定しました",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
+                false
+            }
+
         }
+
 
         return true
     }
@@ -181,7 +178,7 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
     }
 
     override fun onBackPressed() {
-        val isPinning = detailsVM.state.value?.isPinning ?: false
+        val isPinning = vm.state.asLiveData().value?.isPinning ?: false
 
         if (isPinning) {
             moveTaskToBack(true)

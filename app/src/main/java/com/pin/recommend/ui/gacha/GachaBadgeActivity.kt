@@ -19,7 +19,7 @@ import com.pin.recommend.BadgeGachaRemoveAdReward
 import com.pin.recommend.BadgeGachaUserDidEarnRewardCounter
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityBadgeGachaBinding
-import com.pin.recommend.domain.model.CharacterDetails
+import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.main.SpecialContentsFragment
 import com.pin.util.SimpleDialogFragment
 import com.pin.util.admob.RewardAdStateAction
@@ -30,7 +30,7 @@ import com.pin.util.admob.reward.UserDidEarnRewardCounter
 class GachaBadgeActivity : AppCompatActivity() {
 
     private val vm: GachaBadgeViewModel by lazy {
-        ViewModelProvider(this).get(GachaBadgeViewModel::class.java)
+        ViewModelProvider(this)[GachaBadgeViewModel::class.java]
     }
 
     private val binding: ActivityBadgeGachaBinding by lazy {
@@ -43,9 +43,8 @@ class GachaBadgeActivity : AppCompatActivity() {
         val id = intent.getStringExtra(SpecialContentsFragment.INTENT_SPECIAL_CONTENT_ID) ?: ""
 
         val json = intent.getStringExtra(SpecialContentsFragment.INTENT_CHARACTER_STATE) ?: "";
-        val state = CharacterDetails.State.fromJson(json)
-        vm.setCharacterDetailsState(state)
-        vm.characterId.value = state.characterId
+        val state = CharacterDetailsViewModelState.fromJson(json)
+        vm.characterId.value = state.character?.id
 
         binding.lifecycleOwner = this
         binding.gachaVM = vm

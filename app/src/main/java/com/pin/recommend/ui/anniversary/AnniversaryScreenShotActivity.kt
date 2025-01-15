@@ -14,8 +14,8 @@ import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import com.pin.imageutil.insertImage
 import com.pin.recommend.R
-import com.pin.recommend.domain.model.CharacterDetails
 import com.pin.recommend.databinding.ActivityScreenShotBinding
+import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
 import com.pin.util.admob.reward.RemoveAdReward
@@ -34,7 +34,7 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val json = intent.getStringExtra(INTENT_SCREEN_SHOT) ?: "";
-        val state = CharacterDetails.State.fromJson(json)
+        val state = CharacterDetailsViewModelState.fromJson(json)
         val typeface = state.appearance.typeFace(this)
         binding.state = state
         binding.typeface = typeface
@@ -43,7 +43,8 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
     }
 
-    private fun textShadow(state: CharacterDetails.State) {
+
+    private fun textShadow(state: CharacterDetailsViewModelState) {
         val c = state.appearance.homeTextShadowColor
         c?.let { s ->
             binding.characterName.setShadowLayer(3f, 0f, 0f, s)

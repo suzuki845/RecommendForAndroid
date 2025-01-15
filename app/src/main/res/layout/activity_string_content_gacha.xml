@@ -6,13 +6,13 @@
 
         <variable
             name="state"
-            type="com.pin.recommend.domain.model.CharacterDetails.State" />
+            type="com.pin.recommend.ui.character.CharacterDetailsViewModelState" />
 
         <import type="android.view.View" />
 
         <variable
-            name="gachaVM"
-            type="com.pin.recommend.ui.gacha.StringContentGachaViewModel" />
+            name="vm"
+            type="com.pin.recommend.ui.gacha.GachaStringContentViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -58,7 +58,7 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/titleContainer"
-                android:visibility="@{gachaVM.isComplete ? View.GONE : View.VISIBLE}"
+                android:visibility="@{vm.isComplete ? View.GONE : View.VISIBLE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -79,7 +79,7 @@
 
 
                         <TextView
-                            android:text="@{gachaVM.title}"
+                            android:text="@{vm.title}"
                             android:layout_gravity="top|center"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
@@ -91,7 +91,7 @@
                         <Button
                             android:id="@+id/roleGachaButton"
                             android:onClick="onRollGacha"
-                            android:visibility="@{gachaVM.isRolling? View.GONE : View.VISIBLE}"
+                            android:visibility="@{vm.isRolling? View.GONE : View.VISIBLE}"
                             android:text="広告を見てガチャを回す"
                             android:layout_gravity="bottom|center"
                             android:textColor="@color/blue_900"
@@ -105,7 +105,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:indeterminate="true"
-                            android:visibility="@{gachaVM.isRolling? View.VISIBLE : View.GONE}" />
+                            android:visibility="@{vm.isRolling? View.VISIBLE : View.GONE}" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -114,7 +114,7 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/resultContainer"
-                android:visibility="@{gachaVM.isComplete ? View.VISIBLE : View.GONE}"
+                android:visibility="@{vm.isComplete ? View.VISIBLE : View.GONE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -133,7 +133,7 @@
                         android:layout_height="220dp" />
 
                     <TextView
-                        android:text="@{gachaVM.result}"
+                        android:text="@{vm.result}"
                         android:textSize="16sp"
                         android:padding="10dp"
                         android:gravity="center"
@@ -150,7 +150,7 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/oneMoreContainer"
-                android:visibility="@{gachaVM.isComplete ? View.VISIBLE : View.GONE }"
+                android:visibility="@{vm.isComplete ? View.VISIBLE : View.GONE }"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -165,7 +165,7 @@
 
                     <Button
                         android:id="@+id/oneMore"
-                        android:onClick="@{()-> gachaVM.reset()}"
+                        android:onClick="@{()-> vm.reset()}"
                         android:text="もう一度ガチャる"
                         android:layout_gravity="bottom|center"
                         android:textColor="@color/blue_900"

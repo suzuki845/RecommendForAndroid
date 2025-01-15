@@ -13,13 +13,6 @@
 
         <import type="com.pin.recommend.ui.databinding.DateMonthConverter" />
 
-        <variable
-            name="owner"
-            type="com.pin.recommend.ui.main.EventDetailsFragment" />
-
-        <variable
-            name="vm"
-            type="com.pin.recommend.ui.event.EventDetailsViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -33,7 +26,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.prolificinteractive.materialcalendarview.MaterialCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
+            <com.prolificinteractive.materialcalendarview.MaterialCalendarView
                 android:id="@+id/calendarView"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"

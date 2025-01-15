@@ -1,140 +1,263 @@
 package com.pin.recommend.domain.model
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.google.gson.Gson
 import com.pin.recommend.domain.dao.AppDatabase
 import com.pin.recommend.domain.entity.AnniversaryData
-import com.pin.recommend.domain.entity.AnniversaryInterface
 import com.pin.recommend.domain.entity.Appearance
-import com.pin.recommend.domain.entity.ContentId
+import com.pin.recommend.domain.entity.CharacterWithAnniversaries
+import com.pin.recommend.domain.entity.Event
+import com.pin.recommend.domain.entity.Payment
 import com.pin.recommend.domain.entity.Story
 import com.pin.recommend.domain.entity.StoryPicture
+import com.pin.recommend.domain.entity.StoryWithPictures
 import com.pin.recommend.util.combine2
-import com.pin.recommend.util.combine3
+import com.pin.recommend.util.combine5
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
 import java.util.LinkedList
 
-class CharacterDetails(
-    private val context: Context,
-    private val pinningManager: CharacterPinningManager,
+enum class CharacterDetailsAction {
+    Init,
+    Pining,
+    UnPining,
+    DeleteStory,
+    UpdateStoryOrder,
+    DeletePayment,
+    DeleteEvent
+}
+
+enum class CharacterDetailsStatus {
+    Processing,
+    Success,
+    Failure
+}
+
+data class CharacterDetailsState(
+    val action: CharacterDetailsAction = CharacterDetailsAction.Init,
+    val status: CharacterDetailsStatus = CharacterDetailsStatus.Processing,
+    val character: CharacterWithAnniversaries? = null,
+    val fixedCharacterId: Long? = null,
+    val characterName: String = "",
+    val appearance: Appearance = Appearance(),
+    val anniversaries: List<AnniversaryData> = listOf(),
+    val storySortOrder: Int = 0,
+    val stories: List<StoryWithPictures> = listOf(),
+    val payments: MonthlyPayment = MonthlyPayment(),
+    val events: SelectedMonthlyEvent = SelectedMonthlyEvent(),
+    val errorMessage: String? = null,
 ) {
 
+    val isPinning = fixedCharacterId == character?.id
+
+    val currentAnniversary = anniversaries.firstOrNull() ?: AnniversaryData()
+
+    fun toJson(): String {
+        return Gson().toJson(this)
+    }
+
+    companion object {
+        fun fromJson(json: String): CharacterDetailsState {
+            return Gson().fromJson(json, CharacterDetailsState::class.java)
+        }
+    }
+}
+
+class CharacterDetails(
+    private val context: Context,
+) {
     private val db = AppDatabase.getDatabase(context)
 
-    val id = MutableLiveData<Long?>()
+    private val pinningManager = CharacterPinningManager(context)
 
-    private val _displayOnHomeAnniversaries = MutableLiveData<List<AnniversaryInterface>>(listOf())
+    private val eventModel = CharacterMonthlyEventModel(context)
 
-    val cwa = combine2(id, pinningManager.account) { id, account ->
+    private val paymentModel = MonthlyPaymentModel(context)
+
+    private val id = MutableLiveData<Long?>()
+
+    private val character = combine2(id, pinningManager.account) { id, account ->
         return@combine2 db.recommendCharacterDao().watchByIdCharacterWithAnniversaries(
             (id ?: account?.fixedCharacterId) ?: -1
         )
     }.switchMap { it }
 
-    val character = cwa.map {
-        it?.character
-    }
-
-    val stories = character.switchMap {
+    private val stories = character.switchMap {
         if (it == null) return@switchMap MutableLiveData(listOf())
         return@switchMap db.storyDao()
-            .watchByCharacterIdStoryWithPictures(it.id, it.storySortOrder == 1)
+            .watchByCharacterIdStoryWithPictures(it.id, it.character.storySortOrder == 1)
     }
 
-    private val account = pinningManager.account
+    private val _dataStream = combine5(
+        pinningManager.account,
+        character,
+        stories,
+        eventModel.selectedMonthlyEvent,
+        paymentModel.monthlyPayment
+    ) { a, b, c, d, e ->
+        val anniversaries = b?.anniversaries()?.map {
+            AnniversaryData(
+                id = it.getId(),
+                name = it.getName(),
+                topText = it.getTopText(),
+                bottomText = it.getBottomText(),
+                elapsedDays = it.getElapsedDays(Date()).let { d -> "${d}日" } ?: "",
+                getRemainingDays = it.getRemainingDays(Date())?.let { d -> "${d}日" } ?: "",
+                message = it.getMessage(Date()),
+                isAnniversary = it.isAnniversary(Date())
+            )
+        } ?: listOf()
 
-    private val displayOnHomeAnniversary = _displayOnHomeAnniversaries.map {
-        val a = it.firstOrNull()
-        AnniversaryData(
-            a?.getId() ?: ContentId.getEmpty(),
-            a?.getName() ?: "",
-            a?.getTopText() ?: "",
-            a?.getBottomText() ?: "",
-            a?.getElapsedDays(Date())?.let { d -> "${d}日" } ?: "",
-            a?.getRemainingDays(Date())?.let { d -> "${d}日" } ?: "",
-            a?.getMessage(Date()) ?: "",
-            a?.isAnniversary(Date()) ?: false
+        return@combine5 CharacterDetailsState(
+            character = b,
+            fixedCharacterId = a?.fixedCharacterId,
+            characterName = b?.character?.name ?: "",
+            appearance = b?.appearance(context) ?: Appearance(),
+            anniversaries = anniversaries,
+            storySortOrder = b?.character?.storySortOrder ?: 0,
+            stories = c ?: listOf(),
+            events = d ?: SelectedMonthlyEvent(),
+            payments = e ?: MonthlyPayment()
         )
     }
 
-    val state = combine3(account, cwa, displayOnHomeAnniversary) { a, b, c ->
-        return@combine3 State(
-            b?.id ?: -1,
-            a?.fixedCharacterId != null,
-            b?.character?.name ?: "",
-            b?.appearance(context) ?: Appearance(),
-            c ?: AnniversaryData(),
-            b?.character?.storySortOrder ?: 0
-        )
+    private val _state = MutableStateFlow(CharacterDetailsState())
+
+    val state: StateFlow<CharacterDetailsState> = _state
+
+    fun setCharacterId(id: Long) {
+        this.id.value = id
+        eventModel.setCharacter(id)
+        paymentModel.setCharacterId(id)
     }
 
-    fun initialize() {
-        cwa.observeForever {
-            _displayOnHomeAnniversaries.value = it?.anniversaries()
+    fun subscribe(owner: LifecycleOwner) {
+        _dataStream.observe(owner) {
+            _state.value = it
         }
     }
 
-    fun changeDisplayOnHomeAnniversary() {
-        val current = LinkedList<AnniversaryInterface>()
-        _displayOnHomeAnniversaries.value?.forEach {
+    fun changeAnniversary() {
+        val current = LinkedList<AnniversaryData>()
+        state.value.anniversaries.forEach {
             current.add(it)
         }
+
         current.addFirst(current.removeLast())
-        _displayOnHomeAnniversaries.value = current
+        _state.value = state.value.copy(anniversaries = current)
     }
 
     fun deleteStory(story: Story) {
-        AppDatabase.executor.execute {
-            val storyPictures: List<StoryPicture> = db.storyPictureDao().findByStoryId(story.id)
-            for (storyPicture in storyPictures) {
-                storyPicture.deleteImage(context)
+        try {
+            _state.value = _state.value.copy(
+                action = CharacterDetailsAction.DeleteStory,
+                status = CharacterDetailsStatus.Processing,
+            )
+            AppDatabase.executor.execute {
+                val storyPictures: List<StoryPicture> = db.storyPictureDao().findByStoryId(story.id)
+                for (storyPicture in storyPictures) {
+                    storyPicture.deleteImage(context)
+                }
+                db.storyDao().deleteStory(story)
             }
-            db.storyDao().deleteStory(story)
+            _state.value = _state.value.copy(
+                status = CharacterDetailsStatus.Success,
+            )
+        } catch (e: Exception) {
+            _state.value = _state.value.copy(
+                status = CharacterDetailsStatus.Failure,
+                errorMessage = e.message
+            )
         }
     }
 
+    fun deletePayment(payment: Payment) {
+        paymentModel.delete(payment)
+    }
+
+    fun deleteEvent(event: Event) {
+        eventModel.delete(event)
+    }
+
+    fun setCurrentPaymentDate(date: Date) {
+        paymentModel.setCurrentDate(date)
+    }
+
+    fun setCurrentEventDate(date: Date) {
+        eventModel.setCurrentDate(date)
+    }
+
+    fun prevPaymentMonth() {
+        paymentModel.prevMonth()
+    }
+
+    fun prevEventMonth() {
+        eventModel.prevMonth()
+    }
+
+    fun nextPaymentMonth() {
+        paymentModel.nextMonth()
+    }
+
+    fun nextEventMonth() {
+        eventModel.nextMonth()
+    }
+
     fun pinning() {
-        id.value?.let {
-            pinningManager.pinning(it)
+        _state.value = _state.value.copy(
+            action = CharacterDetailsAction.Pining,
+            status = CharacterDetailsStatus.Processing,
+        )
+        val id = id.value
+        if (id != null) {
+            pinningManager.pinning(id)
+            _state.value = _state.value.copy(
+                status = CharacterDetailsStatus.Success,
+            )
+        } else {
+            _state.value = _state.value.copy(
+                status = CharacterDetailsStatus.Failure,
+            )
         }
     }
 
     fun unpinning() {
+        _state.value = _state.value.copy(
+            action = CharacterDetailsAction.UnPining,
+            status = CharacterDetailsStatus.Processing,
+        )
         pinningManager.unpinning()
+        _state.value = _state.value.copy(
+            status = CharacterDetailsStatus.Failure,
+        )
     }
 
     fun updateStorySortOrder(order: Int) {
-        val character = cwa.value?.character
-        character?.storySortOrder = order
-        AppDatabase.executor.execute {
-            character?.let {
-                db.recommendCharacterDao().updateCharacter(
-                    it
-                )
+        try {
+            _state.value = _state.value.copy(
+                action = CharacterDetailsAction.UpdateStoryOrder,
+                status = CharacterDetailsStatus.Processing,
+            )
+            val character = character.value?.character
+            character?.storySortOrder = order
+            AppDatabase.executor.execute {
+                character?.let {
+                    db.recommendCharacterDao().updateCharacter(
+                        it
+                    )
+                }
             }
+        } catch (e: Exception) {
+            _state.value = _state.value.copy(
+                status = CharacterDetailsStatus.Failure,
+                errorMessage = e.message
+            )
         }
     }
 
-    data class State(
-        val characterId: Long,
-        val isPinning: Boolean = false,
-        val characterName: String,
-        val appearance: Appearance,
-        val anniversary: AnniversaryData,
-        val storySortOrder: Int,
-    ) {
-        fun toJson(): String {
-            return Gson().toJson(this)
-        }
-
-        companion object {
-            fun fromJson(json: String): State {
-                return Gson().fromJson(json, State::class.java)
-            }
-        }
-    }
 
 }

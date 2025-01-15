@@ -6,7 +6,7 @@
 
         <variable
             name="state"
-            type="com.pin.recommend.domain.model.CharacterDetails.State" />
+            type="com.pin.recommend.ui.character.CharacterDetailsViewModelState" />
 
         <import type="android.view.View" />
 
