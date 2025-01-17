@@ -6,6 +6,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityWholePeriodPaymentBinding
 
@@ -16,22 +17,26 @@ class PaymentWholePeriodActivity : AppCompatActivity() {
             "com.pin.recommend.WholePeriodPaymentActivity.INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER"
     }
 
-    private val viewModel by lazy {
-        ViewModelProvider(this).get(PaymentWholePeriodViewModel::class.java)
+    private val vm by lazy {
+        ViewModelProvider(this)[PaymentWholePeriodViewModel::class.java]
     }
 
-    private lateinit var binding: ActivityWholePeriodPaymentBinding
+    private val binding: ActivityWholePeriodPaymentBinding
+            by lazy {
+                DataBindingUtil.setContentView(this, R.layout.activity_whole_period_payment)
+            }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        vm.setCharacterId(intent.getLongExtra(INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER, -1))
 
-        viewModel.setCharacterId(intent.getLongExtra(INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER, -1))
-
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_whole_period_payment)
         binding.lifecycleOwner = this
         binding.activity = this
-        binding.vm = viewModel
+        vm.state.asLiveData().observe(this) {
+            binding.state = it
+        }
+
 
         initializeToolbar()
     }

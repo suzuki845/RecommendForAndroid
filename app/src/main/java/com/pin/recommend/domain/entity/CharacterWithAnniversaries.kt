@@ -1,7 +1,6 @@
 package com.pin.recommend.domain.entity
 
 import android.content.Context
-import android.graphics.Color
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
@@ -26,29 +25,11 @@ data class CharacterWithAnniversaries(
     }
 
     fun appearance(context: Context): Appearance {
-        return Appearance(
-            character.getIconImage(context, 500, 500),
-            character.getBackgroundBitmap(context, 1000, 2000),
-            character.backgroundColor ?: Color.parseColor("#77ffffff"),
-            character.homeTextColor ?: Color.parseColor("#ff000000"),
-            character.homeTextShadowColor ?: Color.parseColor("#00000000"),
-            character.elapsedDateFormat,
-            character.fontFamily,
-            character.backgroundImageOpacity
-        )
+        return character.appearance(context)
     }
 
     fun serializableAppearance(): SerializableAppearance {
-        return SerializableAppearance(
-            character.iconImageUri,
-            character.backgroundImageUri,
-            character.backgroundColor ?: Color.parseColor("#77ffffff"),
-            character.homeTextColor ?: Color.parseColor("#ff000000"),
-            character.homeTextShadowColor ?: Color.parseColor("#00000000"),
-            character.elapsedDateFormat,
-            character.fontFamily,
-            character.backgroundImageOpacity
-        )
+        return character.serializableAppearance()
     }
 
     fun toJson(): String {

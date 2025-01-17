@@ -3,6 +3,7 @@ package com.pin.recommend.ui.databinding
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
@@ -11,6 +12,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.databinding.BindingAdapter
 import com.pin.recommend.R
 import com.pin.recommend.domain.entity.Account
+import com.pin.recommend.domain.entity.Appearance
 import com.pin.recommend.domain.entity.RecommendCharacter
 
 
@@ -74,10 +76,39 @@ object DataBindingAdapters {
     }
 
     @JvmStatic
+    @BindingAdapter("android:homeTextAppearance")
+    fun setHomeTextAppearance(textView: TextView, appearance: Appearance?) {
+        appearance?.homeTextColor?.let { textView.setTextColor(it) }
+        appearance?.homeTextShadowColor?.let { textView.setShadowLayer(4f, 0f, 0f, it) }
+        try {
+            if (appearance?.fontFamily != null && appearance.fontFamily != "default") {
+                val font = Typeface.createFromAsset(
+                    textView.context.assets,
+                    "fonts/" + appearance.fontFamily + ".ttf"
+                )
+                textView.typeface = font
+            } else {
+                textView.typeface = null
+            }
+        } catch (e: RuntimeException) {
+            println("font missing " + appearance?.fontFamily)
+        }
+    }
+
+    @JvmStatic
     @BindingAdapter("android:characterIcon")
     fun setCharacterIcon(imageView: ImageView, character: RecommendCharacter?) {
         imageView.setImageResource(R.drawable.ic_person_300dp)
         character?.getIconImage(imageView.context, 500, 500)?.let {
+            imageView.setImageBitmap(it)
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("android:characterIconAppearance")
+    fun setCharacterIconAppearance(imageView: ImageView, appearance: Appearance?) {
+        imageView.setImageResource(R.drawable.ic_person_300dp)
+        appearance?.iconImage.let {
             imageView.setImageBitmap(it)
         }
     }
@@ -91,6 +122,18 @@ object DataBindingAdapters {
         }
         character?.backgroundImageOpacity?.let {
             imageView.alpha = character.backgroundImageOpacity
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("android:characterBackgroundAppearance")
+    fun setCharacterBackgroundAppearance(imageView: ImageView, appearance: Appearance?) {
+        appearance?.backgroundImage?.let {
+            imageView.setImageDrawable(BitmapDrawable(it))
+            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+        }
+        appearance?.backgroundImageOpacity?.let {
+            imageView.alpha = appearance.backgroundImageOpacity
         }
     }
 

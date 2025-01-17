@@ -23,6 +23,8 @@ import com.pin.recommend.ui.component.DialogActionListener
 import com.pin.recommend.ui.payment.PaymentCreateActivity
 import com.pin.recommend.ui.payment.PaymentWholePeriodActivity
 import com.pin.recommend.ui.payment.SavingsWholePeriodActivity
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import java.util.Date
 
 // TODO: Rename parameter arguments, choose names that match
@@ -74,8 +76,8 @@ class PaymentDetailsFragment : Fragment() {
     ): View {
         binding = FragmentPaymentDetailsBinding.inflate(inflater, container, false)
         binding.fragment = this
-
         vm.state.asLiveData().observe(viewLifecycleOwner) {
+            binding.state = it
             adapter.setList(it.payments.payments)
             adapter.isEditMode = it.isDeleteModePayments
             val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
@@ -96,21 +98,25 @@ class PaymentDetailsFragment : Fragment() {
     }
 
     fun toWholePeriodPaymentAmountView() {
-        val intent = Intent(requireContext(), PaymentWholePeriodActivity::class.java)
-        intent.putExtra(
-            PaymentWholePeriodActivity.INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER,
-            vm.state.asLiveData().value?.character?.id
-        )
-        startActivity(intent)
+        runBlocking {
+            val intent = Intent(requireContext(), PaymentWholePeriodActivity::class.java)
+            intent.putExtra(
+                PaymentWholePeriodActivity.INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER,
+                vm.state.first().character?.id
+            )
+            startActivity(intent)
+        }
     }
 
     fun toWholePeriodSavingsAmountView() {
-        val intent = Intent(requireContext(), SavingsWholePeriodActivity::class.java)
-        intent.putExtra(
-            SavingsWholePeriodActivity.INTENT_WHOLE_PERIOD_SAVINGS_CHARACTER,
-            vm.state.asLiveData().value?.character?.id
-        )
-        startActivity(intent)
+        runBlocking {
+            val intent = Intent(requireContext(), SavingsWholePeriodActivity::class.java)
+            intent.putExtra(
+                SavingsWholePeriodActivity.INTENT_WHOLE_PERIOD_SAVINGS_CHARACTER,
+                vm.state.first().character?.id
+            )
+            startActivity(intent)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

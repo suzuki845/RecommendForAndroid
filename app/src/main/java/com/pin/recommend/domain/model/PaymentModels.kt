@@ -6,8 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.pin.recommend.domain.dao.AppDatabase
-import com.pin.recommend.domain.dao.PaymentDao
-import com.pin.recommend.domain.dao.RecommendCharacterDao
 import com.pin.recommend.domain.entity.Payment
 import com.pin.recommend.domain.entity.PaymentAndTag
 import com.pin.recommend.util.TimeUtil
@@ -15,9 +13,11 @@ import java.util.Calendar
 import java.util.Date
 
 class PaymentBetweenCharacterDatesModel(
-    private val paymentDao: PaymentDao,
-    private val characterDao: RecommendCharacterDao
+    context: Context
 ) {
+    private val db = AppDatabase.getDatabase(context)
+    private val paymentDao = db.paymentDao()
+    private val characterDao = db.recommendCharacterDao()
 
     val characterId = MutableLiveData<Long?>()
 
@@ -25,7 +25,7 @@ class PaymentBetweenCharacterDatesModel(
         characterDao.watchById(it ?: -1)
     }
 
-    val section = MutableLiveData<Section>(Section(Date(), Date()))
+    val section = MutableLiveData(Section(Date(), Date()))
 
     val groupingByDate = characterId.switchMap { characterId ->
         section.switchMap { dates ->
@@ -67,12 +67,8 @@ class MonthlyPaymentModel(
     context: Context
 ) {
 
-    private val db = AppDatabase.getDatabase(context)
-    private val paymentDao = db.paymentDao()
-    private val characterDao = db.recommendCharacterDao()
-
     private val paymentBetweenCharacterDatesModel by lazy {
-        PaymentBetweenCharacterDatesModel(paymentDao, characterDao)
+        PaymentBetweenCharacterDatesModel(context)
     }
 
     val characterId: LiveData<Long?> = paymentBetweenCharacterDatesModel.characterId
@@ -144,12 +140,11 @@ class MonthlyPaymentModel(
 
 
 class WholePeriodCharacterPaymentModel(
-    private val paymentDao: PaymentDao,
-    private val characterDao: RecommendCharacterDao
+    private val context: Context
 ) {
 
     private val paymentBetweenCharacterDatesModel by lazy {
-        PaymentBetweenCharacterDatesModel(paymentDao, characterDao)
+        PaymentBetweenCharacterDatesModel(context)
     }
 
     val characterId: LiveData<Long?> = paymentBetweenCharacterDatesModel.characterId

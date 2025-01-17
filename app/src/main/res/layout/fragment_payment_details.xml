@@ -88,6 +88,7 @@
                     android:textColor="@color/colorPrimary"
                     android:layout_gravity="center"
                     android:text="全期間のPayを見る"
+                    android:onClick="@{() -> fragment.toWholePeriodPaymentAmountView()}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -101,6 +102,7 @@
                 <TextView
                     android:textColor="@color/colorPrimary"
                     android:layout_gravity="center"
+                    android:onClick="@{() -> fragment.toWholePeriodSavingsAmountView()}"
                     android:text="全期間の貯金を見る"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />

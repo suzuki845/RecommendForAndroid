@@ -16,8 +16,8 @@
             type="android.app.Activity" />
 
         <variable
-            name="vm"
-            type="com.pin.recommend.ui.payment.PaymentWholePeriodViewModel" />
+            name="state"
+            type="com.pin.recommend.ui.payment.PaymentWholePeriodViewModelState" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -27,7 +27,7 @@
 
         <ImageView
             android:id="@+id/background"
-            android:characterBackground="@{vm.character}"
+            android:characterBackgroundAppearance="@{state.appearance}"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
@@ -58,7 +58,7 @@
                 android:layout_height="160dp"
                 android:layout_centerInParent="true"
                 android:background="@drawable/icon_background"
-                android:characterIcon='@{vm.character}'
+                android:characterIconAppearance="@{state.appearance}"
                 app:civ_border_width="2dp"
                 app:civ_border_color="#eeeeee" />
 
@@ -71,8 +71,8 @@
 
                 <TextView
                     android:id="@+id/character_name"
-                    android:homeText="@{vm.character}"
-                    android:text='@{vm.character.name}'
+                    android:homeTextAppearance="@{state.appearance}"
+                    android:text='@{state.characterName}'
                     android:textSize="26sp"
                     android:padding="4dp"
                     android:layout_gravity="center"
@@ -81,7 +81,7 @@
 
                 <TextView
                     android:id="@+id/first_text"
-                    android:homeText="@{vm.character}"
+                    android:homeTextAppearance="@{state.appearance}"
                     android:textSize="20sp"
                     android:text="推し貯金して"
                     android:layout_gravity="center"
@@ -92,8 +92,8 @@
                     android:id="@+id/amount"
                     android:padding="4dp"
                     android:textSize="34sp"
-                    android:text='@{IntConverter.toString(vm.wholePeriodSavingsAmount) + "円"}'
-                    android:homeText="@{vm.character}"
+                    android:text='@{IntConverter.toString(state.savingsAmount) + "円"}'
+                    android:homeTextAppearance="@{state.appearance}"
                     android:shadowRadius="4"
                     android:layout_gravity="center"
                     android:layout_width="wrap_content"
@@ -101,7 +101,7 @@
 
                 <TextView
                     android:id="@+id/created"
-                    android:homeText="@{vm.character}"
+                    android:homeTextAppearance="@{state.appearance}"
                     android:text="になりました"
                     android:padding="4dp"
                     android:textSize="20sp"

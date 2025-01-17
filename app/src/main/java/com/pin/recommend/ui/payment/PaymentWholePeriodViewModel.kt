@@ -2,31 +2,45 @@ package com.pin.recommend.ui.payment
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import com.pin.recommend.domain.dao.AppDatabase
-import com.pin.recommend.domain.dao.PaymentDao
-import com.pin.recommend.domain.dao.RecommendCharacterDao
+import androidx.lifecycle.asFlow
+import com.pin.recommend.domain.entity.Appearance
 import com.pin.recommend.domain.model.WholePeriodCharacterPaymentModel
+import com.pin.recommend.util.combine3
+import kotlinx.coroutines.flow.Flow
 
-class PaymentWholePeriodViewModel(application: Application) : AndroidViewModel(application) {
+class PaymentWholePeriodViewModelState(
+    val characterName: String = "",
+    val appearance: Appearance = Appearance(),
+    val paymentAmount: Int = 0,
+    val savingsAmount: Int = 0
+)
 
-    private val characterDao: RecommendCharacterDao =
-        AppDatabase.getDatabase(application).recommendCharacterDao()
-    private val paymentDao: PaymentDao = AppDatabase.getDatabase(application).paymentDao()
-    private val paymentModel by lazy {
-        WholePeriodCharacterPaymentModel(paymentDao, characterDao)
+class PaymentWholePeriodViewModel(private val application: Application) :
+    AndroidViewModel(application) {
+
+    private val model by lazy {
+        WholePeriodCharacterPaymentModel(application)
     }
 
-    val isEditMode = MutableLiveData(false)
+    private val _state = combine3(
+        model.character,
+        model.wholePeriodPaymentAmount,
+        model.wholePeriodSavingsAmount
+    ) { a, b, c ->
+        PaymentWholePeriodViewModelState(
+            characterName = a?.name ?: "",
+            appearance = a?.appearance(application) ?: Appearance(),
+            paymentAmount = b ?: 0,
+            savingsAmount = c ?: 0
+        )
+    }
 
-    val characterId = paymentModel.characterId
+    val state: Flow<PaymentWholePeriodViewModelState> = _state.asFlow()
 
-    val character = paymentModel.character
+    fun setCharacterId(id: Long) {
+        model.setCharacterId(id)
+    }
 
-    fun setCharacterId(id: Long?) = paymentModel.setCharacterId(id)
-
-    val wholePeriodPaymentAmount = paymentModel.wholePeriodPaymentAmount
-
-    val wholePeriodSavingsAmount = paymentModel.wholePeriodSavingsAmount
+    fun setCharacterId(id: Long?) = model.setCharacterId(id)
 
 }

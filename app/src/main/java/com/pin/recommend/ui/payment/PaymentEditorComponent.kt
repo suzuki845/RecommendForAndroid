@@ -295,7 +295,7 @@ fun toTagListActivity(
     state: PaymentEditorViewModelState
 ) {
     val intent = Intent(activity, PaymentTagListActivity::class.java);
-    intent.putExtra(PaymentTagListActivity.INTENT_PAYMENT_TYPE, state.type ?: 0)
+    intent.putExtra(PaymentTagListActivity.INTENT_PAYMENT_TYPE, state.type)
     activity.startActivity(intent)
 }
 

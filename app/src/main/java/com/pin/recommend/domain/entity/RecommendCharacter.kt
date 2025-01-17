@@ -230,6 +230,32 @@ class RecommendCharacter {
         } else getDiffDaysSingle(now)
     }
 
+    fun appearance(context: Context): Appearance {
+        return Appearance(
+            iconImage = getIconImage(context, 500, 500),
+            backgroundImage = getBackgroundBitmap(context, 1000, 2000),
+            backgroundColor = backgroundColor ?: Color.parseColor("#77ffffff"),
+            homeTextColor = homeTextColor ?: Color.parseColor("#ff000000"),
+            homeTextShadowColor = homeTextShadowColor ?: Color.parseColor("#00000000"),
+            elapsedDateFormat = elapsedDateFormat,
+            fontFamily = fontFamily,
+            backgroundImageOpacity = backgroundImageOpacity
+        )
+    }
+
+    fun serializableAppearance(): SerializableAppearance {
+        return SerializableAppearance(
+            iconImageUri = iconImageUri,
+            backgroundImageUri = backgroundImageUri,
+            backgroundColor = backgroundColor ?: Color.parseColor("#77ffffff"),
+            homeTextColor = homeTextColor ?: Color.parseColor("#ff000000"),
+            homeTextShadowColor = homeTextShadowColor ?: Color.parseColor("#00000000"),
+            elapsedDateFormat = elapsedDateFormat,
+            fontFamily = fontFamily,
+            backgroundImageOpacity = backgroundImageOpacity
+        )
+    }
+
     fun toJson(): String {
         return Gson().toJson(this)
     }

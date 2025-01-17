@@ -5,7 +5,6 @@ import android.widget.EditText
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,14 +48,15 @@ class PaymentTagListActivity : AppCompatActivity() {
             "com.pin.recommend.view.payment.PaymentTagListActivity.INTENT_PAYMENT_TYPE"
     }
 
-    private lateinit var toolbar: Toolbar
-
     private val vm by lazy {
         ViewModelProvider(this)[PaymentTagListViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val type = intent.getIntExtra(INTENT_PAYMENT_TYPE, 0)
+        vm.setType(type)
         vm.subscribe(this)
         setContent {
             Body(this, vm, vm.state.collectAsState(PaymentTagListViewModelState()).value)
