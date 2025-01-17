@@ -93,74 +93,71 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         binding = FragmentEventDetailsBinding.inflate(inflater, container, false)
 
         calendarView = binding.calendarView
-        with(binding) {
 
-            vm.state.asLiveData().observe(viewLifecycleOwner) {
-                adapter.setDates(it.events.monthlyEvent.days)
-                adapter.setEvents(it.events.monthlyEvent.events)
+        vm.state.asLiveData().observe(viewLifecycleOwner) {
+            adapter.setDates(it.events.monthlyEvent.days)
+            adapter.setEvents(it.events.monthlyEvent.events)
 
-                val events = mutableListOf<CalendarDay>()
-                it.events.monthlyEvent.events.keys.forEach { key ->
-                    if (it.events.monthlyEvent.dayHasEvents(key)) {
-                        val c = Calendar.getInstance()
-                        c.time = key
-                        val day = CalendarDay.from(
-                            c[Calendar.YEAR],
-                            c[Calendar.MONTH] + 1,
-                            c[Calendar.DAY_OF_MONTH]
-                        )
-                        Log.d("calendar", "$day")
-                        events.add(day)
-                    }
-                }
-                val eventDecorator = EventDecorator(Color.RED, events)
-                calendarView.addDecorator(eventDecorator)
-
-                val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
-                eventRecycleView.layoutManager = layoutManager
-                eventRecycleView.adapter = adapter
-
-                val resetDate = TimeUtil.resetDate(it.events.selectedDate)
-                val position = adapter.getSectionItemPosition(resetDate)
-                if (position != -1) {
-                    smoothScroller.targetPosition = position
-                    (binding.eventRecycleView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
-                        position,
-                        0
+            val events = mutableListOf<CalendarDay>()
+            it.events.monthlyEvent.events.keys.forEach { key ->
+                if (it.events.monthlyEvent.dayHasEvents(key)) {
+                    val c = Calendar.getInstance()
+                    c.time = key
+                    val day = CalendarDay.from(
+                        c[Calendar.YEAR],
+                        c[Calendar.MONTH] + 1,
+                        c[Calendar.DAY_OF_MONTH]
                     )
+                    Log.d("calendar", "$day")
+                    events.add(day)
                 }
-
-                adapter.isEditMode = it.isDeleteModeEvents
             }
+            val eventDecorator = EventDecorator(Color.RED, events)
+            calendarView.addDecorator(eventDecorator)
 
-            adapter.setOnSectionClickListener {
-                calendarView.clearSelection()
-                vm.setCurrentEventDate(it)
-            }
+            val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
+            binding.eventRecycleView.layoutManager = layoutManager
+            binding.eventRecycleView.adapter = adapter
 
-            adapter.setOnSectionAddClickListener {
-                calendarView.clearSelection()
-                vm.setCurrentEventDate(it)
-
-                val intent = Intent(activity, EventCreateActivity::class.java)
-                val characterId = requireActivity().intent.getLongExtra(
-                    CharacterDetailActivity.INTENT_CHARACTER,
-                    -1
+            val resetDate = TimeUtil.resetDate(it.events.selectedDate)
+            val position = adapter.getSectionItemPosition(resetDate)
+            if (position != -1) {
+                smoothScroller.targetPosition = position
+                (binding.eventRecycleView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+                    position,
+                    0
                 )
-                intent.putExtra(EventCreateActivity.INTENT_CREATE_EVENT_CHARACTER, characterId)
-                intent.putExtra(EventCreateActivity.INTENT_CREATE_EVENT_DATE, it.time)
-                startActivity(intent)
             }
 
-            adapter.setOnEventClickListener {
-                calendarView.clearSelection()
-                vm.setCurrentEventDate(TimeUtil.resetDate(it.date))
+            adapter.isEditMode = it.isDeleteModeEvents
+        }
 
-                val intent = Intent(activity, EventEditActivity::class.java)
-                intent.putExtra(EventEditActivity.INTENT_EDIT_EVENT_ID, it.id)
-                startActivity(intent)
-            }
+        adapter.setOnSectionClickListener {
+            calendarView.clearSelection()
+            vm.setCurrentEventDate(it)
+        }
 
+        adapter.setOnSectionAddClickListener {
+            calendarView.clearSelection()
+            vm.setCurrentEventDate(it)
+
+            val intent = Intent(activity, EventCreateActivity::class.java)
+            val characterId = requireActivity().intent.getLongExtra(
+                CharacterDetailActivity.INTENT_CHARACTER,
+                -1
+            )
+            intent.putExtra(EventCreateActivity.INTENT_CREATE_EVENT_CHARACTER, characterId)
+            intent.putExtra(EventCreateActivity.INTENT_CREATE_EVENT_DATE, it.time)
+            startActivity(intent)
+        }
+
+        adapter.setOnEventClickListener {
+            calendarView.clearSelection()
+            vm.setCurrentEventDate(TimeUtil.resetDate(it.date))
+
+            val intent = Intent(activity, EventEditActivity::class.java)
+            intent.putExtra(EventEditActivity.INTENT_EDIT_EVENT_ID, it.id)
+            startActivity(intent)
         }
 
 

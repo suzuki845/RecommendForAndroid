@@ -25,6 +25,8 @@ import com.pin.recommend.ui.adapter.VerticalRecyclerViewAdapter
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.story.StoryCreateActivity
 import com.pin.recommend.ui.story.StoryCreateActivity.Companion.INTENT_CHARACTER_ID
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 class StoryListFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
@@ -146,10 +148,12 @@ class StoryListFragment : Fragment() {
             }
 
             R.id.create -> {
-                val intent = Intent(activity, StoryCreateActivity::class.java)
-                val characterId = vm.state.asLiveData().value?.character?.id
-                intent.putExtra(INTENT_CHARACTER_ID, characterId)
-                startActivity(intent)
+                runBlocking {
+                    val intent = Intent(activity, StoryCreateActivity::class.java)
+                    val characterId = vm.state.first().character?.id
+                    intent.putExtra(INTENT_CHARACTER_ID, characterId)
+                    startActivity(intent)
+                }
             }
         }
         return true

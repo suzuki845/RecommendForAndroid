@@ -88,7 +88,9 @@ class CharacterMonthlyEventModel(
     fun nextMonth() {
         val current = _currentDate.value
         val calendar = Calendar.getInstance()
-        calendar.time = current
+        if (current != null) {
+            calendar.time = current
+        }
         calendar.add(Calendar.MONTH, 1)
         setCurrentDate(calendar.time)
     }
@@ -96,7 +98,9 @@ class CharacterMonthlyEventModel(
     fun prevMonth() {
         val current = _currentDate.value
         val calendar = Calendar.getInstance()
-        calendar.time = current
+        if (current != null) {
+            calendar.time = current
+        }
         calendar.add(Calendar.MONTH, -1)
         setCurrentDate(calendar.time)
     }
