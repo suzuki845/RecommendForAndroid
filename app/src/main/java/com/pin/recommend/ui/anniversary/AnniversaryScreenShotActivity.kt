@@ -7,12 +7,12 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore.Images.Media.insertImage
 import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
-import com.pin.imageutil.insertImage
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityScreenShotBinding
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState

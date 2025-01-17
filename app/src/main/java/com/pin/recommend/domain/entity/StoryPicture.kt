@@ -8,10 +8,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.pin.imageutil.BitmapUtility
-import com.pin.recommend.R
+import com.pin.recommend.util.BitmapUtility
 import java.io.File
-import java.util.*
+import java.util.UUID
 
 @Entity(
     foreignKeys = [ForeignKey(
@@ -34,11 +33,6 @@ class StoryPicture {
         return File(context.filesDir, uri)
     }
 
-    fun testGetBitmap(context: Context?, width: Int, height: Int): Bitmap {
-        var bitmap = BitmapUtility.decodeResource(context, R.drawable.test, width, height)
-        bitmap = BitmapUtility.getRoundedCornerBitmap(bitmap, 50)
-        return bitmap
-    }
 
     fun getBackgroundDrawable(context: Context, w: Int, h: Int): Drawable {
         val bitmap = BitmapUtility.readPrivateImage(context, uri, w, h)
@@ -46,7 +40,7 @@ class StoryPicture {
     }
 
     fun getBitmap(
-        context: Context?,
+        context: Context,
         width: Int,
         height: Int
     ): Bitmap? {
@@ -54,7 +48,7 @@ class StoryPicture {
         return BitmapUtility.readPrivateImage(context, uri, width, height)
     }
 
-    fun saveImage(context: Context?, bitmap: Bitmap?): Boolean {
+    fun saveImage(context: Context, bitmap: Bitmap?): Boolean {
         if (BitmapUtility.fileExistsByPrivate(context, uri)) {
             BitmapUtility.deletePrivateImage(context, uri)
         }
@@ -65,7 +59,7 @@ class StoryPicture {
         return success
     }
 
-    fun deleteImage(context: Context?): Boolean {
+    fun deleteImage(context: Context): Boolean {
         if (uri != null) {
             BitmapUtility.deletePrivateImage(context, uri)
             uri = null

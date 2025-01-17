@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.pin.recommend.R
-import com.pin.util.DisplaySizeCheck
+import com.pin.recommend.util.DisplaySizeChecker
 
 class PickStoryPictureAdapter(private val context: AppCompatActivity) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -23,7 +23,7 @@ class PickStoryPictureAdapter(private val context: AppCompatActivity) :
 
     init {
         pictures = ArrayList()
-        display = DisplaySizeCheck.getDisplaySize(context)
+        display = DisplaySizeChecker.getDisplaySize(context)
     }
 
     fun setOnClickListener(onClickListener: (position: Int) -> Unit) {

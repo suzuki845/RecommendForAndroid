@@ -5,11 +5,11 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Typeface
-import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.domain.dao.AppDatabase
 import com.pin.recommend.domain.entity.CharacterWithAnniversaries
 import com.pin.recommend.domain.entity.CustomAnniversary
 import com.pin.recommend.domain.entity.RecommendCharacter
+import com.pin.recommend.util.BitmapUtility
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Date

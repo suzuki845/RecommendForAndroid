@@ -1,11 +1,11 @@
 package com.pin.recommend.domain.model
 
 import android.content.Context
-import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.domain.dao.AppDatabase
 import com.pin.recommend.domain.entity.Story
 import com.pin.recommend.domain.entity.StoryPicture
 import com.pin.recommend.domain.entity.StoryWithPictures
+import com.pin.recommend.util.BitmapUtility
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Date

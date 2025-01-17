@@ -5,9 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Point
 import android.graphics.Typeface
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
-import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.R
+import com.pin.recommend.util.BitmapUtility
 
 data class Appearance(
     val iconImage: Bitmap? = null,
@@ -44,9 +45,11 @@ data class SerializableAppearance(
 ) {
     fun getIconImage(context: Context, width: Int, height: Int): Bitmap? {
         if (iconImageUri == null) {
-            val d = context.getDrawable(R.drawable.ic_person_300dp)
-            return BitmapUtility.drawableToBitmap(d)
+            return ContextCompat.getDrawable(context, R.drawable.ic_person_300dp)?.let {
+                return BitmapUtility.drawableToBitmap(it)
+            }
         }
+
         return BitmapUtility.readPrivateImage(context, iconImageUri, width, height)
     }
 

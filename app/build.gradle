@@ -95,9 +95,6 @@ dependencies {
     }
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(':imageutil')
-    implementation project(':util')
-
     implementation 'com.google.android.gms:play-services-ads:23.3.0'
 
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'

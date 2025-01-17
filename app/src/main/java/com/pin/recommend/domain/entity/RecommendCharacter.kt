@@ -5,14 +5,15 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
-import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.R
+import com.pin.recommend.util.BitmapUtility
 import com.pin.recommend.util.TimeUtil.Companion.resetTime
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -124,19 +125,21 @@ class RecommendCharacter {
         return if (belowText != null) belowText!! else "になりました"
     }
 
-    fun getIconImage(context: Context, width: Int, height: Int): Bitmap {
+    fun getIconImage(context: Context, width: Int, height: Int): Bitmap? {
         if (iconImageUri == null) {
-            val d = context.getDrawable(R.drawable.ic_person_300dp)
-            return BitmapUtility.drawableToBitmap(d)
+            return ContextCompat.getDrawable(context, R.drawable.ic_person_300dp)?.let {
+                return BitmapUtility.drawableToBitmap(it)
+            }
         }
-        return BitmapUtility.readPrivateImage(context, iconImageUri ?: "", width, height)
+
+        return BitmapUtility.readPrivateImage(context, iconImageUri, width, height)
     }
 
     fun hasIconImage(): Boolean {
         return iconImageUri != null
     }
 
-    fun deleteIconImage(context: Context?): Boolean {
+    fun deleteIconImage(context: Context): Boolean {
         if (iconImageUri != null) {
             BitmapUtility.deletePrivateImage(context, iconImageUri)
             iconImageUri = null
@@ -161,7 +164,7 @@ class RecommendCharacter {
         return null
     }
 
-    fun deleteBackgroundImage(context: Context?): Boolean {
+    fun deleteBackgroundImage(context: Context): Boolean {
         if (backgroundImageUri != null) {
             BitmapUtility.deletePrivateImage(context, backgroundImageUri)
             backgroundImageUri = null
