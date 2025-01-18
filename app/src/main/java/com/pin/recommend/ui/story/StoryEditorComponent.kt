@@ -1,9 +1,7 @@
 package com.pin.recommend.ui.story
 
-import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Intent
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -46,13 +44,15 @@ import com.pin.recommend.MyApplication
 import com.pin.recommend.R
 import com.pin.recommend.domain.model.StoryEditorAction
 import com.pin.recommend.domain.model.StoryEditorStatus
+import com.pin.recommend.ui.component.DatePickerModal
 import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
 import com.pin.recommend.util.PermissionChecker
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.toFormattedString
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
-import java.util.Calendar
+import java.time.Instant
+import java.util.Date
 
 @Composable
 fun Body(
@@ -119,12 +119,14 @@ fun DatePickButton(
     vm: StoryEditorViewModel,
     state: StoryEditorViewModelState
 ) {
+    var showModal by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(PaddingValues(start = 16.dp, top = 16.dp))
             .clickable {
-                onShowDatePickerDialog(activity, vm, state)
+                showModal = true
             }
     ) {
         Text(
@@ -132,6 +134,19 @@ fun DatePickButton(
             text = state.created.toFormattedString()
         )
     }
+
+    if (showModal) {
+        DatePickerModal(
+            initialValue = state.created,
+            onDateSelected = {
+                if (it != null) {
+                    vm.setCreated(Date.from(Instant.ofEpochMilli(it)))
+                }
+            },
+            onDismiss = { showModal = false }
+        )
+    }
+
 }
 
 @Composable
@@ -250,36 +265,6 @@ fun onPickImage(activity: AppCompatActivity, requestCodePicture: Int) {
     intent.type = "image/*"
     activity.startActivityForResult(intent, requestCodePicture)
 }
-
-fun onShowDatePickerDialog(
-    activity: AppCompatActivity,
-    vm: StoryEditorViewModel,
-    state: StoryEditorViewModelState
-) {
-    val calendar = Calendar.getInstance()
-    val year = calendar[Calendar.YEAR]
-    val month = calendar[Calendar.MONTH]
-    val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-    val datePickerDialog = DatePickerDialog(
-        activity,
-        DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
-                !dialog.isShown
-            ) {
-                return@OnDateSetListener
-            }
-            val newCalender = Calendar.getInstance()
-            newCalender[year, month] = dayOfMonth
-            val date = newCalender.time
-            vm.setCreated(date)
-        },
-        year,
-        month,
-        dayOfMonth
-    )
-    datePickerDialog.show()
-}
-
 
 private fun save(
     activity: AppCompatActivity,

@@ -3,18 +3,13 @@ package com.pin.recommend.ui.story
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.Constants
-import com.pin.recommend.MyApplication
 import com.pin.recommend.domain.entity.StoryPicture
 import com.pin.recommend.util.BitmapUtility
-import com.pin.recommend.util.PermissionChecker
-import com.pin.recommend.util.PermissionRequests
-import java.text.SimpleDateFormat
 
 class StoryCreateActivity : AppCompatActivity() {
     private val vm: StoryEditorViewModel by lazy {
@@ -38,25 +33,6 @@ class StoryCreateActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
-
-    fun onPickImage(v: View?) {
-        if (!PermissionChecker.requestPermissions(
-                this, MyApplication.REQUEST_PICK_IMAGE, PermissionRequests().requestImages()
-            )
-        ) {
-            return
-        }
-
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "image/*"
-        startActivityForResult(intent, REQUEST_PICK_STORY_PICTURE)
-    }
-
     public override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         if (requestCode == REQUEST_PICK_STORY_PICTURE && resultCode == RESULT_OK) {
             val uri: Uri?
@@ -73,7 +49,6 @@ class StoryCreateActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_PICK_STORY_PICTURE = 3000
-        private val FORMAT = SimpleDateFormat("yyyy年MM月dd日")
         val INTENT_CHARACTER_ID = "com.pin.recommend.StoryCreateActivity.INTENT_CHARACTER_ID"
     }
 }

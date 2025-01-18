@@ -14,7 +14,6 @@ import com.pin.recommend.R
 import com.pin.recommend.domain.entity.StoryPicture
 import com.pin.recommend.domain.entity.StoryWithPictures
 import com.pin.recommend.util.BitmapUtility
-import java.text.SimpleDateFormat
 
 class StoryEditActivity : AppCompatActivity() {
 
@@ -41,10 +40,6 @@ class StoryEditActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         if (requestCode == REQUEST_PICK_STORY_PICTURE && resultCode == RESULT_OK) {
@@ -67,7 +62,6 @@ class StoryEditActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_PICK_STORY_PICTURE = 3000
-        private val FORMAT = SimpleDateFormat("yyyy年MM月dd日")
         var INTENT_EDIT_ENTITY = "com.pin.recommend.StoryEditActivity.INTENT_EDIT_ENTITY"
     }
 

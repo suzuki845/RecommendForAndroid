@@ -109,9 +109,7 @@ class AnniversaryEditor {
                 status = AnniversaryEditorStatus.Processing
             )
             val s = _state.value
-            if (s.characterId == -1L) {
-                throw Exception("foreign key is null")
-            }
+
             if (s.name.isBlank()) {
                 throw Exception("記念日名がありません")
             }
