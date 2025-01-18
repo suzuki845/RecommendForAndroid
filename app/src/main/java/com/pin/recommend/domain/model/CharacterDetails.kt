@@ -185,11 +185,43 @@ class CharacterDetails(
     }
 
     fun deletePayment(payment: Payment) {
-        paymentModel.delete(payment)
+        try {
+            _state.value = _state.value.copy(
+                action = CharacterDetailsAction.DeletePayment,
+                status = CharacterDetailsStatus.Processing,
+            )
+            paymentModel.delete(payment)
+            _state.value = _state.value.copy(
+                action = CharacterDetailsAction.DeletePayment,
+                status = CharacterDetailsStatus.Success,
+            )
+        } catch (e: Exception) {
+            _state.value = _state.value.copy(
+                action = CharacterDetailsAction.DeletePayment,
+                status = CharacterDetailsStatus.Failure,
+                errorMessage = e.message
+            )
+        }
     }
 
     fun deleteEvent(event: Event) {
-        eventModel.delete(event)
+        try {
+            _state.value = _state.value.copy(
+                action = CharacterDetailsAction.DeleteEvent,
+                status = CharacterDetailsStatus.Processing,
+            )
+            eventModel.delete(event)
+            _state.value = _state.value.copy(
+                action = CharacterDetailsAction.DeleteEvent,
+                status = CharacterDetailsStatus.Success,
+            )
+        } catch (e: Exception) {
+            _state.value = _state.value.copy(
+                action = CharacterDetailsAction.DeleteEvent,
+                status = CharacterDetailsStatus.Failure,
+                errorMessage = e.message
+            )
+        }
     }
 
     fun setCurrentPaymentDate(date: Date) {
