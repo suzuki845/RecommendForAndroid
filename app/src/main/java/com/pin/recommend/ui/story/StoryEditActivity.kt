@@ -9,11 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
-import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.Constants
 import com.pin.recommend.R
 import com.pin.recommend.domain.entity.StoryPicture
 import com.pin.recommend.domain.entity.StoryWithPictures
+import com.pin.recommend.util.BitmapUtility
 import java.text.SimpleDateFormat
 
 class StoryEditActivity : AppCompatActivity() {

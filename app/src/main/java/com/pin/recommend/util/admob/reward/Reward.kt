@@ -6,7 +6,7 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.pin.util.BuildConfig
+import com.pin.recommend.BuildConfig
 import com.pin.util.admob.RewardAdStateAction
 
 

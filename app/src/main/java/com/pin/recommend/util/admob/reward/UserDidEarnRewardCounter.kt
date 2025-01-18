@@ -1,7 +1,7 @@
 package com.pin.util.admob.reward
 
 import android.content.Context
-import com.pin.util.PrefUtil
+import com.pin.recommend.util.PrefUtil
 
 open class UserDidEarnRewardCounter(val context: Context) {
 
@@ -22,6 +22,8 @@ open class UserDidEarnRewardCounter(val context: Context) {
     val LAST_USER_DID_EARN_REWARD_DATE_KEY =
         "UserDidEarnRewardCounter.LAST_USER_DID_EARN_REWARD_DATE_KEY"
 
+    private val pref by lazy { PrefUtil(context) }
+
     private var prefix: String? = null
 
     fun setPrefix(prefix: String) {
@@ -35,8 +37,6 @@ open class UserDidEarnRewardCounter(val context: Context) {
     private fun getLastUserDidEarnRewardDateKey(): String {
         return if (prefix == null) LAST_USER_DID_EARN_REWARD_DATE_KEY else "$LAST_USER_DID_EARN_REWARD_DATE_KEY.$prefix"
     }
-
-    private val pref: PrefUtil = PrefUtil(context)
 
     private fun getLastUserDidEarnRewardDate(): Long {
         return pref.getLong(getLastUserDidEarnRewardDateKey())

@@ -6,7 +6,7 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.pin.util.BuildConfig
+import com.pin.recommend.BuildConfig
 
 class Interstitial(
     private val adUnitId: String,

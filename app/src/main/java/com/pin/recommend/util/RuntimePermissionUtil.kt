@@ -14,7 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import com.pin.util.R
+import com.pin.recommend.R
 
 object RuntimePermissionUtil {
     @JvmStatic

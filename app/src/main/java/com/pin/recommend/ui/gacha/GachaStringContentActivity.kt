@@ -13,14 +13,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.pin.imageutil.insertImage
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityStringContentGachaBinding
 import com.pin.recommend.domain.model.gacha.GachaItemAssetsRepository
 import com.pin.recommend.domain.model.gacha.PlaceholderParser
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.main.SpecialContentsFragment
-import com.pin.util.SimpleDialogFragment
+import com.pin.recommend.util.SimpleDialogFragment
+import com.pin.recommend.util.admob.ContentResolverUtil
 import com.pin.util.admob.RewardAdStateAction
 import com.pin.util.admob.reward.RemoveAdReward
 import com.pin.util.admob.reward.Reward
@@ -166,7 +166,7 @@ class GachaStringContentActivity : AppCompatActivity() {
         context: Context, bitmap: Bitmap, format: Bitmap.CompressFormat,
         mimeType: String, displayName: String
     ): Uri {
-        return insertImage(bitmap, format, mimeType, displayName)
+        return ContentResolverUtil.insertImage(context, bitmap, format, mimeType, displayName)
     }
 
 

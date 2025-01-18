@@ -8,12 +8,12 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModelProvider
-import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.Constants
 import com.pin.recommend.MyApplication
 import com.pin.recommend.domain.entity.StoryPicture
+import com.pin.recommend.util.BitmapUtility
+import com.pin.recommend.util.PermissionChecker
 import com.pin.recommend.util.PermissionRequests
-import com.pin.util.PermissionChecker
 import java.text.SimpleDateFormat
 
 class StoryCreateActivity : AppCompatActivity() {
@@ -59,7 +59,7 @@ class StoryCreateActivity : AppCompatActivity() {
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         if (requestCode == REQUEST_PICK_STORY_PICTURE && resultCode == RESULT_OK) {
-            var uri: Uri?
+            val uri: Uri?
             if (resultData != null) {
                 uri = resultData.data
                 val bitmap = BitmapUtility.decodeUri(this, uri, 500, 500)

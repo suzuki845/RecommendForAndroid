@@ -161,16 +161,18 @@ class CharacterListActivity : AppCompatActivity() {
                     )
                     startActivity(intent)
                 }) {
-            Image(
-                bitmap = character.getIconImage(this@CharacterListActivity, 50, 50)
-                    .asImageBitmap(),
-                contentDescription = "",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(25.dp))
-                    .size(50.dp)
-                    .border(1.dp, Color.Black, CircleShape)
-            )
+            character.getIconImage(this@CharacterListActivity, 50, 50)
+                ?.asImageBitmap()?.let {
+                    Image(
+                        bitmap = it,
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(25.dp))
+                            .size(50.dp)
+                            .border(1.dp, Color.Black, CircleShape)
+                    )
+                }
             Spacer(Modifier.width(6.dp))
             Column {
                 Text(character.name ?: "", fontSize = 20.sp)

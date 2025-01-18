@@ -1,7 +1,6 @@
 package com.pin.recommend.ui.gacha
 
 import android.app.ProgressDialog
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -14,14 +13,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.pin.imageutil.insertImage
 import com.pin.recommend.BadgeGachaRemoveAdReward
 import com.pin.recommend.BadgeGachaUserDidEarnRewardCounter
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityBadgeGachaBinding
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.main.SpecialContentsFragment
-import com.pin.util.SimpleDialogFragment
+import com.pin.recommend.util.SimpleDialogFragment
+import com.pin.recommend.util.admob.ContentResolverUtil
 import com.pin.util.admob.RewardAdStateAction
 import com.pin.util.admob.reward.Reward
 import com.pin.util.admob.reward.RewardDialogFragment
@@ -134,7 +133,6 @@ class GachaBadgeActivity : AppCompatActivity() {
             println("onSaveImage")
             val image = getViewBitmap()
             save(
-                this,
                 image!!,
                 Bitmap.CompressFormat.PNG,
                 "image/png",
@@ -178,10 +176,10 @@ class GachaBadgeActivity : AppCompatActivity() {
     }
 
     fun save(
-        context: Context, bitmap: Bitmap, format: Bitmap.CompressFormat,
+        bitmap: Bitmap, format: Bitmap.CompressFormat,
         mimeType: String, displayName: String
     ): Uri {
-        return insertImage(bitmap, format, mimeType, displayName)
+        return ContentResolverUtil.insertImage(this, bitmap, format, mimeType, displayName)
     }
 
 }

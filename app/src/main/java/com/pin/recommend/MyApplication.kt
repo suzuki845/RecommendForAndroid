@@ -23,13 +23,15 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
 
     override val viewModelStore = ViewModelStore()
     private var isNeedPassCodeConfirmation = true
+
     override fun onCreate() {
         super.onCreate()
+        val pref = PrefUtil(this)
+
         CharacterPinningManager(this).initialize()
-        PrefUtil.setSharedPreferences(applicationContext)
         registerActivityLifecycleCallbacks(this as ActivityLifecycleCallbacks)
-        var appStartCount = PrefUtil.getInt(Constants.APP_START_COUNT)
-        PrefUtil.putInt(Constants.APP_START_COUNT, ++appStartCount)
+        var appStartCount = pref.getInt(Constants.APP_START_COUNT)
+        pref.putInt(Constants.APP_START_COUNT, ++appStartCount)
     }
 
     override fun onTrimMemory(level: Int) {
@@ -44,7 +46,8 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
         val intent = activity.intent
         val isPickImage = intent.getBooleanExtra(Constants.PICK_IMAGE, false)
         if (activity !is MainActivity) {
-            if (isNeedPassCodeConfirmation && PrefUtil.getBoolean(Constants.PREF_KEY_IS_LOCKED) && !isPickImage) {
+            val pref = PrefUtil(this)
+            if (isNeedPassCodeConfirmation && pref.getBoolean(Constants.PREF_KEY_IS_LOCKED) && !isPickImage) {
                 activity.startActivity(PassCodeConfirmationActivity.createIntent(applicationContext))
             }
             isNeedPassCodeConfirmation = false
@@ -105,14 +108,6 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
             return alpha <= 100
         }
 
-        private var app: MyApplication? = null
-
-        @JvmStatic
-        val instance: MyApplication?
-            get() {
-                if (app == null) app = MyApplication()
-                return app
-            }
     }
 }
 

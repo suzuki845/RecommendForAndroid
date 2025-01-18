@@ -18,7 +18,6 @@ import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
-import com.pin.imageutil.ImageSaver
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
@@ -344,10 +343,10 @@ object BitmapUtility {
     }
 
     fun insertPrivateImage(
-        context: Context?,
+        context: Context,
         bitmap: Bitmap?,
         filename: String?,
-        extension: String?
+        extension: String
     ): Boolean {
         val imageSaver = ImageSaver(context)
         imageSaver.setSaveFileName(filename)

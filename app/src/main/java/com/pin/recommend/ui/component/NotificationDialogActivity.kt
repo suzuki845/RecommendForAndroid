@@ -24,17 +24,19 @@ class NotificationChecker(val context: Context) {
         const val NOTIFICATION_DATA = "NotificationChecker.DATA"
     }
 
+    private val pref by lazy { PrefUtil(context) }
+
     fun check(check: Int, intents: ArrayList<Intent>, data: NotificationData) {
-        val appStartCount = PrefUtil.getInt(Constants.APP_START_COUNT)
-        val notificationCount = PrefUtil.getInt(NOTIFICATION_COUNT)
+        val appStartCount = pref.getInt(Constants.APP_START_COUNT)
+        val notificationCount = pref.getInt(NOTIFICATION_COUNT)
         if (check > notificationCount && appStartCount > 3) {
-            val isPassCodeLocked = PrefUtil.getBoolean(Constants.PREF_KEY_IS_LOCKED)
+            val isPassCodeLocked = pref.getBoolean(Constants.PREF_KEY_IS_LOCKED)
             if (!isPassCodeLocked) {
                 val intent = NotificationDialogActivity.createIntent(context)
                 intent.putExtra(NOTIFICATION_DATA, data.toJson())
                 intents.add(intent)
                 val next = notificationCount + 1;
-                PrefUtil.putInt(NOTIFICATION_COUNT, next);
+                pref.putInt(NOTIFICATION_COUNT, next);
             }
         }
     }

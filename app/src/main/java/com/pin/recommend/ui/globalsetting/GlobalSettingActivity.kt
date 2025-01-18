@@ -32,6 +32,8 @@ class GlobalSettingActivity : AppCompatActivity() {
 
     private lateinit var passCodeRock: Switch
 
+    private val pref by lazy { PrefUtil(this) }
+
     private val backupExporter by lazy {
         BackupExporter(
             AppDatabase.getDatabase(this)
@@ -68,13 +70,13 @@ class GlobalSettingActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        passCodeRock.isChecked = PrefUtil.getBoolean(Constants.PREF_KEY_IS_LOCKED)
+        passCodeRock.isChecked = pref.getBoolean(Constants.PREF_KEY_IS_LOCKED)
         passCodeRock.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 startActivity(PassCodeSetActivity.createIntent(this))
             } else {
-                PrefUtil.putBoolean(Constants.PREF_KEY_IS_LOCKED, false);
-                PrefUtil.putInt(Constants.PREF_KEY_PASSWORD, 0);
+                pref.putBoolean(Constants.PREF_KEY_IS_LOCKED, false);
+                pref.putInt(Constants.PREF_KEY_PASSWORD, 0);
                 Toast.makeText(this, "ロックを解除しました。", Toast.LENGTH_SHORT).show();
             }
         })

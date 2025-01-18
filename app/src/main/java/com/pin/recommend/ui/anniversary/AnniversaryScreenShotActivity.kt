@@ -1,13 +1,11 @@
 package com.pin.recommend.ui.anniversary
 
 import android.app.ProgressDialog
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore.Images.Media.insertImage
 import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityScreenShotBinding
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
+import com.pin.recommend.util.admob.ContentResolverUtil
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
 import com.pin.util.admob.reward.RemoveAdReward
@@ -84,7 +83,6 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
         try {
             val image = getViewBitmap()
             save(
-                this,
                 image!!,
                 Bitmap.CompressFormat.PNG,
                 "image/png",
@@ -94,7 +92,7 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
                 this, """
      スクリーンショットを保存しました。ファイルをご確認ください。
      """.trimIndent(), Toast.LENGTH_LONG
-            )
+            ).show()
         } catch (e: Exception) {
             println(e)
             Toast.makeText(this, "保存に失敗しました。 \n\n ${e.message}", Toast.LENGTH_LONG)
@@ -148,13 +146,11 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
         return bitmap
     }
 
-    private val REQUEST_PERMISSION_CODE = 1234
-
     fun save(
-        context: Context, bitmap: Bitmap, format: Bitmap.CompressFormat,
+        bitmap: Bitmap, format: Bitmap.CompressFormat,
         mimeType: String, displayName: String
     ): Uri {
-        return insertImage(bitmap, format, mimeType, displayName)
+        return ContentResolverUtil.insertImage(this, bitmap, format, mimeType, displayName)
     }
 
 }

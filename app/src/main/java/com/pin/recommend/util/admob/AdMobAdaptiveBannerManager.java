@@ -16,7 +16,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.pin.util.BuildConfig;
+import com.pin.recommend.BuildConfig;
 
 /**
  * Created by pin on 2018/11/10.

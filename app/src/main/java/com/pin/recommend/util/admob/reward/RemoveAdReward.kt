@@ -3,7 +3,7 @@ package com.pin.util.admob.reward
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.pin.util.PrefUtil
+import com.pin.recommend.util.PrefUtil
 import java.util.Date
 
 open class RemoveAdReward(val context: Context) {
@@ -24,6 +24,8 @@ open class RemoveAdReward(val context: Context) {
     val TIME_LEFT = "RemoveAdReward.TIME_LEFT"
     val IS_NO_THANKS = "RemoveAdReward.IS_NO_THANKS"
 
+    private val pref by lazy { PrefUtil(context) }
+
     private var prefix: String? = null
 
     private val _isNotify = MutableLiveData(false)
@@ -31,8 +33,6 @@ open class RemoveAdReward(val context: Context) {
 
     private val _isBetweenRewardTime = MutableLiveData(false)
     val isBetweenRewardTime: LiveData<Boolean> = _isBetweenRewardTime
-
-    private val pref: PrefUtil = PrefUtil(context)
 
     fun setPrefix(prefix: String) {
         this.prefix = prefix

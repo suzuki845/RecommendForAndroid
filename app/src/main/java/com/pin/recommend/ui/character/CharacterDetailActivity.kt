@@ -16,7 +16,7 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.pin.recommend.R
 import com.pin.recommend.ui.main.SectionsPagerAdapter
-import com.pin.util.admob.AdMobAdaptiveBannerManager
+import com.pin.recommend.util.admob.AdMobAdaptiveBannerManager
 import com.pin.util.admob.reward.RemoveAdReward
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking

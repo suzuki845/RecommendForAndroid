@@ -8,13 +8,13 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModelProvider
-import com.pin.imageutil.BitmapUtility
 import com.pin.recommend.Constants
 import com.pin.recommend.domain.entity.CharacterWithAnniversaries
 import com.pin.recommend.domain.entity.CustomAnniversary
 import com.pin.recommend.ui.anniversary.AnniversaryCreateActivity.Companion.INTENT_CREATE_ANNIVERSARY
 import com.pin.recommend.ui.anniversary.AnniversaryEditActivity.Companion.INTENT_EDIT_ANNIVERSARY
-import com.pin.util.DisplaySizeCheck
+import com.pin.recommend.util.BitmapUtility
+import com.pin.recommend.util.DisplaySizeChecker
 import com.pin.util.admob.reward.RemoveAdReward
 import com.soundcloud.android.crop.Crop
 import java.io.File
@@ -132,7 +132,7 @@ class CharacterEditActivity : AppCompatActivity() {
 
     private fun beginCropBackground(source: Uri?) {
         val destination = Uri.fromFile(File(this.cacheDir, "cropped"))
-        val displaySize = DisplaySizeCheck.getDisplaySize(this)
+        val displaySize = DisplaySizeChecker.getDisplaySize(this)
         Crop.of(source, destination).withAspect(displaySize.x, displaySize.y)
             .start(this)
     }

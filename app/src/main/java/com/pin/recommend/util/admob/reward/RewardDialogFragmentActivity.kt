@@ -10,7 +10,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import com.pin.util.R
+import com.pin.recommend.R
 import com.pin.util.admob.RewardAdStateAction
 
 class RewardDialogFragmentActivity : FragmentActivity() {
@@ -52,7 +52,8 @@ class RewardDialogFragment(
         val view = requireActivity().layoutInflater.inflate(R.layout.dialog_reward, null)
 
         view.findViewById<TextView>(R.id.title).setText("動画広告を見ると広告を削除できます")
-        view.findViewById<TextView>(R.id.message).setText("視聴すると16時間広告が表示されなくなります。")
+        view.findViewById<TextView>(R.id.message)
+            .setText("視聴すると16時間広告が表示されなくなります。")
         val builder = AlertDialog.Builder(activity)
 
         val d = builder

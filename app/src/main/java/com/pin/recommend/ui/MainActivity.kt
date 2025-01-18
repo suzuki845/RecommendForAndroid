@@ -15,8 +15,10 @@ import com.pin.util.admob.reward.RemoveAdReward
 class MainActivity : AppCompatActivity() {
 
     private val vm: CharacterDetailsViewModel by lazy {
-        ViewModelProvider(this).get(CharacterDetailsViewModel::class.java)
+        ViewModelProvider(this)[CharacterDetailsViewModel::class.java]
     }
+
+    private val pref by lazy { PrefUtil(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +37,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 intents.add(characterDetailIntent)
             }
-            if (isNeedPassCodeConfirmation && PrefUtil.getBoolean(PREF_KEY_IS_LOCKED)) {
+            if (isNeedPassCodeConfirmation && pref.getBoolean(PREF_KEY_IS_LOCKED)) {
                 intents.add(PassCodeConfirmationActivity.createIntent(applicationContext))
             }
             isNeedPassCodeConfirmation = false
