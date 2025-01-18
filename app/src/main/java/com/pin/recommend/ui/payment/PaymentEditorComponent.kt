@@ -1,16 +1,11 @@
 package com.pin.recommend.ui.payment
 
 import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Intent
-import android.os.Build
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,21 +31,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.pin.recommend.R
 import com.pin.recommend.domain.model.PaymentEditorAction
 import com.pin.recommend.domain.model.PaymentEditorStatus
 import com.pin.recommend.ui.adapter.PaymentTagAdapter
+import com.pin.recommend.ui.component.DatePickerTextField
 import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
 import com.pin.recommend.ui.component.composable.Section
-import com.pin.recommend.util.TimeUtil
-import com.pin.recommend.util.toFormattedString
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
-import java.util.Calendar
 
 @Composable
 fun Body(
@@ -188,24 +179,11 @@ fun Date(
 ) {
     Column {
         Section { Text("日付") }
-        TextField(
-            modifier = Modifier
-                .padding(4.dp)
-                .pointerInput(state.date) {
-                    awaitEachGesture {
-                        awaitFirstDown(pass = PointerEventPass.Initial)
-                        val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                        if (upEvent != null) {
-                            onShowDatePickerDialog(activity = activity, vm = vm, state = state)
-                        }
-                    }
-                },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White,
-            ),
-            readOnly = true,
-            value = state.date.toFormattedString(),
-            onValueChange = {})
+        DatePickerTextField(value = state.date, onDateSelected = {
+            if (it != null) {
+                vm.setDate(it)
+            }
+        })
     }
 }
 
@@ -324,39 +302,6 @@ fun onShowTagDialog(
     }
 
     dialog.show()
-}
-
-
-fun onShowDatePickerDialog(
-    activity: AppCompatActivity,
-    vm: PaymentEditorViewModel,
-    state: PaymentEditorViewModelState
-) {
-    val calendar = Calendar.getInstance()
-    calendar.time = state.date
-    val year = calendar[Calendar.YEAR]
-    val month = calendar[Calendar.MONTH]
-    val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
-    val datePickerDialog = DatePickerDialog(
-        activity,
-        DatePickerDialog.OnDateSetListener { dialog, year, month, dayOfMonth ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT &&
-                !dialog.isShown
-            ) {
-                return@OnDateSetListener
-                //api19はクリックするとonDateSetが２回呼ばれるため
-            }
-            val newCalender = Calendar.getInstance()
-            newCalender[year, month] = dayOfMonth
-            TimeUtil.resetTime(newCalender)
-            val date = newCalender.time
-            vm.setDate(date)
-        },
-        year,
-        month,
-        dayOfMonth
-    )
-    datePickerDialog.show()
 }
 
 
