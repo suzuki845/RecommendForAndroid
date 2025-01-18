@@ -59,9 +59,10 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         super.onCreate(savedInstanceState)
         val characterId =
             requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
-        vm.observe(this)
         vm.setCharacterId(characterId)
-        vm.setCurrentPaymentDate(Date())
+        vm.setCurrentEventDate(Date())
+
+        vm.observe(this)
 
         adapter = DateSeparatedEventAdapter(this, onDelete = {
             val dialog =
@@ -79,7 +80,7 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
 
         smoothScroller = object : LinearSmoothScroller(context) {
             override fun getVerticalSnapPreference(): Int {
-                return LinearSmoothScroller.SNAP_TO_START
+                return SNAP_TO_START
             }
         }
 
@@ -156,7 +157,7 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
             vm.setCurrentEventDate(TimeUtil.resetDate(it.date))
 
             val intent = Intent(activity, EventEditActivity::class.java)
-            intent.putExtra(EventEditActivity.INTENT_EDIT_EVENT_ID, it.id)
+            intent.putExtra(EventEditActivity.INTENT_EDIT_EVENT_ID, it.toJson())
             startActivity(intent)
         }
 

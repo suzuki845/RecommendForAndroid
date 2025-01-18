@@ -14,7 +14,7 @@
 
         <variable
             name="fragment"
-            type="com.pin.recommend.ui.main.PaymentDetailsFragment" />
+            type="com.pin.recommend.ui.main.PaymentListFragment" />
 
         <variable
             name="vm"
@@ -28,7 +28,7 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:background="#88ffffff"
-        tools:context=".ui.main.PaymentDetailsFragment"
+        tools:context=".ui.main.PaymentListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

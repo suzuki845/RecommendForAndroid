@@ -19,8 +19,8 @@ class SectionsPagerAdapter(private val mContext: Context, fm: FragmentManager?) 
         when (position) {
             0 -> return CharacterDetailsFragment.newInstance(position)
             1 -> return StoryListFragment.newInstance(position)
-            2 -> return SpecialContentsFragment.newInstance(position)
-            3 -> return PaymentDetailsFragment.newInstance(position)
+            2 -> return SpecialContentListFragment.newInstance(position)
+            3 -> return PaymentListFragment.newInstance(position)
             4 -> return EventDetailsFragment.newInstance(position)
         }
         throw Exception("Missing Fragment")

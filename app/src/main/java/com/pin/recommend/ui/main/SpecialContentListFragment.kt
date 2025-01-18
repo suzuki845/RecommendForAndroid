@@ -15,7 +15,7 @@ import com.pin.recommend.ui.gacha.GachaStringContentActivity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
-class SpecialContentsFragment : Fragment() {
+class SpecialContentListFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
 
     private val vm: CharacterDetailsViewModel by lazy {
@@ -143,8 +143,8 @@ class SpecialContentsFragment : Fragment() {
             "com.pin.recommend.SpecialContentsFragment.INTENT_PLACE_HOLDER"
 
         @JvmStatic
-        fun newInstance(index: Int): SpecialContentsFragment {
-            val fragment = SpecialContentsFragment()
+        fun newInstance(index: Int): SpecialContentListFragment {
+            val fragment = SpecialContentListFragment()
             val bundle = Bundle()
             bundle.putInt(ARG_SECTION_NUMBER, index)
             fragment.arguments = bundle

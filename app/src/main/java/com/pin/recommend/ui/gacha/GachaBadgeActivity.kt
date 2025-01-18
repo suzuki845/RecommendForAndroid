@@ -18,7 +18,7 @@ import com.pin.recommend.BadgeGachaUserDidEarnRewardCounter
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityBadgeGachaBinding
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
-import com.pin.recommend.ui.main.SpecialContentsFragment
+import com.pin.recommend.ui.main.SpecialContentListFragment
 import com.pin.recommend.util.SimpleDialogFragment
 import com.pin.recommend.util.admob.ContentResolverUtil
 import com.pin.util.admob.RewardAdStateAction
@@ -39,9 +39,9 @@ class GachaBadgeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val id = intent.getStringExtra(SpecialContentsFragment.INTENT_SPECIAL_CONTENT_ID) ?: ""
+        val id = intent.getStringExtra(SpecialContentListFragment.INTENT_SPECIAL_CONTENT_ID) ?: ""
 
-        val json = intent.getStringExtra(SpecialContentsFragment.INTENT_CHARACTER_STATE) ?: "";
+        val json = intent.getStringExtra(SpecialContentListFragment.INTENT_CHARACTER_STATE) ?: "";
         val state = CharacterDetailsViewModelState.fromJson(json)
         vm.characterId.value = state.character?.id
         vm.setPrizeImage(state.appearance.iconImage)

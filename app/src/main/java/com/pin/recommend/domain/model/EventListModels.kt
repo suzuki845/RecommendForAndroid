@@ -135,7 +135,6 @@ class CharacterMonthlyEventModel(
         eventBetweenDatesModel.delete(event)
     }
 
-
 }
 
 class SelectedMonthlyEvent(

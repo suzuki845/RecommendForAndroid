@@ -64,8 +64,6 @@ fun Body(
                 .padding(padding)
                 .fillMaxWidth()
         ) {
-            ErrorMessage(vm, state)
-            SaveSuccess(activity, state)
             Content(vm, state)
         }
     }

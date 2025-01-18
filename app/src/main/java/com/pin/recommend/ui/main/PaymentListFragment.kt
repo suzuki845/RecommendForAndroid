@@ -34,10 +34,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [PaymentDetailsFragment.newInstance] factory method to
+ * Use the [PaymentListFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class PaymentDetailsFragment : Fragment() {
+class PaymentListFragment : Fragment() {
 
     private val vm: CharacterDetailsViewModel by lazy {
         ViewModelProvider(this)[CharacterDetailsViewModel::class.java]
@@ -163,7 +163,7 @@ class PaymentDetailsFragment : Fragment() {
 
         @JvmStatic
         fun newInstance(index: Int) =
-            PaymentDetailsFragment().apply {
+            PaymentListFragment().apply {
                 val bundle = Bundle()
                 bundle.putInt(ARG_SECTION_NUMBER, index)
                 arguments = bundle

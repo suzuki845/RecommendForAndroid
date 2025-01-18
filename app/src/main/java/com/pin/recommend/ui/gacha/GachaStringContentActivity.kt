@@ -18,7 +18,7 @@ import com.pin.recommend.databinding.ActivityStringContentGachaBinding
 import com.pin.recommend.domain.model.gacha.GachaItemAssetsRepository
 import com.pin.recommend.domain.model.gacha.PlaceholderParser
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
-import com.pin.recommend.ui.main.SpecialContentsFragment
+import com.pin.recommend.ui.main.SpecialContentListFragment
 import com.pin.recommend.util.SimpleDialogFragment
 import com.pin.recommend.util.admob.ContentResolverUtil
 import com.pin.util.admob.RewardAdStateAction
@@ -40,15 +40,15 @@ class GachaStringContentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val id = intent.getStringExtra(SpecialContentsFragment.INTENT_SPECIAL_CONTENT_ID) ?: ""
+        val id = intent.getStringExtra(SpecialContentListFragment.INTENT_SPECIAL_CONTENT_ID) ?: ""
         val asset = GachaItemAssetsRepository().fetch(id)
         vm.setAsset(asset!!)
 
-        val json = intent.getStringExtra(SpecialContentsFragment.INTENT_CHARACTER_STATE) ?: "";
+        val json = intent.getStringExtra(SpecialContentListFragment.INTENT_CHARACTER_STATE) ?: "";
         val state = CharacterDetailsViewModelState.fromJson(json)
         vm.setCharacterDetailsViewModeState(state)
 
-        val template = intent.getStringExtra(SpecialContentsFragment.INTENT_PLACE_HOLDER) ?: ""
+        val template = intent.getStringExtra(SpecialContentListFragment.INTENT_PLACE_HOLDER) ?: ""
         vm.setPlaceHolder(PlaceholderParser(template))
 
         binding.lifecycleOwner = this
