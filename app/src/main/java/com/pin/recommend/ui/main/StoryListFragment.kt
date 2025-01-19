@@ -4,24 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import com.l4digital.fastscroll.FastScrollRecyclerView
-import com.pin.recommend.ui.adapter.VerticalRecyclerViewAdapter
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 
 class StoryListFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
-    private lateinit var verticalRecyclerViewAdapter: VerticalRecyclerViewAdapter
-    private lateinit var recyclerView: FastScrollRecyclerView
-    private lateinit var sortView: TextView
     private val vm: CharacterDetailsViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(CharacterDetailsViewModel::class.java)
+        ViewModelProvider(requireActivity())[CharacterDetailsViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
