@@ -10,19 +10,18 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.widget.PopupMenu
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.asLiveData
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScrollRecyclerView
 import com.pin.recommend.R
 import com.pin.recommend.domain.entity.RecommendCharacter
 import com.pin.recommend.ui.adapter.VerticalRecyclerViewAdapter
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
+import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.story.StoryCreateActivity
 import com.pin.recommend.ui.story.StoryCreateActivity.Companion.INTENT_CHARACTER_ID
 import kotlinx.coroutines.flow.first
@@ -52,7 +51,14 @@ class StoryListFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val state = vm.state.collectAsState(CharacterDetailsViewModelState()).value
+                com.pin.recommend.ui.story.Content(requireActivity(), vm, state)
+            }
+        }
+        /*
         val root = inflater.inflate(R.layout.fragment_story_list, container, false)
 
         sortView = root.findViewById(R.id.sort)
@@ -116,6 +122,7 @@ class StoryListFragment : Fragment() {
         }
 
         return root
+         */
     }
 
     private fun initializeText(character: RecommendCharacter) {
