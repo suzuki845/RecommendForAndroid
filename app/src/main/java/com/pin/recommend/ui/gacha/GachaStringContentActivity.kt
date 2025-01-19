@@ -3,12 +3,9 @@ package com.pin.recommend.ui.gacha
 import android.app.ProgressDialog
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
@@ -45,11 +42,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.drawToBitmap
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.R
-import com.pin.recommend.databinding.ActivityStringContentGachaBinding
 import com.pin.recommend.domain.model.gacha.GachaItemAssetsRepository
 import com.pin.recommend.domain.model.gacha.PlaceholderParser
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
@@ -67,10 +61,6 @@ class GachaStringContentActivity : AppCompatActivity() {
 
     private val vm: GachaStringContentViewModel by lazy {
         ViewModelProvider(this)[GachaStringContentViewModel::class.java]
-    }
-
-    private val binding: ActivityStringContentGachaBinding by lazy {
-        DataBindingUtil.setContentView(this, R.layout.activity_string_content_gacha)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -128,9 +118,6 @@ class GachaStringContentActivity : AppCompatActivity() {
                     onRollGacha = {
                         onRollGacha(null)
                     },
-                    onSaveImage = {
-                        onSaveImage(null)
-                    },
                     onReset = {
                         vm.reset()
                     })
@@ -161,7 +148,6 @@ class GachaStringContentActivity : AppCompatActivity() {
     fun Content(
         state: GachaStringContentViewModelState,
         onRollGacha: () -> Unit,
-        onSaveImage: () -> Unit,
         onReset: () -> Unit
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -266,12 +252,6 @@ class GachaStringContentActivity : AppCompatActivity() {
                             TextButton(onClick = onReset) {
                                 Text("もう一度ガチャる")
                             }
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            TextButton(onClick = onSaveImage) {
-                                Text("画像を保存")
-                            }
                         }
                     }
                 }
@@ -336,54 +316,6 @@ class GachaStringContentActivity : AppCompatActivity() {
         ).show(supportFragmentManager, RewardDialogFragment.TAG)
     }
 
-
-    fun onSaveImage(view: View?) {
-        try {
-            println("onSaveImage")
-            val image = getViewBitmap()
-            save(
-                this,
-                image,
-                Bitmap.CompressFormat.PNG,
-                "image/png",
-                "anniversary-${System.currentTimeMillis()}"
-            )
-            Toast.makeText(
-                this, """
-     スクリーンショットを保存しました。ファイルをご確認ください。
-     """.trimIndent(), Toast.LENGTH_LONG
-            ).show()
-        } catch (e: Exception) {
-            println(e)
-            Toast.makeText(this, "保存に失敗しました。 \n\n ${e.message}", Toast.LENGTH_LONG)
-                .show()
-        }
-    }
-
-    private fun getViewBitmap(): Bitmap {
-        val bitmap = Bitmap.createBitmap(
-            binding.backgroundImage.width, binding.backgroundImage.height,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-
-        val image = binding.backgroundImage.drawToBitmap(Bitmap.Config.ARGB_8888)
-        val imagePaint = Paint().apply {
-            alpha = (binding.backgroundImage.alpha * 255).toInt()
-        }
-        canvas.drawBitmap(image, 0F, 0F, imagePaint)
-
-        val color = binding.backgroundColor.drawToBitmap(Bitmap.Config.ARGB_8888)
-        val colorPaint = Paint().apply {
-            alpha = (binding.backgroundColor.alpha * 255).toInt()
-        }
-
-        canvas.drawBitmap(color, 0F, 0F, colorPaint)
-
-        binding.resultContainer.draw(canvas)
-
-        return bitmap
-    }
 
     fun save(
         context: Context, bitmap: Bitmap, format: Bitmap.CompressFormat,
