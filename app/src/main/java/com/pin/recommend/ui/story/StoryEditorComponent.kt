@@ -98,6 +98,31 @@ fun Body(
     }
 }
 
+@Composable
+fun SaveSuccess(activity: AppCompatActivity, state: StoryEditorViewModelState) {
+    if (state.action == StoryEditorAction.Save && state.status == StoryEditorStatus.Success) {
+        activity.finish()
+    }
+}
+
+@Composable
+fun ErrorMessage(
+    vm: StoryEditorViewModel,
+    state: StoryEditorViewModelState
+) {
+    if (state.errorMessage != null) {
+        AlertDialog(
+            onDismissRequest = { vm.resetError() },
+            title = { Text("Error") },
+            text = { Text(state.errorMessage) },
+            confirmButton = {
+                TextButton(onClick = { vm.resetError() }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+}
 
 @Composable
 fun Content(
@@ -226,31 +251,6 @@ fun PickImage(
     }
 }
 
-@Composable
-fun SaveSuccess(activity: AppCompatActivity, state: StoryEditorViewModelState) {
-    if (state.action == StoryEditorAction.Save && state.status == StoryEditorStatus.Success) {
-        activity.finish()
-    }
-}
-
-@Composable
-fun ErrorMessage(
-    vm: StoryEditorViewModel,
-    state: StoryEditorViewModelState
-) {
-    if (state.errorMessage != null) {
-        AlertDialog(
-            onDismissRequest = { vm.resetError() },
-            title = { Text("Error") },
-            text = { Text(state.errorMessage) },
-            confirmButton = {
-                TextButton(onClick = { vm.resetError() }) {
-                    Text("OK")
-                }
-            }
-        )
-    }
-}
 
 fun onPickImage(activity: AppCompatActivity, requestCodePicture: Int) {
     if (!PermissionChecker.requestPermissions(

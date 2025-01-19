@@ -9,16 +9,51 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityStringContentGachaBinding
 import com.pin.recommend.domain.model.gacha.GachaItemAssetsRepository
 import com.pin.recommend.domain.model.gacha.PlaceholderParser
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
+import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
 import com.pin.recommend.ui.main.SpecialContentListFragment
 import com.pin.recommend.util.SimpleDialogFragment
 import com.pin.recommend.util.admob.ContentResolverUtil
@@ -55,12 +90,192 @@ class GachaStringContentActivity : AppCompatActivity() {
 
         vm.observe(this)
 
-        vm.state.asLiveData().observe(this) {
-            binding.lifecycleOwner = this
-            binding.vm = vm
-            binding.state = it
-            binding.toolbar.title = "ガチャ"
-            setSupportActionBar(binding.toolbar)
+        setContent {
+            Body(
+                vm,
+                vm.state.collectAsState(GachaStringContentViewModelState()).value
+            )
+        }
+    }
+
+    @Composable
+    fun Body(
+        vm: GachaStringContentViewModel,
+        state: GachaStringContentViewModelState
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = Color.Black,
+                    title = {
+                        Text("ガチャ")
+                    },
+                )
+            },
+            bottomBar = {
+                ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
+            }
+        ) { padding ->
+            ErrorMessage(vm, state)
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth()
+            ) {
+                Content(
+                    state = state,
+                    onRollGacha = {
+                        onRollGacha(null)
+                    },
+                    onSaveImage = {
+                        onSaveImage(null)
+                    },
+                    onReset = {
+                        vm.reset()
+                    })
+            }
+        }
+    }
+
+    @Composable
+    fun ErrorMessage(
+        vm: GachaStringContentViewModel,
+        state: GachaStringContentViewModelState
+    ) {
+        if (state.errorMessage != null) {
+            AlertDialog(
+                onDismissRequest = { vm.resetError() },
+                title = { Text("Error") },
+                text = { Text(state.errorMessage) },
+                confirmButton = {
+                    TextButton(onClick = { vm.resetError() }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun Content(
+        state: GachaStringContentViewModelState,
+        onRollGacha: () -> Unit,
+        onSaveImage: () -> Unit,
+        onReset: () -> Unit
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Background Image
+            state.appearance.backgroundImage?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            // Background Color Overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(state.appearance.backgroundColor))
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Title Container
+                if (!state.isComplete) {
+                    Card(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .clip(RoundedCornerShape(8.dp)),
+                        elevation = 8.dp
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .widthIn(min = 180.dp, max = 200.dp)
+                                .heightIn(min = 120.dp, max = 160.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = state.title,
+                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                textAlign = TextAlign.Center
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            if (state.isRolling) {
+                                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                            } else {
+                                TextButton(onClick = onRollGacha) {
+                                    Text("広告を見てガチャを回す")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Result Container
+                if (state.isComplete) {
+                    Card(
+                        modifier = Modifier.size(350.dp),
+                        elevation = 8.dp
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            state.appearance.iconImage?.let {
+                                Image(
+                                    bitmap = it.asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .height(220.dp)
+                                        .fillMaxWidth(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+
+                            Text(
+                                text = state.result().toString(),
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(top = 10.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // One More and Save Image Buttons
+                    Card(
+                        modifier = Modifier.wrapContentSize(),
+                        elevation = 8.dp
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            TextButton(onClick = onReset) {
+                                Text("もう一度ガチャる")
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            TextButton(onClick = onSaveImage) {
+                                Text("画像を保存")
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -122,13 +337,13 @@ class GachaStringContentActivity : AppCompatActivity() {
     }
 
 
-    fun onSaveImage(view: View) {
+    fun onSaveImage(view: View?) {
         try {
             println("onSaveImage")
             val image = getViewBitmap()
             save(
                 this,
-                image!!,
+                image,
                 Bitmap.CompressFormat.PNG,
                 "image/png",
                 "anniversary-${System.currentTimeMillis()}"
@@ -145,7 +360,7 @@ class GachaStringContentActivity : AppCompatActivity() {
         }
     }
 
-    private fun getViewBitmap(): Bitmap? {
+    private fun getViewBitmap(): Bitmap {
         val bitmap = Bitmap.createBitmap(
             binding.backgroundImage.width, binding.backgroundImage.height,
             Bitmap.Config.ARGB_8888

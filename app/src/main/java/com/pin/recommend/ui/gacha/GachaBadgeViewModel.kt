@@ -19,6 +19,11 @@ data class GachaBadgeViewModelState(
     val state: BadgeGachaMachineState = BadgeGachaMachineState(),
     val appearance: Appearance = Appearance(),
 ) {
+
+    val action = state.action
+
+    val status = state.status
+
     val title = state.title
 
     val summary = state.summary
@@ -26,6 +31,8 @@ data class GachaBadgeViewModelState(
     val resultImage = state.resulImage
 
     val resultMessage = state.resultMessage
+
+    val errorMessage = state.errorMessage
 
     val isRolling
         get(): Boolean {
@@ -66,6 +73,10 @@ class GachaBadgeViewModel(application: Application) : AndroidViewModel(applicati
 
     fun reset() {
         model.reset()
+    }
+
+    fun resetError() {
+        model
     }
 
     fun setPrizeImage(image: Bitmap?) {

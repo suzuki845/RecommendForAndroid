@@ -205,6 +205,10 @@ class BadgeGachaMachine(private val db: AppDatabase) {
         machine.reset()
     }
 
+    fun resetError() {
+        machine.resetError()
+    }
+
     private data class CombineData(
         val state: GachaMachineState<Bitmap?>,
         val characterId: Long = -1,

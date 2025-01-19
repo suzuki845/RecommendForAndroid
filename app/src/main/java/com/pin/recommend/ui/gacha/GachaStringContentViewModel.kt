@@ -20,7 +20,13 @@ data class GachaStringContentViewModelState(
     val appearance: Appearance = Appearance(),
 ) {
 
+    val action = state.action
+
+    val status = state.status
+
     val title = state.title
+
+    val errorMessage = state.errorMessage
 
     val isRolling
         get(): Boolean {
@@ -78,6 +84,10 @@ class GachaStringContentViewModel(application: Application) : AndroidViewModel(a
 
     fun reset() {
         model.reset()
+    }
+
+    fun resetError() {
+        model.resetError()
     }
 
     fun setAsset(asset: GachaItemAsset<String>) {
