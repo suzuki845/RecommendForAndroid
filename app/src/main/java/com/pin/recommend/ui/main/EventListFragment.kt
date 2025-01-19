@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.pin.recommend.R
-import com.pin.recommend.databinding.FragmentEventDetailsBinding
+import com.pin.recommend.databinding.FragmentEventListBinding
 import com.pin.recommend.ui.adapter.DateSeparatedEventAdapter
 import com.pin.recommend.ui.character.CharacterDetailActivity
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
@@ -46,7 +46,7 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         ViewModelProvider(this)[CharacterDetailsViewModel::class.java]
     }
 
-    private lateinit var binding: FragmentEventDetailsBinding
+    private lateinit var binding: FragmentEventListBinding
 
     private lateinit var adapter: DateSeparatedEventAdapter
 
@@ -91,7 +91,7 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentEventDetailsBinding.inflate(inflater, container, false)
+        binding = FragmentEventListBinding.inflate(inflater, container, false)
 
         calendarView = binding.calendarView
 

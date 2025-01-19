@@ -14,7 +14,7 @@ import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pin.recommend.R
-import com.pin.recommend.databinding.FragmentPaymentDetailsBinding
+import com.pin.recommend.databinding.FragmentPaymentListBinding
 import com.pin.recommend.ui.adapter.DateSeparatedPaymentAdapter
 import com.pin.recommend.ui.character.CharacterDetailActivity
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
@@ -43,7 +43,7 @@ class PaymentListFragment : Fragment() {
         ViewModelProvider(this)[CharacterDetailsViewModel::class.java]
     }
 
-    private lateinit var binding: FragmentPaymentDetailsBinding
+    private lateinit var binding: FragmentPaymentListBinding
 
     private lateinit var adapter: DateSeparatedPaymentAdapter
 
@@ -74,7 +74,7 @@ class PaymentListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPaymentDetailsBinding.inflate(inflater, container, false)
+        binding = FragmentPaymentListBinding.inflate(inflater, container, false)
         binding.fragment = this
         vm.state.asLiveData().observe(viewLifecycleOwner) {
             binding.state = it
