@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import com.pin.recommend.BadgeGachaRemoveAdReward
 import com.pin.recommend.BadgeGachaUserDidEarnRewardCounter
 import com.pin.recommend.R
@@ -39,35 +40,34 @@ class GachaBadgeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val id = intent.getStringExtra(SpecialContentListFragment.INTENT_SPECIAL_CONTENT_ID) ?: ""
-
         val json = intent.getStringExtra(SpecialContentListFragment.INTENT_CHARACTER_STATE) ?: "";
         val state = CharacterDetailsViewModelState.fromJson(json)
-        vm.characterId.value = state.character?.id
+        vm.setCharacterId(state.character?.id ?: -1)
         vm.setPrizeImage(state.appearance.iconImage)
-
-        binding.lifecycleOwner = this
-        binding.gachaVM = vm
-        binding.state = state
-
-        binding.roleGachaButton.setOnClickListener {
-            onRollGacha()
-        }
+        vm.setAppearance(state.appearance)
+        vm.observe(this)
 
         val icon = state.appearance.iconImage ?: BitmapFactory.decodeResource(
             resources,
             R.drawable.ic_person_300dp
         )
 
-        vm.summary.observe(this) {
-            println("GachaMachineSummary: actual: $it")
+        vm.state.asLiveData().observe(this) {
             val list = mutableListOf<Bitmap>()
-            for (i in 1..it) {
+            for (i in 1..it.summary) {
                 list.add(icon)
             }
-            println("GachaMachineSummary: listSize:${list.size}")
             binding.toteBagView.badges = list
+            binding.lifecycleOwner = this
+            binding.vm = vm
+            binding.state = it
         }
+
+        binding.roleGachaButton.setOnClickListener {
+            onRollGacha()
+        }
+
+
 
         binding.toolbar.title = "ガチャ"
         setSupportActionBar(binding.toolbar)

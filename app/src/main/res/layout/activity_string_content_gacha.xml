@@ -4,11 +4,11 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="state"
-            type="com.pin.recommend.ui.character.CharacterDetailsViewModelState" />
-
-        <import type="android.view.View" />
+            type="com.pin.recommend.ui.gacha.GachaStringContentViewModelState" />
 
         <variable
             name="vm"
@@ -58,7 +58,7 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/titleContainer"
-                android:visibility="@{vm.isComplete ? View.GONE : View.VISIBLE}"
+                android:visibility="@{state.isComplete ? View.GONE : View.VISIBLE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -79,7 +79,7 @@
 
 
                         <TextView
-                            android:text="@{vm.title}"
+                            android:text="@{state.title}"
                             android:layout_gravity="top|center"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
@@ -91,7 +91,7 @@
                         <Button
                             android:id="@+id/roleGachaButton"
                             android:onClick="onRollGacha"
-                            android:visibility="@{vm.isRolling? View.GONE : View.VISIBLE}"
+                            android:visibility="@{state.isRolling? View.GONE : View.VISIBLE}"
                             android:text="広告を見てガチャを回す"
                             android:layout_gravity="bottom|center"
                             android:textColor="@color/blue_900"
@@ -105,7 +105,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:indeterminate="true"
-                            android:visibility="@{vm.isRolling? View.VISIBLE : View.GONE}" />
+                            android:visibility="@{state.isRolling? View.VISIBLE : View.GONE}" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -114,7 +114,7 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/resultContainer"
-                android:visibility="@{vm.isComplete ? View.VISIBLE : View.GONE}"
+                android:visibility="@{state.isComplete ? View.VISIBLE : View.GONE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -133,7 +133,7 @@
                         android:layout_height="220dp" />
 
                     <TextView
-                        android:text="@{vm.result}"
+                        android:text="@{state.result}"
                         android:textSize="16sp"
                         android:padding="10dp"
                         android:gravity="center"
@@ -150,7 +150,7 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/oneMoreContainer"
-                android:visibility="@{vm.isComplete ? View.VISIBLE : View.GONE }"
+                android:visibility="@{state.isComplete ? View.VISIBLE : View.GONE }"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 

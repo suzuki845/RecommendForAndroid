@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import com.pin.recommend.R
 import com.pin.recommend.databinding.ActivityStringContentGachaBinding
 import com.pin.recommend.domain.model.gacha.GachaItemAssetsRepository
@@ -46,17 +47,21 @@ class GachaStringContentActivity : AppCompatActivity() {
 
         val json = intent.getStringExtra(SpecialContentListFragment.INTENT_CHARACTER_STATE) ?: "";
         val state = CharacterDetailsViewModelState.fromJson(json)
-        vm.setCharacterDetailsViewModeState(state)
+        vm.setAppearance(state.appearance)
+        vm.setCharacterName(state.characterName)
 
         val template = intent.getStringExtra(SpecialContentListFragment.INTENT_PLACE_HOLDER) ?: ""
         vm.setPlaceHolder(PlaceholderParser(template))
 
-        binding.lifecycleOwner = this
-        binding.vm = vm
-        binding.state = state
-        binding.toolbar.title = "ガチャ"
+        vm.observe(this)
 
-        setSupportActionBar(binding.toolbar)
+        vm.state.asLiveData().observe(this) {
+            binding.lifecycleOwner = this
+            binding.vm = vm
+            binding.state = it
+            binding.toolbar.title = "ガチャ"
+            setSupportActionBar(binding.toolbar)
+        }
     }
 
     private fun remainingRewardCoolDownElapsedTimeToHours(): Int {
@@ -70,13 +75,16 @@ class GachaStringContentActivity : AppCompatActivity() {
 
     fun onRollGacha(view: View?) {
         val removeAdReward = RemoveAdReward.getInstance(this)
+
         if (removeAdReward.isBetweenRewardTime.value == true) {
             vm.rollGacha()
             return
         }
+
         val border = 10
         val counter = UserDidEarnRewardCounter.getInstance(this)
         val count = border - counter.count()
+
         SimpleDialogFragment(
             title = "広告を視聴してガチャを回す",
             message = "あと${count}回ガチャを回すと24時間バッジガチャ以外の動画広告が非表示になります。\n(⚠️あと${remainingRewardCoolDownElapsedTimeToHours()}時間経過するとカウントがリセットされます。)",
