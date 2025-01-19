@@ -2,7 +2,6 @@ package com.pin.recommend.ui.story
 
 import android.content.Intent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -53,11 +52,14 @@ fun Content(
 ) {
     Column(
         Modifier
-            .background(Color.White)
-            .alpha(0.5f)) {
+            .drawBehind { // 親の背景を描画
+                drawRect(Color.White.copy(alpha = 0.5f))
+            }
+    ) {
         SortOrder(vm, state)
         List(activity, vm, state)
     }
+
 }
 
 @Composable
@@ -114,8 +116,6 @@ fun SortOrder(
             )
         }
     }
-
-
 }
 
 @Composable
@@ -148,19 +148,29 @@ fun ListItem(
                 activity.startActivity(intent)
             }) {
         Column {
-            Text(elapsedText, fontSize = 24.sp)
-            Text(story.story.created?.toFormattedString() ?: "")
-            Text(story.story.getShortComment(15))
-            LazyRow(Modifier.fillMaxWidth(0.7f)) {
+            Text(
+                fontSize = 24.sp,
+                text = elapsedText
+            )
+            Text(
+                text = story.story.created?.toFormattedString() ?: ""
+            )
+            Text(
+                text = story.story.getShortComment(15)
+            )
+            LazyRow(
+                Modifier
+                    .fillMaxWidth(0.7f)
+            ) {
                 items(story.pictures) {
                     it.getBitmap(activity, 60, 60)?.asImageBitmap()?.let { image ->
                         Image(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .size(60.dp),
                             bitmap = image,
                             contentScale = ContentScale.Crop,
                             contentDescription = null,
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .size(60.dp)
                         )
                     }
                 }

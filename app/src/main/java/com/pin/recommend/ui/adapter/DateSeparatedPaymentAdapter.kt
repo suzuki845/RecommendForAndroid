@@ -10,13 +10,11 @@ import android.view.ViewGroup
 import android.widget.LinearLayout.VISIBLE
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pin.recommend.R
 import com.pin.recommend.domain.entity.Payment
 import com.pin.recommend.domain.entity.PaymentAndTag
-import com.pin.recommend.ui.payment.PaymentDetailsViewModel
 import com.pin.recommend.ui.payment.PaymentEditActivity
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,9 +24,6 @@ class DateSeparatedPaymentAdapter(
     fragment: Fragment,
     private val onDelete: (Payment) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val paymentDetailsViewModel: PaymentDetailsViewModel by lazy {
-        ViewModelProvider(fragment.requireActivity()).get(PaymentDetailsViewModel::class.java)
-    }
     private val fragment: Fragment
     private var dates: Map<Date, List<PaymentAndTag>> = mapOf()
 
@@ -62,12 +57,6 @@ class DateSeparatedPaymentAdapter(
         val dateKeys = dates.keys.toTypedArray()
         val date = dateKeys[position]
         val paymentAndTags = dates[date] ?: arrayListOf()
-        /*
-        Log.d("Date!", "-------------")
-        Log.d("Date!", date.toString())
-        Log.d("Date!", paymentAndTags.size.toString())
-        Log.d("Date!", "-------------")
-         */
         holder.dateView.text = FORMAT.format(date)
 
         paymentRecycleViewHolder.bindViewHolder(paymentAndTags)

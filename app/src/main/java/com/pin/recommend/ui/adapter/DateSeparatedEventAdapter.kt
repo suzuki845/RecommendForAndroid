@@ -10,12 +10,10 @@ import android.widget.LinearLayout.VISIBLE
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pin.recommend.R
 import com.pin.recommend.domain.entity.Event
-import com.pin.recommend.ui.event.EventDetailsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -24,9 +22,6 @@ class DateSeparatedEventAdapter(
     fragment: Fragment,
     private val onDelete: (Event) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val eventDetailsViewModel: EventDetailsViewModel by lazy {
-        ViewModelProvider(fragment.requireActivity()).get(EventDetailsViewModel::class.java)
-    }
     private var dates: List<Date> = listOf()
     private var events: Map<Date, List<Event>> = mapOf()
 

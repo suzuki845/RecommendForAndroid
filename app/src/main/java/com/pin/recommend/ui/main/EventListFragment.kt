@@ -42,7 +42,6 @@ import java.util.Date
 class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedListener,
     OnDateLongClickListener {
 
-
     private val vm: CharacterDetailsViewModel by lazy {
         ViewModelProvider(this)[CharacterDetailsViewModel::class.java]
     }
@@ -59,6 +58,7 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         super.onCreate(savedInstanceState)
         val characterId =
             requireActivity().intent.getLongExtra(CharacterDetailActivity.INTENT_CHARACTER, -1)
+
         vm.setCharacterId(characterId)
         vm.setCurrentEventDate(Date())
 
