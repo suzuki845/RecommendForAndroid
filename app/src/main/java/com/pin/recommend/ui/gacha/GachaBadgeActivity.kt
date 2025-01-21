@@ -3,22 +3,47 @@ package com.pin.recommend.ui.gacha
 import android.app.ProgressDialog
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
-import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.drawToBitmap
-import androidx.databinding.DataBindingUtil
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import com.pin.recommend.BadgeGachaRemoveAdReward
 import com.pin.recommend.BadgeGachaUserDidEarnRewardCounter
 import com.pin.recommend.R
-import com.pin.recommend.databinding.ActivityBadgeGachaBinding
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
+import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.ToteBagViewComposable
 import com.pin.recommend.ui.main.SpecialContentListFragment
 import com.pin.recommend.util.SimpleDialogFragment
 import com.pin.recommend.util.admob.ContentResolverUtil
@@ -33,10 +58,6 @@ class GachaBadgeActivity : AppCompatActivity() {
         ViewModelProvider(this)[GachaBadgeViewModel::class.java]
     }
 
-    private val binding: ActivityBadgeGachaBinding by lazy {
-        DataBindingUtil.setContentView(this, R.layout.activity_badge_gacha)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -47,30 +68,196 @@ class GachaBadgeActivity : AppCompatActivity() {
         vm.setAppearance(state.appearance)
         vm.observe(this)
 
-        val icon = state.appearance.iconImage ?: BitmapFactory.decodeResource(
-            resources,
-            R.drawable.ic_person_300dp
-        )
+        setContent {
+            Body(
+                vm,
+                vm.state.collectAsState(GachaBadgeViewModelState()).value
+            )
+        }
+    }
 
-        vm.state.asLiveData().observe(this) {
-            val list = mutableListOf<Bitmap>()
-            for (i in 1..it.summary) {
-                list.add(icon)
+    @Composable
+    fun Body(
+        vm: GachaBadgeViewModel,
+        state: GachaBadgeViewModelState,
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = Color.Black,
+                    title = {
+                        Text("ガチャ")
+                    },
+                )
+            },
+            bottomBar = {
+                ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
             }
-            binding.toteBagView.badges = list
-            binding.lifecycleOwner = this
-            binding.vm = vm
-            binding.state = it
+        ) { padding ->
+            ErrorMessage(vm, state)
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth()
+            ) {
+                Content(vm, state)
+            }
         }
+    }
 
-        binding.roleGachaButton.setOnClickListener {
-            onRollGacha()
+    @Composable
+    fun ErrorMessage(
+        vm: GachaBadgeViewModel,
+        state: GachaBadgeViewModelState,
+    ) {
+        if (state.errorMessage != null) {
+            AlertDialog(
+                onDismissRequest = { vm.resetError() },
+                title = { Text("Error") },
+                text = { Text(state.errorMessage) },
+                confirmButton = {
+                    TextButton(onClick = { vm.resetError() }) {
+                        Text("OK")
+                    }
+                }
+            )
         }
+    }
 
+    @Composable
+    fun Content(
+        vm: GachaBadgeViewModel,
+        state: GachaBadgeViewModelState,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            state.appearance.backgroundImage?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(state.appearance.backgroundColor))
+            )
 
-        binding.toolbar.title = "ガチャ"
-        setSupportActionBar(binding.toolbar)
+            if (state.isComplete) {
+                ResultContainer(state.resultImage, state.resultMessage, onReset = { vm.reset() })
+            } else {
+                GachaContainer(state, state.title, state.isRolling, { onRollGacha() })
+            }
+        }
+    }
+
+    @Composable
+    fun GachaContainer(
+        state: GachaBadgeViewModelState,
+        title: String,
+        isRolling: Boolean,
+        onRollGacha: () -> Unit
+    ) {
+        Card(
+            modifier = Modifier.padding(16.dp),
+            elevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .widthIn(min = 300.dp, max = 300.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.h6,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(300.dp)
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val icon = state.appearance.iconImage ?: BitmapFactory.decodeResource(
+                        resources,
+                        R.drawable.ic_person_300dp
+                    )
+                    val badges = mutableListOf<Bitmap>()
+                    for (i in 1..state.summary) {
+                        badges.add(icon)
+                    }
+
+                    ToteBagViewComposable(
+                        badges = badges
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (isRolling) {
+                    CircularProgressIndicator()
+                } else {
+                    TextButton(onClick = onRollGacha) {
+                        Text("広告を見てガチャを回す")
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun ResultContainer(
+        resultImage: Bitmap?,
+        resultMessage: String,
+        onReset: () -> Unit,
+    ) {
+        Card(
+            modifier = Modifier.padding(16.dp),
+            elevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .widthIn(min = 200.dp, max = 300.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                resultImage?.let {
+                    Image(
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(200.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = resultMessage,
+                    style = MaterialTheme.typography.h6,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextButton(onClick = onReset) {
+                    Text("もう一度ガチャる")
+                }
+
+            }
+        }
     }
 
     private fun remainingRewardCoolDownElapsedTimeToHours(): Int {
@@ -125,54 +312,6 @@ class GachaBadgeActivity : AppCompatActivity() {
             },
             onNegative = { it.dismiss() },
         ).show(supportFragmentManager, RewardDialogFragment.TAG)
-    }
-
-
-    fun onSaveImage(view: View) {
-        try {
-            println("onSaveImage")
-            val image = getViewBitmap()
-            save(
-                image!!,
-                Bitmap.CompressFormat.PNG,
-                "image/png",
-                "anniversary-${System.currentTimeMillis()}"
-            )
-            Toast.makeText(
-                this, """
-     スクリーンショットを保存しました。ファイルをご確認ください。
-     """.trimIndent(), Toast.LENGTH_LONG
-            ).show()
-        } catch (e: Exception) {
-            println(e)
-            Toast.makeText(this, "保存に失敗しました。 \n\n ${e.message}", Toast.LENGTH_LONG)
-                .show()
-        }
-    }
-
-    private fun getViewBitmap(): Bitmap? {
-        val bitmap = Bitmap.createBitmap(
-            binding.backgroundImage.width, binding.backgroundImage.height,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-
-        val image = binding.backgroundImage.drawToBitmap(Bitmap.Config.ARGB_8888)
-        val imagePaint = Paint().apply {
-            alpha = (binding.backgroundImage.alpha * 255).toInt()
-        }
-        canvas.drawBitmap(image, 0F, 0F, imagePaint)
-
-        val color = binding.backgroundColor.drawToBitmap(Bitmap.Config.ARGB_8888)
-        val colorPaint = Paint().apply {
-            alpha = (binding.backgroundColor.alpha * 255).toInt()
-        }
-
-        canvas.drawBitmap(color, 0F, 0F, colorPaint)
-
-        binding.resultContainer.draw(canvas)
-
-        return bitmap
     }
 
     fun save(
