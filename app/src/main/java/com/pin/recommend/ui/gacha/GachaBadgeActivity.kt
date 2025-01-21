@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -228,7 +229,7 @@ class GachaBadgeActivity : AppCompatActivity() {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .widthIn(min = 200.dp, max = 300.dp),
+                    .widthIn(min = 300.dp, max = 300.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 resultImage?.let {
@@ -238,7 +239,8 @@ class GachaBadgeActivity : AppCompatActivity() {
                         modifier = Modifier
                             .size(200.dp)
                             .clip(CircleShape)
-                            .background(Color.Gray)
+                            .border(2.dp, Color.Gray, CircleShape)
+                            .background(Color.White)
                     )
                 }
 
