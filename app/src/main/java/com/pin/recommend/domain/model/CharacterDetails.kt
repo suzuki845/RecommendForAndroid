@@ -15,7 +15,6 @@ import com.pin.recommend.domain.entity.Payment
 import com.pin.recommend.domain.entity.Story
 import com.pin.recommend.domain.entity.StoryPicture
 import com.pin.recommend.domain.entity.StoryWithPictures
-import com.pin.recommend.domain.value.Value
 import com.pin.recommend.util.combine2
 import com.pin.recommend.util.combine5
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +48,7 @@ data class CharacterDetailsState(
     val anniversaries: List<AnniversaryData> = listOf(),
     val storySortOrder: Int = 0,
     val stories: List<StoryWithPictures> = listOf(),
-    val payments: MonthlyPayment = MonthlyPayment(),
+    val payments: SelectedMonthlyPayment = SelectedMonthlyPayment(),
     val events: SelectedMonthlyEvent = SelectedMonthlyEvent(),
     val errorMessage: String? = null,
 ) {
@@ -99,7 +98,7 @@ class CharacterDetails(
         character,
         stories,
         eventModel.selectedMonthlyEvent,
-        paymentModel.monthlyPayment
+        paymentModel.selectedMonthlyPayment
     ) { a, b, c, d, e ->
         val anniversaries = b?.anniversaries()?.map {
             AnniversaryData(
@@ -123,7 +122,7 @@ class CharacterDetails(
             storySortOrder = b?.character?.storySortOrder ?: 0,
             stories = c ?: listOf(),
             events = d ?: SelectedMonthlyEvent(),
-            payments = e ?: MonthlyPayment()
+            payments = e ?: SelectedMonthlyPayment()
         )
     }
 
@@ -306,5 +305,5 @@ class CharacterDetails(
             errorMessage = null
         )
     }
-    
+
 }

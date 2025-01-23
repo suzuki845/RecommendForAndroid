@@ -9,6 +9,7 @@ import com.pin.recommend.domain.dao.AppDatabase
 import com.pin.recommend.domain.entity.Payment
 import com.pin.recommend.domain.entity.PaymentAndTag
 import com.pin.recommend.util.TimeUtil
+import com.pin.recommend.util.combine2
 import java.util.Calendar
 import java.util.Date
 
@@ -110,31 +111,20 @@ class MonthlyPaymentModel(
         paymentBetweenCharacterDatesModel.delete(payment)
     }
 
-    val monthlyPayment = paymentBetweenCharacterDatesModel.groupingByDate.map { MonthlyPayment(it) }
-
-    val monthlyPaymentAmount = paymentBetweenCharacterDatesModel.groupingByDate.map { dates ->
-        var amount = 0.0
-        dates.values.forEach { paymentAndTags ->
-            paymentAndTags.forEach { paymentAndTag ->
-                if (paymentAndTag.payment.type == 0) {
-                    amount += paymentAndTag.payment.amount
-                }
-            }
+    private val monthlyPayment =
+        paymentBetweenCharacterDatesModel.groupingByDate.map {
+            MonthlyPayment(it.map { m ->
+                DateWithPayments(
+                    m.key,
+                    m.value
+                )
+            })
         }
-        return@map amount.toInt()
+
+    val selectedMonthlyPayment = combine2(currentDate, monthlyPayment) { date, payments ->
+        SelectedMonthlyPayment(date ?: Date(), payments ?: MonthlyPayment(listOf()))
     }
 
-    val monthlySavingsAmount = paymentBetweenCharacterDatesModel.groupingByDate.map { dates ->
-        var amount = 0.0
-        dates.values.forEach { paymentAndTags ->
-            paymentAndTags.forEach { paymentAndTag ->
-                if (paymentAndTag.payment.type == 1) {
-                    amount += paymentAndTag.payment.amount
-                }
-            }
-        }
-        return@map amount.toInt()
-    }
 
 }
 
@@ -184,24 +174,35 @@ class WholePeriodCharacterPaymentModel(
 
 }
 
+class SelectedMonthlyPayment(
+    val selectedDate: Date = Date(),
+    val monthlyData: MonthlyPayment = MonthlyPayment()
+) {
+    val totalPayment = monthlyData.totalPayment
+    val totalSavings = monthlyData.totalSavings
+}
 
 data class MonthlyPayment(
-    val payments: Map<Date, List<PaymentAndTag>> = mapOf()
+    val result: List<DateWithPayments> = listOf()
 ) {
 
     val totalPayment
-        get() = payments.values
-            .flatten()
+        get() = result
+            .flatMap {
+                it.payments
+            }
             .map { it.payment }
             .filter { it.type == 0 }
             .sumOf { it.amount }.toInt()
 
     val totalSavings
-        get() = payments.values
-            .flatten()
+        get() = result
+            .flatMap {
+                it.payments
+            }
             .map { it.payment }
             .filter { it.type == 1 }
             .sumOf { it.amount }.toInt()
-
 }
 
+data class DateWithPayments(val date: Date, val payments: List<PaymentAndTag>)

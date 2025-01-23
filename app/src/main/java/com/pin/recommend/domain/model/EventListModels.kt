@@ -139,15 +139,15 @@ class CharacterMonthlyEventModel(
 
 class SelectedMonthlyEvent(
     val selectedDate: Date = Date(),
-    val monthlyEvent: MonthlyEvent = MonthlyEvent()
+    val monthlyData: MonthlyEvent = MonthlyEvent()
 )
 
 class MonthlyEvent(
     val days: List<Date> = listOf(),
-    val events: Map<Date, List<Event>> = mapOf()
+    val result: Map<Date, List<Event>> = mapOf()
 ) {
     fun dayHasEvents(date: Date): Boolean {
-        return events[date] != null
+        return result[date] != null
     }
 }
 

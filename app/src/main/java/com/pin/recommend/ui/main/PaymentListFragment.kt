@@ -8,44 +8,24 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.pin.recommend.R
-import com.pin.recommend.databinding.FragmentPaymentListBinding
-import com.pin.recommend.ui.adapter.DateSeparatedPaymentAdapter
 import com.pin.recommend.ui.character.CharacterDetailActivity
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
-import com.pin.recommend.ui.component.DeleteDialogFragment
-import com.pin.recommend.ui.component.DialogActionListener
+import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.payment.PaymentCreateActivity
-import com.pin.recommend.ui.payment.PaymentWholePeriodActivity
-import com.pin.recommend.ui.payment.SavingsWholePeriodActivity
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import com.pin.recommend.ui.payment.PaymentListComponent
 import java.util.Date
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [PaymentListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PaymentListFragment : Fragment() {
 
-    private val vm: CharacterDetailsViewModel by lazy {
+    private val vm by lazy {
         ViewModelProvider(this)[CharacterDetailsViewModel::class.java]
     }
-
-    private lateinit var binding: FragmentPaymentListBinding
-
-    private lateinit var adapter: DateSeparatedPaymentAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,19 +34,6 @@ class PaymentListFragment : Fragment() {
         vm.observe(this)
         vm.setCharacterId(characterId)
         vm.setCurrentPaymentDate(Date())
-        adapter = DateSeparatedPaymentAdapter(this, onDelete = {
-            val dialog =
-                DeleteDialogFragment(object :
-                    DialogActionListener<DeleteDialogFragment> {
-                    override fun onDecision(dialog: DeleteDialogFragment) {
-                        vm.deletePayment(it)
-                    }
-
-                    override fun onCancel() {
-                    }
-                })
-            dialog.show(requireActivity().supportFragmentManager, TAG)
-        })
         setHasOptionsMenu(true)
     }
 
@@ -74,48 +41,11 @@ class PaymentListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPaymentListBinding.inflate(inflater, container, false)
-        binding.fragment = this
-        vm.state.asLiveData().observe(viewLifecycleOwner) {
-            binding.state = it
-            adapter.setList(it.payments.payments)
-            adapter.isEditMode = it.isDeleteModePayments
-            val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
-            binding.paymentRecycleView.layoutManager = layoutManager
-            binding.paymentRecycleView.adapter = adapter
-        }
-        binding.lifecycleOwner = viewLifecycleOwner
-
-        return binding.root
-    }
-
-    fun onNextMonth() {
-        vm.nextPaymentMonth()
-    }
-
-    fun onPrevMonth() {
-        vm.prevPaymentMonth()
-    }
-
-    fun toWholePeriodPaymentAmountView() {
-        runBlocking {
-            val intent = Intent(requireContext(), PaymentWholePeriodActivity::class.java)
-            intent.putExtra(
-                PaymentWholePeriodActivity.INTENT_WHOLE_PERIOD_PAYMENT_CHARACTER,
-                vm.state.first().character?.id
-            )
-            startActivity(intent)
-        }
-    }
-
-    fun toWholePeriodSavingsAmountView() {
-        runBlocking {
-            val intent = Intent(requireContext(), SavingsWholePeriodActivity::class.java)
-            intent.putExtra(
-                SavingsWholePeriodActivity.INTENT_WHOLE_PERIOD_SAVINGS_CHARACTER,
-                vm.state.first().character?.id
-            )
-            startActivity(intent)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val state = vm.state.collectAsState(CharacterDetailsViewModelState()).value
+                PaymentListComponent(vm, state)
+            }
         }
     }
 

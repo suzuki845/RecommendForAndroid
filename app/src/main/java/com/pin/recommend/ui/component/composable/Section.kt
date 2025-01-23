@@ -15,7 +15,7 @@ fun Section(content: @Composable () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Gray.copy(alpha = 0.5f))
+            .background(Color(0xFFBABABA))
     ) {
         Box(modifier = Modifier.padding(4.dp)) {
             content()

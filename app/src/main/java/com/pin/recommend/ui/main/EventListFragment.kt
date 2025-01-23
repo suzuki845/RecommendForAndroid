@@ -96,12 +96,12 @@ class EventDetailsFragment : Fragment(), OnDateSelectedListener, OnMonthChangedL
         calendarView = binding.calendarView
 
         vm.state.asLiveData().observe(viewLifecycleOwner) {
-            adapter.setDates(it.events.monthlyEvent.days)
-            adapter.setEvents(it.events.monthlyEvent.events)
+            adapter.setDates(it.events.monthlyData.days)
+            adapter.setEvents(it.events.monthlyData.result)
 
             val events = mutableListOf<CalendarDay>()
-            it.events.monthlyEvent.events.keys.forEach { key ->
-                if (it.events.monthlyEvent.dayHasEvents(key)) {
+            it.events.monthlyData.result.keys.forEach { key ->
+                if (it.events.monthlyData.dayHasEvents(key)) {
                     val c = Calendar.getInstance()
                     c.time = key
                     val day = CalendarDay.from(
