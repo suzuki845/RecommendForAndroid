@@ -15,6 +15,7 @@ import com.pin.recommend.domain.entity.Payment
 import com.pin.recommend.domain.entity.Story
 import com.pin.recommend.domain.entity.StoryPicture
 import com.pin.recommend.domain.entity.StoryWithPictures
+import com.pin.recommend.domain.value.Value
 import com.pin.recommend.util.combine2
 import com.pin.recommend.util.combine5
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -300,5 +301,10 @@ class CharacterDetails(
         }
     }
 
-
+    fun resetError() {
+        _state.value = _state.value.copy(
+            errorMessage = null
+        )
+    }
+    
 }

@@ -3,22 +3,27 @@ package com.pin.recommend.ui.character
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.asLiveData
 import com.google.gson.Gson
 import com.pin.recommend.domain.entity.Event
 import com.pin.recommend.domain.entity.Payment
 import com.pin.recommend.domain.entity.Story
 import com.pin.recommend.domain.model.CharacterDetails
 import com.pin.recommend.domain.model.CharacterDetailsState
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import java.util.Date
 
+
 data class CharacterDetailsViewModelState(
-    private val state: CharacterDetailsState = CharacterDetailsState(),
+    val state: CharacterDetailsState = CharacterDetailsState(),
     val isDeleteModeStories: Boolean = false,
     val isDeleteModePayments: Boolean = false,
     val isDeleteModeEvents: Boolean = false,
 ) {
+    val action = state.action
+    val status = state.status
     val character = state.character
     val fixedCharacterId = state.fixedCharacterId
     val isPinning = state.isPinning
@@ -31,8 +36,6 @@ data class CharacterDetailsViewModelState(
     val payments = state.payments
     val events = state.events
     val errorMessage = state.errorMessage
-    val action = state.action
-    val status = state.status
 
     fun toJson(): String {
         return Gson().toJson(this)
@@ -56,14 +59,23 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
 
     private val editModeEvent = MutableStateFlow(false)
 
-    val state = combine(model.state, editModeStory, editModePayment, editModeEvent) { a, b, c, d ->
+    private val resultData = combine(
+        model.state,
+        editModeStory,
+        editModePayment,
+        editModeEvent,
+    ) { a, b, c, d ->
         CharacterDetailsViewModelState(
             state = a,
             isDeleteModeStories = b,
             isDeleteModePayments = c,
-            isDeleteModeEvents = d
+            isDeleteModeEvents = d,
         )
     }
+
+    private val _state = MutableStateFlow(CharacterDetailsViewModelState())
+
+    val state: Flow<CharacterDetailsViewModelState> = _state
 
     fun observePinningCharacterId(owner: LifecycleOwner, callback: (Long?) -> Unit) {
         model.observePinningCharacterId(owner, callback)
@@ -75,6 +87,9 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
 
     fun observe(owner: LifecycleOwner) {
         model.observe(owner)
+        resultData.asLiveData().observe(owner) {
+            _state.value = it
+        }
     }
 
     fun changeAnniversary() {
@@ -140,5 +155,6 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
     fun toggleEditModeEvent() {
         editModeEvent.value = editModeEvent.value != true
     }
+
 
 }

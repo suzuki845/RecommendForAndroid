@@ -1,23 +1,30 @@
 package com.pin.recommend.ui.anniversary
 
 import android.app.ProgressDialog
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.net.Uri
 import android.os.Bundle
-import android.view.Menu
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.drawToBitmap
-import androidx.databinding.DataBindingUtil
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.R
-import com.pin.recommend.databinding.ActivityScreenShotBinding
-import com.pin.recommend.ui.character.CharacterDetailsViewModelState
-import com.pin.recommend.util.admob.ContentResolverUtil
+import com.pin.recommend.domain.model.CharacterDetailsState
+import com.pin.recommend.ui.component.composable.AnniversaryDetailScreen
+import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
-import com.pin.util.admob.reward.RemoveAdReward
 
 
 class AnniversaryScreenShotActivity : AppCompatActivity() {
@@ -26,33 +33,87 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
         val INTENT_SCREEN_SHOT = "com.pin.recommend.ScreenShotActivity.INTENT_SCREEN_SHOT"
     }
 
-    private val binding: ActivityScreenShotBinding by lazy {
-        DataBindingUtil.setContentView(this, R.layout.activity_screen_shot)
+    private val vm by lazy {
+        ViewModelProvider(this)[AnniversaryScreenShotViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val json = intent.getStringExtra(INTENT_SCREEN_SHOT) ?: "";
-        val state = CharacterDetailsViewModelState.fromJson(json)
-        val typeface = state.appearance.typeFace(this)
-        binding.state = state
-        binding.typeface = typeface
-        textShadow(state)
+        val state = CharacterDetailsState.fromJson(json)
+        vm.setCharacterDetailsState(state)
+        setContent {
+            Body(vm, vm.state.collectAsState(AnniversaryScreenShotViewModelState()).value)
+        }
 
-        setSupportActionBar(binding.toolbar)
+    }
+
+    @Composable
+    fun Body(vm: AnniversaryScreenShotViewModel, state: AnniversaryScreenShotViewModelState) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = Color.Black,
+                    title = {
+                    },
+                    actions = {
+                        TextButton({
+                            save()
+                        }) {
+                            Text("スクリーンショット")
+                        }
+                    },
+                )
+            },
+            bottomBar = {
+                ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
+            }
+        ) { padding ->
+            ErrorMessage(vm, state)
+            SaveSuccess(state)
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth()
+            ) {
+                AnniversaryDetailScreen(vm, state)
+            }
+        }
+
     }
 
 
-    private fun textShadow(state: CharacterDetailsViewModelState) {
-        val c = state.appearance.homeTextShadowColor
-        c?.let { s ->
-            binding.characterName.setShadowLayer(3f, 0f, 0f, s)
-            binding.topText.setShadowLayer(3f, 0f, 0f, s)
-            binding.bottomText.setShadowLayer(3f, 0f, 0f, s)
-            binding.anniversary.setShadowLayer(3f, 0f, 0f, s)
-            binding.elapsedTime.setShadowLayer(3f, 0f, 0f, s)
+    @Composable
+    fun ErrorMessage(
+        vm: AnniversaryScreenShotViewModel,
+        state: AnniversaryScreenShotViewModelState
+    ) {
+        if (state.errorMessage != null) {
+            AlertDialog(
+                onDismissRequest = { vm.resetError() },
+                title = { Text("Error") },
+                text = { Text(state.errorMessage) },
+                confirmButton = {
+                    TextButton(onClick = { vm.resetError() }) {
+                        Text("OK")
+                    }
+                }
+            )
         }
     }
+
+    @Composable
+    fun SaveSuccess(state: AnniversaryScreenShotViewModelState) {
+        if (state.action == AnniversaryScreenShotViewModelAction.Save && state.status == AnniversaryScreenShotViewModelStatus.Success) {
+            Toast.makeText(
+                this, """
+     スクリーンショットを保存しました。ファイルをご確認ください。
+     """.trimIndent(), Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
 
     fun save() {
         val ad = Interstitial(resources.getString(R.string.interstitial_f_id))
@@ -65,92 +126,19 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
         }, {
             progress.dismiss()
         }, {
-            saveInner()
+            vm.saveScreenshot()
             progress.dismiss()
             finish()
         }, {
-            saveInner()
+            vm.saveScreenshot()
             progress.dismiss()
             finish()
         }, {
-            saveInner()
+            vm.saveScreenshot()
             progress.dismiss()
             finish()
         }))
     }
 
-    private fun saveInner() {
-        try {
-            val image = getViewBitmap()
-            save(
-                image!!,
-                Bitmap.CompressFormat.PNG,
-                "image/png",
-                "anniversary-${System.currentTimeMillis()}"
-            )
-            Toast.makeText(
-                this, """
-     スクリーンショットを保存しました。ファイルをご確認ください。
-     """.trimIndent(), Toast.LENGTH_LONG
-            ).show()
-        } catch (e: Exception) {
-            println(e)
-            Toast.makeText(this, "保存に失敗しました。 \n\n ${e.message}", Toast.LENGTH_LONG)
-                .show()
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_screen_shot, menu)
-
-        val item = menu.findItem(R.id.save)
-        item.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.save -> {
-                    val reward = RemoveAdReward.getInstance(this)
-                    if (reward.isBetweenRewardTime.value == false) {
-                        save()
-                    } else {
-                        saveInner()
-                        finish()
-                    }
-                }
-            }
-            false
-        }
-        return true
-    }
-
-    private fun getViewBitmap(): Bitmap? {
-        val bitmap = Bitmap.createBitmap(
-            binding.backgroundImage.width, binding.backgroundImage.height,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-
-        val image = binding.backgroundImage.drawToBitmap(Bitmap.Config.ARGB_8888)
-        val imagePaint = Paint().apply {
-            alpha = (binding.backgroundImage.alpha * 255).toInt()
-        }
-        canvas.drawBitmap(image, 0F, 0F, imagePaint)
-
-        val color = binding.backgroundColor.drawToBitmap(Bitmap.Config.ARGB_8888)
-        val colorPaint = Paint().apply {
-            alpha = (binding.backgroundColor.alpha * 255).toInt()
-        }
-
-        canvas.drawBitmap(color, 0F, 0F, colorPaint)
-
-        binding.container.draw(canvas)
-
-        return bitmap
-    }
-
-    fun save(
-        bitmap: Bitmap, format: Bitmap.CompressFormat,
-        mimeType: String, displayName: String
-    ): Uri {
-        return ContentResolverUtil.insertImage(this, bitmap, format, mimeType, displayName)
-    }
 
 }
