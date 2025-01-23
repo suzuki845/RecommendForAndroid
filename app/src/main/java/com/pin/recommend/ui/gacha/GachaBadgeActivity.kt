@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -43,7 +44,7 @@ import com.pin.recommend.BadgeGachaRemoveAdReward
 import com.pin.recommend.BadgeGachaUserDidEarnRewardCounter
 import com.pin.recommend.R
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.component.composable.ToteBagViewComposable
 import com.pin.recommend.ui.main.SpecialContentListFragment
 import com.pin.recommend.util.SimpleDialogFragment
@@ -93,7 +94,7 @@ class GachaBadgeActivity : AppCompatActivity() {
                 )
             },
             bottomBar = {
-                ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
+                AdaptiveBanner(adId = resources.getString(R.string.banner_id))
             }
         ) { padding ->
             ErrorMessage(vm, state)
@@ -148,6 +149,7 @@ class GachaBadgeActivity : AppCompatActivity() {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color(state.appearance.backgroundColor))
+                    .alpha(state.appearance.backgroundImageOpacity)
             )
 
             if (state.isComplete) {

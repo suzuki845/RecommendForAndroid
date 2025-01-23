@@ -45,7 +45,7 @@ import com.pin.recommend.R
 import com.pin.recommend.domain.model.StoryEditorAction
 import com.pin.recommend.domain.model.StoryEditorStatus
 import com.pin.recommend.ui.component.DatePickerModal
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.util.PermissionChecker
 import com.pin.recommend.util.PermissionRequests
 import com.pin.recommend.util.toFormattedString
@@ -82,7 +82,7 @@ fun Body(
         bottomBar = {
             Column {
                 PickImage(activity, requestCodePicture)
-                ComposableAdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
+                AdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
             }
         }
     ) { padding ->

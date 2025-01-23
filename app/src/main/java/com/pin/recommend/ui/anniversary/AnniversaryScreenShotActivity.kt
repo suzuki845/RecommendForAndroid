@@ -21,8 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.R
 import com.pin.recommend.domain.model.CharacterDetailsState
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.component.composable.AnniversaryDetailScreen
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
 
@@ -67,7 +67,7 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
                 )
             },
             bottomBar = {
-                ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
+                AdaptiveBanner(adId = resources.getString(R.string.banner_id))
             }
         ) { padding ->
             ErrorMessage(vm, state)
@@ -113,7 +113,6 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
             ).show()
         }
     }
-
 
     fun save() {
         val ad = Interstitial(resources.getString(R.string.interstitial_f_id))

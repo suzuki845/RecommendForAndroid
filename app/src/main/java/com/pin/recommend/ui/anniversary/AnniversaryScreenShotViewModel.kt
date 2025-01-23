@@ -6,8 +6,6 @@ import android.graphics.Picture
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import com.pin.recommend.domain.model.CharacterDetailsState
-import com.pin.recommend.domain.model.CharacterDetailsStatus
-import com.pin.recommend.domain.value.Value
 import com.pin.recommend.util.admob.ContentResolverUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +40,7 @@ class AnniversaryScreenShotViewModel(application: Application) : AndroidViewMode
             characterDetailsState = state
         )
     }
-    
+
     fun setScreenshot(picture: Picture) {
         _state.value = _state.value.copy(
             picture = picture

@@ -71,7 +71,7 @@ import com.pin.recommend.ui.anniversary.AnniversaryEditActivity.Companion.INTENT
 import com.pin.recommend.ui.component.ColorPickerDialogFragment
 import com.pin.recommend.ui.component.DatePickerTextField
 import com.pin.recommend.ui.component.DialogActionListener
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.component.composable.Section
 import com.pin.recommend.util.PermissionChecker
 import com.pin.recommend.util.PermissionRequests
@@ -113,7 +113,7 @@ fun Body(
             )
         },
         bottomBar = {
-            ComposableAdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
+            AdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
         }
     ) { padding ->
         ErrorMessage(vm, state)

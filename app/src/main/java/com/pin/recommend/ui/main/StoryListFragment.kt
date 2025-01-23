@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
+import com.pin.recommend.ui.story.StoryListComponent
 
 class StoryListFragment : Fragment() {
     private var pageViewModel: PageViewModel? = null
@@ -35,7 +36,7 @@ class StoryListFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val state = vm.state.collectAsState(CharacterDetailsViewModelState()).value
-                com.pin.recommend.ui.story.Content(requireActivity(), vm, state)
+                StoryListComponent(requireActivity(), vm, state)
             }
         }
     }

@@ -38,7 +38,7 @@ import com.pin.recommend.domain.model.PaymentEditorAction
 import com.pin.recommend.domain.model.PaymentEditorStatus
 import com.pin.recommend.ui.adapter.PaymentTagAdapter
 import com.pin.recommend.ui.component.DatePickerTextField
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.component.composable.Section
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
@@ -72,7 +72,7 @@ fun Body(
             )
         },
         bottomBar = {
-            ComposableAdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
+            AdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
         }
     ) { padding ->
         ErrorMessage(vm, state)

@@ -25,7 +25,7 @@ import com.pin.recommend.domain.model.AnniversaryEditorStatus
 import com.pin.recommend.ui.anniversary.AnniversaryCreateActivity.Companion.INTENT_CREATE_ANNIVERSARY
 import com.pin.recommend.ui.anniversary.AnniversaryEditActivity.Companion.INTENT_EDIT_ANNIVERSARY
 import com.pin.recommend.ui.component.DatePickerTextField
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.component.composable.Section
 
 
@@ -54,7 +54,7 @@ fun Body(
             )
         },
         bottomBar = {
-            ComposableAdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
+            AdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
         }
     ) { padding ->
         ErrorMessage(vm, state)

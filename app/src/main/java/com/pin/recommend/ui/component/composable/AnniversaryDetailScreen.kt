@@ -83,6 +83,7 @@ fun AnniversaryDetailScreen(
                 )
                 .alpha(state.appearance.backgroundImageOpacity)
         )
+
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

@@ -45,7 +45,7 @@ import com.pin.recommend.util.toFormattedString
 import java.util.Calendar
 
 @Composable
-fun Content(
+fun StoryListComponent(
     activity: FragmentActivity,
     vm: CharacterDetailsViewModel,
     state: CharacterDetailsViewModelState

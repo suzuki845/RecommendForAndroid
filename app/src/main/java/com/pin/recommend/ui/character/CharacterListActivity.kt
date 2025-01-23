@@ -45,7 +45,7 @@ import com.pin.recommend.R
 import com.pin.recommend.domain.entity.RecommendCharacter
 import com.pin.recommend.ui.component.DeleteDialogFragment
 import com.pin.recommend.ui.component.DialogActionListener
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.globalsetting.GlobalSettingActivity
 import java.util.Calendar
 
@@ -101,7 +101,7 @@ class CharacterListActivity : AppCompatActivity() {
                 )
             },
             bottomBar = {
-                ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
+                AdaptiveBanner(adId = resources.getString(R.string.banner_id))
             }
         ) { padding ->
             ErrorMessage()

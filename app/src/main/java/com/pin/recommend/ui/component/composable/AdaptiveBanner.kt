@@ -10,7 +10,7 @@ import com.google.android.gms.ads.AdView
 import com.pin.recommend.BuildConfig
 
 @Composable
-fun ComposableAdaptiveBanner(adId: String) {
+fun AdaptiveBanner(adId: String) {
     var id = adId
     if (BuildConfig.DEBUG) {
         id = "ca-app-pub-3940256099942544/6300978111"

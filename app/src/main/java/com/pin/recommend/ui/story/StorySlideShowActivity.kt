@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.pin.recommend.R
 import com.pin.recommend.domain.entity.StoryWithPictures
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.component.composable.Slideshow
 import java.io.File
 
@@ -53,7 +53,7 @@ class StorySlideShowActivity : AppCompatActivity() {
             },
             bottomBar = {
                 Column {
-                    ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
+                    AdaptiveBanner(adId = resources.getString(R.string.banner_id))
                 }
             }
         ) { padding ->

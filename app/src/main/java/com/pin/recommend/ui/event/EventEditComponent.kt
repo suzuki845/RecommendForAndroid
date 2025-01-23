@@ -21,7 +21,7 @@ import com.pin.recommend.R
 import com.pin.recommend.domain.model.EventEditorAction
 import com.pin.recommend.domain.model.EventEditorStatus
 import com.pin.recommend.ui.component.DatePickerTextField
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.component.composable.Section
 import com.pin.util.admob.Interstitial
 import com.pin.util.admob.InterstitialAdStateAction
@@ -52,7 +52,7 @@ fun Body(
             )
         },
         bottomBar = {
-            ComposableAdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
+            AdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
         }
     ) { padding ->
         ErrorMessage(vm, state)

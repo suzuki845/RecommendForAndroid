@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -47,7 +48,7 @@ import com.pin.recommend.R
 import com.pin.recommend.domain.model.gacha.GachaItemAssetsRepository
 import com.pin.recommend.domain.model.gacha.PlaceholderParser
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.main.SpecialContentListFragment
 import com.pin.recommend.util.SimpleDialogFragment
 import com.pin.recommend.util.admob.ContentResolverUtil
@@ -104,7 +105,7 @@ class GachaStringContentActivity : AppCompatActivity() {
                 )
             },
             bottomBar = {
-                ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
+                AdaptiveBanner(adId = resources.getString(R.string.banner_id))
             }
         ) { padding ->
             ErrorMessage(vm, state)
@@ -151,7 +152,6 @@ class GachaStringContentActivity : AppCompatActivity() {
         onReset: () -> Unit
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Background Image
             state.appearance.backgroundImage?.let {
                 Image(
                     bitmap = it.asImageBitmap(),
@@ -161,11 +161,11 @@ class GachaStringContentActivity : AppCompatActivity() {
                 )
             }
 
-            // Background Color Overlay
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color(state.appearance.backgroundColor))
+                    .alpha(state.appearance.backgroundImageOpacity)
             )
 
             Column(

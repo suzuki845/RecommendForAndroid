@@ -36,7 +36,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.pin.recommend.R
 import com.pin.recommend.domain.entity.StoryWithPictures
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.story.StoryEditActivity.Companion.INTENT_EDIT_ENTITY
 
 class StoryDetailActivity : AppCompatActivity() {
@@ -85,7 +85,7 @@ class StoryDetailActivity : AppCompatActivity() {
             },
             bottomBar = {
                 Column {
-                    ComposableAdaptiveBanner(adId = resources.getString(R.string.banner_id))
+                    AdaptiveBanner(adId = resources.getString(R.string.banner_id))
                 }
             }
         ) { padding ->

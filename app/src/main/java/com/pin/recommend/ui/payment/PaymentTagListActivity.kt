@@ -37,7 +37,7 @@ import com.pin.recommend.domain.model.PaymentTagListModelAction
 import com.pin.recommend.domain.model.PaymentTagListModelStatus
 import com.pin.recommend.ui.component.DeleteDialogFragment
 import com.pin.recommend.ui.component.DialogActionListener
-import com.pin.recommend.ui.component.composable.ComposableAdaptiveBanner
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import java.util.Date
 
 
@@ -92,7 +92,7 @@ class PaymentTagListActivity : AppCompatActivity() {
                 )
             },
             bottomBar = {
-                ComposableAdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
+                AdaptiveBanner(adId = activity.resources.getString(R.string.banner_id))
             }
         ) { padding ->
             ErrorMessage(vm, state)
