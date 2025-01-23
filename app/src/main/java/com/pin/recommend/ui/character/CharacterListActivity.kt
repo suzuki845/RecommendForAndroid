@@ -121,7 +121,7 @@ class CharacterListActivity : AppCompatActivity() {
             AlertDialog(
                 onDismissRequest = { vm.resetError() },
                 title = { Text("Error") },
-                text = { Text(state.errorMessage ?: "Unknown error") },
+                text = { Text(state.errorMessage) },
                 confirmButton = {
                     TextButton(onClick = { vm.resetError() }) {
                         Text("OK")
