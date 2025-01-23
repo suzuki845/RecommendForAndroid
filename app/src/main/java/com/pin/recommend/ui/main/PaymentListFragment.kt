@@ -86,10 +86,6 @@ class PaymentListFragment : Fragment() {
     companion object {
         const val TAG = "com.pin.recommend.main.PaymentDetailsFragment"
         private const val ARG_SECTION_NUMBER = "section_number"
-        const val INTENT_PAYMENT_DETAILS =
-            "com.pin.recommend.PaymentDetailsFragment.INTENT_PAYMENT_DETAILS"
-        const val INTENT_CREATE_PAYMENT =
-            "com.pin.recommend.PaymentDetailsFragment.INTENT_CREATE_PAYMENT"
 
         @JvmStatic
         fun newInstance(index: Int) =
