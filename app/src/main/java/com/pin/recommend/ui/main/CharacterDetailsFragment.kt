@@ -9,14 +9,15 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.asLiveData
 import com.pin.recommend.R
-import com.pin.recommend.databinding.FragmentCharacterDetailBinding
-import com.pin.recommend.ui.anniversary.AnniversaryScreenShotActivity
+import com.pin.recommend.ui.character.CharacterDetailsComponent
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
+import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.character.CharacterEditActivity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -29,7 +30,6 @@ class CharacterDetailsFragment : Fragment() {
     private val vm: CharacterDetailsViewModel by lazy {
         ViewModelProvider(requireActivity())[CharacterDetailsViewModel::class.java]
     }
-    private lateinit var binding: FragmentCharacterDetailBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,45 +47,11 @@ class CharacterDetailsFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCharacterDetailBinding.inflate(inflater)
-        binding.lifecycleOwner = requireActivity()
-        binding.fragment = this
-        vm.observe(requireActivity())
-        vm.state.asLiveData().observe(requireActivity()) {
-            binding.state = it
-        }
-        otherInit()
-        return binding.root
-    }
-
-    private fun otherInit() {
-        vm.state.asLiveData().observe(requireActivity()) { it ->
-            val a = it.appearance
-            a.homeTextShadowColor?.let { s ->
-                binding.characterName.setShadowLayer(3f, 0f, 0f, s)
-                binding.topText.setShadowLayer(3f, 0f, 0f, s)
-                binding.bottomText.setShadowLayer(3f, 0f, 0f, s)
-                binding.anniversary.setShadowLayer(3f, 0f, 0f, s)
-                binding.elapsedTime.setShadowLayer(3f, 0f, 0f, s)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val state = vm.state.collectAsState(CharacterDetailsViewModelState()).value
+                CharacterDetailsComponent(state)
             }
-            a.typeFace(requireActivity())?.let {
-                binding.characterName.typeface = it
-                binding.topText.typeface = it
-                binding.bottomText.typeface = it
-                binding.anniversary.typeface = it
-                binding.elapsedTime.typeface = it
-            }
-        }
-    }
-
-    fun onDestinationScreenshotActivity(view: View) {
-        runBlocking {
-            val intent = Intent(requireActivity(), AnniversaryScreenShotActivity::class.java);
-            intent.putExtra(
-                AnniversaryScreenShotActivity.INTENT_SCREEN_SHOT,
-                vm.state.first().toJson()
-            )
-            startActivity(intent)
         }
     }
 

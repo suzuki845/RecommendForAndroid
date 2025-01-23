@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
@@ -60,13 +61,12 @@ class CharacterListActivity : AppCompatActivity() {
         vm.subscribe(this)
 
         setContent {
-            Body()
+            Body(vm, vm.state.collectAsState(CharacterListViewState()).value)
         }
     }
 
     @Composable
-    fun Body() {
-        val state = vm.state.collectAsState().value
+    fun Body(vm: CharacterListViewModel, state: CharacterListViewState) {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -104,20 +104,19 @@ class CharacterListActivity : AppCompatActivity() {
                 AdaptiveBanner(adId = resources.getString(R.string.banner_id))
             }
         ) { padding ->
-            ErrorMessage()
+            ErrorMessage(vm, state)
             Column(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxWidth()
             ) {
-                ListView()
+                ListView(vm, state)
             }
         }
     }
 
     @Composable
-    fun ErrorMessage() {
-        val state = vm.state.collectAsState().value
+    fun ErrorMessage(vm: CharacterListViewModel, state: CharacterListViewState) {
         if (state.errorMessage != null) {
             AlertDialog(
                 onDismissRequest = { vm.resetError() },
@@ -133,11 +132,10 @@ class CharacterListActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun ListView() {
-        val state = vm.state.collectAsState().value
+    fun ListView(vm: CharacterListViewModel, state: CharacterListViewState) {
         LazyColumn {
             items(state.characters) {
-                ListItem(it)
+                ListItem(vm, state, it)
                 Divider()
             }
         }
@@ -145,8 +143,12 @@ class CharacterListActivity : AppCompatActivity() {
 
 
     @Composable
-    fun ListItem(character: RecommendCharacter) {
-        val state = vm.state.collectAsState().value
+    fun ListItem(
+        vm: CharacterListViewModel,
+        state: CharacterListViewState,
+        character: RecommendCharacter
+    ) {
+        val context = LocalContext.current
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -154,14 +156,14 @@ class CharacterListActivity : AppCompatActivity() {
                 .fillMaxWidth()
                 .clickable {
                     val intent =
-                        Intent(this@CharacterListActivity, CharacterDetailActivity::class.java)
+                        Intent(context, CharacterDetailActivity::class.java)
                     intent.putExtra(
                         CharacterDetailActivity.INTENT_CHARACTER,
                         character.id
                     )
                     startActivity(intent)
                 }) {
-            character.getIconImage(this@CharacterListActivity, 50, 50)
+            character.getIconImage(context, 50, 50)
                 ?.asImageBitmap()?.let {
                     Image(
                         bitmap = it,
@@ -181,13 +183,13 @@ class CharacterListActivity : AppCompatActivity() {
             }
             Spacer(modifier = Modifier.weight(1f))
             if (state.deleteMode) {
-                DeleteButton(character)
+                DeleteButton(vm, character)
             }
         }
     }
 
     @Composable
-    fun DeleteButton(character: RecommendCharacter) {
+    fun DeleteButton(vm: CharacterListViewModel, character: RecommendCharacter) {
         IconButton({
             val dialog =
                 DeleteDialogFragment(object :
