@@ -127,15 +127,12 @@ class AnniversaryScreenShotActivity : AppCompatActivity() {
         }, {
             vm.saveScreenshot()
             progress.dismiss()
-            finish()
         }, {
             vm.saveScreenshot()
             progress.dismiss()
-            finish()
         }, {
             vm.saveScreenshot()
             progress.dismiss()
-            finish()
         }))
     }
 
