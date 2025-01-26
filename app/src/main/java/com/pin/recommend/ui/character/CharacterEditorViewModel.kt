@@ -3,9 +3,12 @@ package com.pin.recommend.ui.character
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.view.View
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.AndroidViewModel
 import com.pin.recommend.domain.entity.CharacterWithAnniversaries
 import com.pin.recommend.domain.entity.CustomAnniversary
@@ -52,6 +55,22 @@ data class CharacterEditorViewModelState(
     val typeFace: (Context) -> Typeface? = modelState::typeface
 
     val isNewEntity = modelState.isNewEntity
+
+    fun getFontFamily(
+        assets: AssetManager,
+    ): FontFamily? {
+        if (fontFamily == "Default") return null
+        if (fontFamily == "default") return null
+        if (fontFamily == "デフォルト") return null
+
+        return FontFamily(
+            Font(
+                assetManager = assets,
+                path = "fonts/$fontFamily.ttf"
+            )
+        )
+    }
+
 }
 
 

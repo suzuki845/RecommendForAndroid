@@ -1,9 +1,7 @@
 package com.pin.recommend.ui.payment
 
-import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
-import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,11 +12,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -28,15 +30,18 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.pin.recommend.R
+import com.pin.recommend.domain.entity.PaymentTag
 import com.pin.recommend.domain.model.PaymentEditorAction
 import com.pin.recommend.domain.model.PaymentEditorStatus
-import com.pin.recommend.ui.adapter.PaymentTagAdapter
 import com.pin.recommend.ui.component.DatePickerTextField
 import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.component.composable.Section
@@ -235,6 +240,8 @@ fun Tag(
     vm: PaymentEditorViewModel,
     state: PaymentEditorViewModelState
 ) {
+    val openTafDialog = remember { mutableStateOf(false) }
+
     Column {
         Section {
             Row(
@@ -255,7 +262,7 @@ fun Tag(
                 .fillMaxWidth()
                 .padding(PaddingValues(start = 16.dp, top = 16.dp))
                 .clickable {
-                    onShowTagDialog(activity = activity, vm = vm, state = state)
+                    openTafDialog.value = true
                 }
         ) {
             Text(
@@ -263,6 +270,15 @@ fun Tag(
                 text = state.selectedTag?.tagName ?: "タップして選択"
             )
         }
+    }
+
+    if (openTafDialog.value) {
+        TagDialog(state = state, onItemSelected = {
+            vm.setTag(it)
+            openTafDialog.value = false
+        }, onDismissRequest = {
+            openTafDialog.value = false
+        })
     }
 }
 
@@ -277,33 +293,41 @@ fun toTagListActivity(
     activity.startActivity(intent)
 }
 
-fun onShowTagDialog(
-    activity: AppCompatActivity,
-    vm: PaymentEditorViewModel,
-    state: PaymentEditorViewModelState
+
+@Composable
+fun TagDialog(
+    state: PaymentEditorViewModelState,
+    onItemSelected: (PaymentTag) -> Unit,
+    onDismissRequest: () -> Unit
 ) {
-    val listView = ListView(activity)
-    val tagAdapter = PaymentTagAdapter(activity, onDelete = {})
-    tagAdapter.setList(state.currentTags)
-    listView.adapter = tagAdapter
-
-    val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
-        .setTitle("選択してくだい。")
-        .setView(listView)
-    builder.setNegativeButton("キャンセル") { d, _ ->
-        d.cancel()
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column {
+                LazyColumn(Modifier.weight(0.9f)) {
+                    items(state.currentTags) { tag ->
+                        TextButton({
+                            onItemSelected(tag)
+                        }) {
+                            Text(tag.tagName)
+                        }
+                    }
+                }
+                Row {
+                    Spacer(Modifier.weight(1f))
+                    TextButton({ onDismissRequest() }) {
+                        Text("閉じる")
+                    }
+                }
+            }
+        }
     }
-
-    val dialog = builder.create()
-    listView.setOnItemClickListener { parent, view, pos, id ->
-        val tag = tagAdapter.getItem(pos)
-        vm.setTag(tag)
-        dialog.cancel()
-    }
-
-    dialog.show()
 }
-
 
 private fun save(
     activity: AppCompatActivity,

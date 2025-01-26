@@ -1,10 +1,7 @@
 package com.pin.recommend.ui.character
 
-import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
-import android.content.res.AssetManager
-import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
@@ -24,10 +21,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -44,6 +45,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,16 +60,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.pin.recommend.MyApplication
 import com.pin.recommend.R
 import com.pin.recommend.domain.entity.CustomAnniversary
+import com.pin.recommend.domain.entity.CustomFont
 import com.pin.recommend.domain.model.CharacterEditAction
 import com.pin.recommend.domain.model.CharacterEditStatus
-import com.pin.recommend.ui.adapter.FontAdapter
 import com.pin.recommend.ui.anniversary.AnniversaryCreateActivity
 import com.pin.recommend.ui.anniversary.AnniversaryEditActivity
 import com.pin.recommend.ui.anniversary.AnniversaryEditActivity.Companion.INTENT_EDIT_ANNIVERSARY
@@ -181,7 +185,7 @@ fun Form(
         Divider()
         BelowText(vm, state)
         Divider()
-        Fonts(activity, vm, state)
+        Fonts(vm, state)
         Divider()
         AnniversaryList(
             activity = activity,
@@ -515,33 +519,18 @@ fun AnniversaryItem(
     }
 }
 
-private fun getFontFamily(
-    assets: AssetManager,
-    state: CharacterEditorViewModelState
-): FontFamily? {
-    if (state.fontFamily == "Default") return null
-    if (state.fontFamily == "default") return null
-    if (state.fontFamily == "デフォルト") return null
-
-    return FontFamily(
-        Font(
-            assetManager = assets,
-            path = "fonts/" + state.fontFamily + ".ttf"
-        )
-    )
-}
-
 @Composable
 fun Fonts(
-    activity: AppCompatActivity,
     vm: CharacterEditorViewModel,
     state: CharacterEditorViewModelState
 ) {
+    var isOpenFontDialog by remember { mutableStateOf(false) }
+
     Column {
         Section { Text("フォント") }
         TextField(
             textStyle = TextStyle(
-                fontFamily = getFontFamily(LocalContext.current.assets, state)
+                fontFamily = state.getFontFamily(LocalContext.current.assets)
             ),
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color.White,
@@ -554,7 +543,7 @@ fun Fonts(
                         awaitFirstDown(pass = PointerEventPass.Initial)
                         val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
                         if (upEvent != null) {
-                            onShowFontDialog(activity, vm)
+                            isOpenFontDialog = true
                         }
                     }
                 },
@@ -562,7 +551,67 @@ fun Fonts(
             onValueChange = {},
         )
     }
+
+    if (isOpenFontDialog) {
+        FontDialog(
+            onItemSelected = {
+                vm.setFontFamily(it.name)
+                isOpenFontDialog = false
+            },
+            onDismissRequest = { isOpenFontDialog = false })
+    }
 }
+
+@Composable
+fun FontDialog(
+    onItemSelected: (CustomFont) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val fonts = listOf(
+        CustomFont("Default", false),
+        CustomFont("huifont29", false),
+        CustomFont("NotoSans-Black", false),
+        CustomFont("NotoSans-BlackItalic", false),
+        CustomFont("NotoSans-Condensed", false),
+        CustomFont("NotoSans-CondensedItalic", false),
+        CustomFont("NotoSerifDisplay-Black", false),
+        CustomFont("NotoSerifDisplay-Condensed", false),
+        CustomFont("NotoSerifDisplay-BlackItalic", false),
+        CustomFont("NotoSerifDisplay-CondensedItalic", false)
+    )
+
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column {
+                LazyColumn(Modifier.weight(0.9f)) {
+                    items(fonts) { font ->
+                        TextButton({
+                            onItemSelected(font)
+                        }) {
+                            Text(
+                                style = TextStyle(fontFamily = font.getFontFamily(LocalContext.current.assets)),
+                                text = font.name
+                            )
+                        }
+                    }
+                }
+                Row {
+                    Spacer(Modifier.weight(1f))
+                    TextButton({ onDismissRequest() }) {
+                        Text("閉じる")
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun ErrorMessage(vm: CharacterEditorViewModel, state: CharacterEditorViewModelState) {
@@ -601,28 +650,6 @@ fun onAddAnniversary(
     val intent = Intent(activity, AnniversaryCreateActivity::class.java)
     intent.putExtra(AnniversaryCreateActivity.INTENT_CHARACTER_ID, characterId)
     activity.startActivityForResult(intent, requestCode)
-}
-
-private fun onShowFontDialog(
-    activity: AppCompatActivity,
-    vm: CharacterEditorViewModel,
-) {
-    val adapter = FontAdapter(activity)
-    val listView = ListView(activity)
-    listView.adapter = adapter
-    val builder: AlertDialog.Builder =
-        AlertDialog.Builder(activity).setTitle("選択してくだい。").setView(listView)
-    builder.setNegativeButton("キャンセル") { d, _ ->
-        d.cancel()
-    }
-
-    val dialog = builder.create()
-    listView.setOnItemClickListener { parent, view, pos, id ->
-        vm.setFontFamily(adapter.getItem(pos).name)
-        dialog.cancel()
-    }
-
-    dialog.show()
 }
 
 private fun onSetIcon(activity: AppCompatActivity, requestCode: Int) {

@@ -2,6 +2,7 @@ package com.pin.recommend.ui.payment
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -132,6 +133,11 @@ fun Item(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(6.dp)
+                        .clickable {
+                            val intent = Intent(activity, PaymentEditActivity::class.java)
+                            intent.putExtra(PaymentEditActivity.INTENT_EDIT_PAYMENT, it.payment.id)
+                            activity.startActivity(intent)
+                        }
                 ) {
                     Column {
                         Text(
