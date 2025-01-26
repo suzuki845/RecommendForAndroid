@@ -11,7 +11,7 @@ import com.pin.recommend.domain.entity.Event
 class EventEditActivity : AppCompatActivity() {
 
     companion object {
-        const val INTENT_EDIT_EVENT_ID =
+        const val INTENT_EDIT_EVENT =
             "com.pin.recommend.CreateEventActivity.INTENT_EDIT_EVENT_ID"
     }
 
@@ -23,7 +23,7 @@ class EventEditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        val json = intent.getStringExtra(INTENT_EDIT_EVENT_ID) ?: ""
+        val json = intent.getStringExtra(INTENT_EDIT_EVENT) ?: ""
         val entity = Event.fromJson(json)
         vm.setEntity(entity)
 

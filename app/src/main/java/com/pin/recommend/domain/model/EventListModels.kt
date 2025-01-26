@@ -123,12 +123,21 @@ class CharacterMonthlyEventModel(
 
     private val events = eventBetweenDatesModel.groupingByDate
 
-    val monthlyEvent = combine2(monthInDays, events) { days, events ->
-        MonthlyEvent(days ?: listOf(), events ?: mapOf())
+    private val monthlyEvent = combine2(monthInDays, events) { days, events ->
+        val filled = (days ?: listOf()).map { day ->
+            val map = (events ?: mapOf())
+            DateWithEvents(day, map[day] ?: listOf())
+        }
+        MonthlyEvent(filled)
     }
 
     val selectedMonthlyEvent = combine2(currentDate, monthlyEvent) { date, events ->
-        SelectedMonthlyEvent(date ?: Date(), events ?: MonthlyEvent(listOf(), mapOf()))
+        SelectedMonthlyEvent(
+            date ?: Date(),
+            events ?: MonthlyEvent(
+                listOf()
+            )
+        )
     }
 
     fun delete(event: Event) {
@@ -140,15 +149,30 @@ class CharacterMonthlyEventModel(
 class SelectedMonthlyEvent(
     val selectedDate: Date = Date(),
     val monthlyData: MonthlyEvent = MonthlyEvent()
-)
-
-class MonthlyEvent(
-    val days: List<Date> = listOf(),
-    val result: Map<Date, List<Event>> = mapOf()
 ) {
-    fun dayHasEvents(date: Date): Boolean {
-        return result[date] != null
+    fun indexOfSelectedDate(): Int? {
+        val index = monthlyData.indexOf(TimeUtil.resetDate(selectedDate))
+        if (index == -1) {
+            return null
+        }
+        return index
     }
 }
 
+class MonthlyEvent(
+    val result: List<DateWithEvents> = listOf()
+) {
+    val days = result.map { it.date }
 
+    fun dayHasEvents(date: Date): Boolean {
+        return result.find { it.date == date }?.hasEvents ?: true
+    }
+
+    fun indexOf(date: Date): Int {
+        return days.indexOfFirst { it == date }
+    }
+}
+
+data class DateWithEvents(val date: Date, val events: List<Event>) {
+    val hasEvents = events.isNotEmpty()
+}
