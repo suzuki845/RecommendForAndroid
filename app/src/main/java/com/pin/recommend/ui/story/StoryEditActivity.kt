@@ -54,12 +54,7 @@ class StoryEditActivity : AppCompatActivity() {
         intent.putExtra(Constants.PICK_IMAGE, true)
         super.onActivityResult(requestCode, resultCode, resultData)
     }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_create_story, menu)
-        return true
-    }
-
+    
     companion object {
         private const val REQUEST_PICK_STORY_PICTURE = 3000
         var INTENT_EDIT_ENTITY = "com.pin.recommend.StoryEditActivity.INTENT_EDIT_ENTITY"
