@@ -104,6 +104,10 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
         model.unpinning()
     }
 
+    fun togglePinning() {
+        model.togglePinning()
+    }
+
     fun setCurrentPaymentDate(date: Date) {
         model.setCurrentPaymentDate(date)
     }
@@ -156,5 +160,8 @@ class CharacterDetailsViewModel(application: Application) : AndroidViewModel(app
         editModeEvent.value = editModeEvent.value != true
     }
 
+    fun resetError() {
+        model.resetError()
+    }
 
 }

@@ -43,7 +43,7 @@ class StoryListFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val state = vm.state.collectAsState(CharacterDetailsViewModelState()).value
-                StoryListComponent(requireActivity(), vm, state)
+                StoryListComponent(vm, state)
             }
         }
     }

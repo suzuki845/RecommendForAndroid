@@ -1,6 +1,7 @@
 package com.pin.recommend.ui.story
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -33,9 +34,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.FragmentActivity
 import com.pin.recommend.domain.entity.StoryWithPictures
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
@@ -46,7 +47,6 @@ import java.util.Calendar
 
 @Composable
 fun StoryListComponent(
-    activity: FragmentActivity,
     vm: CharacterDetailsViewModel,
     state: CharacterDetailsViewModelState
 ) {
@@ -57,20 +57,19 @@ fun StoryListComponent(
             }
     ) {
         SortOrder(vm, state)
-        List(activity, vm, state)
+        List(vm, state)
     }
 
 }
 
 @Composable
 fun List(
-    activity: FragmentActivity,
     vm: CharacterDetailsViewModel,
     state: CharacterDetailsViewModelState
 ) {
     LazyColumn {
         items(state.stories) {
-            ListItem(activity, vm, state, it)
+            ListItem(vm, state, it)
             Divider()
         }
     }
@@ -120,7 +119,6 @@ fun SortOrder(
 
 @Composable
 fun ListItem(
-    activity: FragmentActivity,
     vm: CharacterDetailsViewModel,
     state: CharacterDetailsViewModelState,
     story: StoryWithPictures
@@ -137,6 +135,7 @@ fun ListItem(
         }
     }
 
+    val activity = LocalContext.current as AppCompatActivity
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -185,7 +184,7 @@ fun ListItem(
 
 @Composable
 fun DeleteButton(
-    activity: FragmentActivity,
+    activity: AppCompatActivity,
     vm: CharacterDetailsViewModel,
     story: StoryWithPictures
 ) {

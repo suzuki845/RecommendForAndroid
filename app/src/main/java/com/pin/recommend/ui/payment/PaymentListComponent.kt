@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
@@ -36,8 +35,8 @@ import com.pin.recommend.ui.component.DeleteDialogFragment
 import com.pin.recommend.ui.component.DialogActionListener
 import com.pin.recommend.ui.component.composable.Section
 import com.pin.recommend.ui.main.PaymentListFragment.Companion.TAG
-import com.pin.recommend.util.toFormattedString
 import com.pin.recommend.util.toMdString
+import com.pin.recommend.util.toyyyyMString
 
 
 @Composable
@@ -60,15 +59,15 @@ fun DateSelector(vm: CharacterDetailsViewModel, state: CharacterDetailsViewModel
         IconButton({
             vm.prevPaymentMonth()
         }) {
-            Icon(Icons.Default.ChevronLeft, null, tint = MaterialTheme.colors.primary)
+            Icon(Icons.Default.ChevronLeft, null)
         }
         Spacer(Modifier.weight(1f))
-        Text(fontSize = 20.sp, text = state.payments.selectedDate.toFormattedString())
+        Text(fontSize = 20.sp, text = state.payments.selectedDate.toyyyyMString())
         Spacer(Modifier.weight(1f))
         IconButton({
             vm.nextPaymentMonth()
         }) {
-            Icon(Icons.Default.ChevronRight, null, tint = MaterialTheme.colors.primary)
+            Icon(Icons.Default.ChevronRight, null)
         }
     }
 }

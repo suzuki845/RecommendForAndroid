@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.pin.recommend.R
-import com.pin.recommend.ui.character.CharacterDetailsComponent
+import com.pin.recommend.ui.character.CharacterAnniversaryComponent
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.character.CharacterEditActivity
@@ -50,7 +50,7 @@ class CharacterDetailsFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val state = vm.state.collectAsState(CharacterDetailsViewModelState()).value
-                CharacterDetailsComponent(state)
+                CharacterAnniversaryComponent(state)
             }
         }
     }

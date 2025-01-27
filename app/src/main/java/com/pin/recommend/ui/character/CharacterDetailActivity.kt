@@ -1,26 +1,57 @@
 package com.pin.recommend.ui.character
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.toDrawable
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
-import androidx.viewpager.widget.ViewPager
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.pin.recommend.R
-import com.pin.recommend.ui.main.SectionsPagerAdapter
-import com.pin.recommend.util.admob.AdMobAdaptiveBannerManager
-import com.pin.util.admob.reward.RemoveAdReward
+import com.pin.recommend.ui.main.CharacterDetailsComponent
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import java.util.Date
 
+class CharacterDetailActivity : AppCompatActivity() {
+    private val vm by lazy {
+        ViewModelProvider(this)[CharacterDetailsViewModel::class.java]
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val id = intent.getLongExtra(INTENT_CHARACTER, -1)
+        vm.setCharacterId(id)
+        vm.setCurrentEventDate(Date())
+        vm.setCurrentPaymentDate(Date())
+        vm.observe(this)
+
+        val self = this
+        setContent {
+            CharacterDetailsComponent(
+                self, vm, vm.state.collectAsState(
+                    CharacterDetailsViewModelState()
+                ).value
+            )
+        }
+    }
+
+    override fun onBackPressed() {
+        runBlocking {
+            val isPinning = vm.state.first().isPinning
+            println("pinning!!! ${isPinning}")
+            if (isPinning) {
+                moveTaskToBack(true)
+            } else {
+                super.onBackPressed()
+            }
+        }
+    }
+
+    companion object {
+        const val INTENT_CHARACTER = "com.pin.recommend.CharacterListFragment.INTENT_CHARACTER"
+    }
+
+}
+
+/*
 class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener {
     private lateinit var backgroundImage: ImageView
     private lateinit var backgroundColor: View
@@ -195,3 +226,5 @@ class CharacterDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListe
         const val INTENT_CHARACTER = "com.pin.recommend.CharacterListFragment.INTENT_CHARACTER"
     }
 }
+
+ */

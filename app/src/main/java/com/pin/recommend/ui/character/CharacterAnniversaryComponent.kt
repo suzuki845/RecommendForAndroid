@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.pin.recommend.ui.anniversary.AnniversaryScreenShotActivity
 
 @Composable
-fun CharacterDetailsComponent(
+fun CharacterAnniversaryComponent(
     state: CharacterDetailsViewModelState
 ) {
     val context = LocalContext.current

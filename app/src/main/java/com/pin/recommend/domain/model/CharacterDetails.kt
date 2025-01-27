@@ -257,10 +257,12 @@ class CharacterDetails(
         if (id != null) {
             pinningManager.pinning(id)
             _state.value = _state.value.copy(
+                action = CharacterDetailsAction.Pining,
                 status = CharacterDetailsStatus.Success,
             )
         } else {
             _state.value = _state.value.copy(
+                action = CharacterDetailsAction.Pining,
                 status = CharacterDetailsStatus.Failure,
             )
         }
@@ -273,8 +275,17 @@ class CharacterDetails(
         )
         pinningManager.unpinning()
         _state.value = _state.value.copy(
-            status = CharacterDetailsStatus.Failure,
+            action = CharacterDetailsAction.UnPining,
+            status = CharacterDetailsStatus.Success,
         )
+    }
+
+    fun togglePinning() {
+        if (_state.value.isPinning) {
+            unpinning()
+        } else {
+            pinning()
+        }
     }
 
     fun updateStorySortOrder(order: Int) {
