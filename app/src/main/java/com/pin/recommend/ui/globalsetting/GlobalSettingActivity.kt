@@ -2,93 +2,294 @@ package com.pin.recommend.ui.globalsetting
 
 import android.app.Dialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.view.View
-import android.widget.CompoundButton
-import android.widget.Switch
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.documentfile.provider.DocumentFile
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Switch
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.DialogFragment
-import com.pin.recommend.Constants
+import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.R
-import com.pin.recommend.domain.dao.AppDatabase
-import com.pin.recommend.domain.model.BackupExporter
-import com.pin.recommend.domain.model.BackupImporter
 import com.pin.recommend.ui.component.DialogActionListener
+import com.pin.recommend.ui.component.composable.AdaptiveBanner
+import com.pin.recommend.ui.component.composable.Section
 import com.pin.recommend.ui.passcode.PassCodeSetActivity
-import com.pin.recommend.util.PrefUtil
-import com.pin.util.admob.reward.RewardDialogFragment
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 
 class GlobalSettingActivity : AppCompatActivity() {
 
-    private lateinit var toolbar: Toolbar
-
-    private lateinit var passCodeRock: Switch
-
-    private val pref by lazy { PrefUtil(this) }
-
-    private val backupExporter by lazy {
-        BackupExporter(
-            AppDatabase.getDatabase(this)
-        )
-    }
-
-    private val backupImporter by lazy {
-        BackupImporter(
-            AppDatabase.getDatabase(this)
-        )
-    }
+    private val vm by lazy { ViewModelProvider(this)[GlobalSettingViewModel::class.java] }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_global_setting)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setContent {
+            Body(vm, vm.state.collectAsState(GlobalSettingViewModelState()).value)
+        }
+    }
 
-        toolbar = findViewById(R.id.toolbar)
-        toolbar.title = "設定"
-        setSupportActionBar(toolbar)
-        /*
-                val showReward = findViewById<ViewGroup>(R.id.show_reward)
-                val reward = RemoveAdReward.getInstance(this)
-                reward.isBetweenRewardTime.observe(this) {
-                    if (!it) {
-                        showReward.visibility = View.VISIBLE
-                    } else {
-                        showReward.visibility = View.GONE
+    @Composable
+    fun Body(
+        vm: GlobalSettingViewModel,
+        state: GlobalSettingViewModelState
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = Color.Black,
+                    title = {
+                        Text("設定")
+                    },
+                    actions = {
+                    },
+                )
+            },
+            bottomBar = {
+                AdaptiveBanner(adId = resources.getString(R.string.banner_id))
+            }
+        ) { padding ->
+            ErrorMessage(vm, state)
+            ActionStatus(state)
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth()
+            ) {
+                Content(vm, state)
+            }
+        }
+    }
+
+    @Composable
+    fun ActionStatus(state: GlobalSettingViewModelState) {
+        if (state.action == GlobalSettingViewModelAction.BackupExport && state.status == GlobalSettingViewModelStatus.Success) {
+            Toast.makeText(
+                this@GlobalSettingActivity,
+                "バックアップを作成しました。",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        if (state.action == GlobalSettingViewModelAction.BackupImport && state.status == GlobalSettingViewModelStatus.Success) {
+            Toast.makeText(
+                this@GlobalSettingActivity,
+                "バックアップを復元しました。",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        if (state.action == GlobalSettingViewModelAction.UnLockPassCode && state.status == GlobalSettingViewModelStatus.Success) {
+            Toast.makeText(this, "パスコードを解除しました。", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @Composable
+    fun ErrorMessage(
+        vm: GlobalSettingViewModel,
+        state: GlobalSettingViewModelState
+    ) {
+        if (state.errorMessage != null) {
+            AlertDialog(
+                onDismissRequest = { vm.resetError() },
+                title = { Text("Error") },
+                text = { Text(state.errorMessage) },
+                confirmButton = {
+                    TextButton(onClick = { vm.resetError() }) {
+                        Text("OK")
                     }
                 }
-        */
-        passCodeRock = findViewById(R.id.passcode_rock)
+            )
+        }
     }
+
+    @Composable
+    fun Content(
+        vm: GlobalSettingViewModel,
+        state: GlobalSettingViewModelState
+    ) {
+        val self = this
+        Column {
+            Row(
+                Modifier
+                    .padding(6.dp)
+                    .height(30.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("パスコード")
+                Spacer(Modifier.weight(1f))
+                Switch(
+                    checked = state.isPassCodeLock,
+                    onCheckedChange = { isChecked ->
+                        if (isChecked) {
+                            startActivity(PassCodeSetActivity.createIntent(self))
+                        } else {
+                            vm.unlockPassCode()
+                        }
+                    }
+                )
+            }
+            Divider()
+            Box(
+                Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth()
+                    .clickable {
+                        onExportBackup()
+                    }) {
+                Text("バックアップの作成")
+            }
+            Divider()
+            Box(
+                Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth()
+                    .clickable {
+                        onImportBackup()
+                    }) {
+                Text("バックアップの復元")
+            }
+            Divider()
+            Box(
+                Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth()
+                    .clickable {
+                        intent = Intent(Intent.ACTION_VIEW, state.privacyPolicyUri);
+                        startActivity(intent)
+                    }) {
+                Text("プライバシーポリシー")
+            }
+            Divider()
+            Box(
+                Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth()
+                    .clickable {
+                        intent = Intent(Intent.ACTION_VIEW, state.homePageUri);
+                        startActivity(intent)
+                    }) {
+                Text("お問い合わせ")
+            }
+            Section {
+                Text("きっとあなたが気に入るアプリ")
+            }
+            Row(
+                modifier = Modifier
+                    .padding(6.dp)
+                    .clickable {
+                        intent = Intent(Intent.ACTION_VIEW, state.oshiTimerUri);
+                        startActivity(intent)
+                    }, verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+                    painter = painterResource(R.drawable.oshitimer),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Text("推しと集中タイマー")
+            }
+            Row(
+                modifier = Modifier
+                    .padding(6.dp)
+                    .clickable {
+                        intent = Intent(Intent.ACTION_VIEW, state.oshiDietUri);
+                        startActivity(intent)
+                    }, verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+
+                    painter = painterResource(R.drawable.diet_support),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Text("推しダイエット")
+            }
+            Row(
+                modifier = Modifier
+                    .padding(6.dp)
+                    .clickable {
+                        intent = Intent(Intent.ACTION_VIEW, state.emotionDiaryUri);
+                        startActivity(intent)
+                    }, verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+
+                    painter = painterResource(R.drawable.emotion_diary),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Text("気分を記録できるつぶやき日記　Meemo(ミーモ)")
+            }
+            Row(
+                modifier = Modifier
+                    .padding(6.dp)
+                    .clickable {
+                        intent = Intent(Intent.ACTION_VIEW, state.wordBookUri);
+                        startActivity(intent)
+                    }, verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+
+                    painter = painterResource(R.drawable.wordbook),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+                Text("推しと学ぶ韓国語・英語")
+            }
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()
-        passCodeRock.isChecked = pref.getBoolean(Constants.PREF_KEY_IS_LOCKED)
-        passCodeRock.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                startActivity(PassCodeSetActivity.createIntent(this))
-            } else {
-                pref.putBoolean(Constants.PREF_KEY_IS_LOCKED, false);
-                pref.putInt(Constants.PREF_KEY_PASSWORD, 0);
-                Toast.makeText(this, "ロックを解除しました。", Toast.LENGTH_SHORT).show();
-            }
-        })
+        vm.checkPassCodeLock()
     }
 
-    fun onExportBackup(v: View) {
+    private fun onExportBackup() {
         Toast.makeText(this, "バックアップの作成先を選択して下さい。", Toast.LENGTH_LONG).show()
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         startActivityForResult(intent, EXPORT_BACKUP_REQUEST_CODE)
     }
 
-    fun onImportBackup(v: View) {
+    private fun onImportBackup() {
         val dialog =
             BackupImportDialogFragment(object :
                 DialogActionListener<BackupImportDialogFragment> {
@@ -114,115 +315,15 @@ class GlobalSettingActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, result)
         if (resultCode == RESULT_OK) {
             if (requestCode == EXPORT_BACKUP_REQUEST_CODE) {
-                result?.data?.let { data ->
-                    val pickedDir = DocumentFile.fromTreeUri(this, data) ?: return Toast.makeText(
-                        this@GlobalSettingActivity,
-                        "バックアップの作成に失敗しました。",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    GlobalScope.launch {
-                        try {
-                            backupExporter.export(this@GlobalSettingActivity, pickedDir)
-                            this@GlobalSettingActivity.runOnUiThread {
-                                Toast.makeText(
-                                    this@GlobalSettingActivity,
-                                    "バックアップを作成しました。",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        } catch (e: Exception) {
-                            this@GlobalSettingActivity.runOnUiThread {
-                                Toast.makeText(
-                                    this@GlobalSettingActivity,
-                                    "バックアップの作成に失敗しました。\n\n${e.message}",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                    }
-                }
+                vm.backupExport(result?.data)
             }
 
             if (requestCode == IMPORT_BACKUP_REQUEST_CODE) {
-                result?.data?.let { data ->
-                    val pickedDir = DocumentFile.fromTreeUri(this, data)
-                        ?: return Toast.makeText(
-                            this@GlobalSettingActivity,
-                            "バックアップの復元に失敗しました。",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    GlobalScope.launch {
-                        try {
-                            backupImporter.import(this@GlobalSettingActivity, pickedDir)
-                            this@GlobalSettingActivity.runOnUiThread {
-                                Toast.makeText(
-                                    this@GlobalSettingActivity,
-                                    "バックアップを復元しました。",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        } catch (e: Exception) {
-                            this@GlobalSettingActivity.runOnUiThread {
-                                Toast.makeText(
-                                    this@GlobalSettingActivity,
-                                    "バックアップの復元に失敗しました。\n\n${e.message}",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                    }
-                }
+                vm.backupImport(result?.data)
             }
 
         }
     }
-
-    fun onClickHomePage(v: View) {
-        val uri = Uri.parse("https://developer-d5452.web.app/");
-        intent = Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
-    }
-
-    fun onClickPrivacyPolicy(v: View) {
-        val uri = Uri.parse("https://developer-d5452.web.app/privacy-policy.html");
-        intent = Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
-    }
-
-    fun onShowRewardDialog(v: View) {
-        RewardDialogFragment(
-            adUnitId = resources.getString(R.string.reward_id),
-            onOk = { it.dismiss() },
-            onCancel = { it.dismiss() },
-            onStop = {}).show(supportFragmentManager, RewardDialogFragment.TAG)
-    }
-
-    fun onClickOshiTimer(v: View) {
-        val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.oshitimer");
-        intent = Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
-    }
-
-    fun onClickEmotionDiary(v: View) {
-        val uri =
-            Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.emotiondiary");
-        intent = Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
-    }
-
-    fun onClickDietSupport(v: View) {
-        val uri =
-            Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.diet_support");
-        intent = Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
-    }
-
-    fun onClickWordBook(v: View) {
-        val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.suzuki.wordbook");
-        intent = Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
-    }
-
 
 }
 
@@ -240,7 +341,6 @@ class BackupImportDialogFragment(private val actionListener: DialogActionListene
 
     override fun onPause() {
         super.onPause()
-        // onPause でダイアログを閉じる場合
         dismiss()
     }
 
