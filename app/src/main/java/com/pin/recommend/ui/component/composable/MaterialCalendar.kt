@@ -25,7 +25,7 @@ fun MaterialCalendar(
                     FrameLayout.LayoutParams.MATCH_PARENT,
                     FrameLayout.LayoutParams.WRAP_CONTENT
                 )
-                layoutParams.height = 500
+                layoutParams.height = 550
                 tileWidth = FrameLayout.LayoutParams.MATCH_PARENT
                 // デコレーターを追加
                 decorators.forEach { decorator ->
