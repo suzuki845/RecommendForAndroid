@@ -19,9 +19,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
-import com.pin.recommend.ui.main.SpecialContentListFragment.Companion.INTENT_CHARACTER_STATE
-import com.pin.recommend.ui.main.SpecialContentListFragment.Companion.INTENT_PLACE_HOLDER
-import com.pin.recommend.ui.main.SpecialContentListFragment.Companion.INTENT_SPECIAL_CONTENT_ID
+import com.pin.recommend.ui.gacha.GachaStringContentActivity.Companion.INTENT_PLACE_HOLDER
+import com.pin.recommend.ui.gacha.GachaStringContentActivity.Companion.INTENT_SPECIAL_CONTENT_ID
+import com.pin.recommend.ui.gacha.GachaBadgeActivity.Companion.INTENT_CHARACTER_STATE as BADGE_GACHA_INTENT_CHARACTER_STATE
+import com.pin.recommend.ui.gacha.GachaStringContentActivity.Companion.INTENT_CHARACTER_STATE as STRING_GACHA_INTENT_CHARACTER_STATE
 
 @Composable
 fun SpecialContentListComponent(state: CharacterDetailsViewModelState) {
@@ -40,11 +41,7 @@ fun SpecialContentListComponent(state: CharacterDetailsViewModelState) {
             "推しのバッジを当てて痛バを完成させよう", {
                 val intent = Intent(context, GachaBadgeActivity::class.java)
                 intent.putExtra(
-                    INTENT_SPECIAL_CONTENT_ID,
-                    "BadgeGachaAsset"
-                )
-                intent.putExtra(
-                    INTENT_CHARACTER_STATE,
+                    BADGE_GACHA_INTENT_CHARACTER_STATE,
                     state.toJson()
                 )
                 context.startActivity(intent)
@@ -61,7 +58,7 @@ fun SpecialContentListComponent(state: CharacterDetailsViewModelState) {
                     "RelationshipWithOshiNextLifeGachaAsset"
                 )
                 intent.putExtra(
-                    INTENT_CHARACTER_STATE,
+                    STRING_GACHA_INTENT_CHARACTER_STATE,
                     state.toJson()
                 )
                 intent.putExtra(
@@ -83,7 +80,7 @@ fun SpecialContentListComponent(state: CharacterDetailsViewModelState) {
                     "ReadFortunesGachaAsset"
                 )
                 intent.putExtra(
-                    INTENT_CHARACTER_STATE,
+                    STRING_GACHA_INTENT_CHARACTER_STATE,
                     state.toJson()
                 )
                 intent.putExtra(
@@ -104,7 +101,7 @@ fun SpecialContentListComponent(state: CharacterDetailsViewModelState) {
                     "GoingOutGachaAsset"
                 )
                 intent.putExtra(
-                    INTENT_CHARACTER_STATE,
+                    STRING_GACHA_INTENT_CHARACTER_STATE,
                     state.toJson()
                 )
                 intent.putExtra(
@@ -127,7 +124,7 @@ fun SpecialContentListComponent(state: CharacterDetailsViewModelState) {
                     "EncountOshiGachaAsset"
                 )
                 intent.putExtra(
-                    INTENT_CHARACTER_STATE,
+                    STRING_GACHA_INTENT_CHARACTER_STATE,
                     state.toJson()
                 )
                 intent.putExtra(

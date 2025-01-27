@@ -49,7 +49,6 @@ import com.pin.recommend.domain.model.gacha.GachaItemAssetsRepository
 import com.pin.recommend.domain.model.gacha.PlaceholderParser
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.component.composable.AdaptiveBanner
-import com.pin.recommend.ui.main.SpecialContentListFragment
 import com.pin.recommend.util.SimpleDialogFragment
 import com.pin.recommend.util.admob.ContentResolverUtil
 import com.pin.util.admob.RewardAdStateAction
@@ -60,6 +59,15 @@ import com.pin.util.admob.reward.UserDidEarnRewardCounter
 
 class GachaStringContentActivity : AppCompatActivity() {
 
+    companion object {
+        const val INTENT_SPECIAL_CONTENT_ID =
+            "com.pin.recommend.GachaStringContentActivity.INTENT_SPECIAL_CONTENT_ID"
+        const val INTENT_CHARACTER_STATE =
+            "com.pin.recommend.GachaStringContentActivity.INTENT_CHARACTER_STATE"
+        const val INTENT_PLACE_HOLDER =
+            "com.pin.recommend.GachaStringContentActivity.INTENT_PLACE_HOLDER"
+    }
+
     private val vm: GachaStringContentViewModel by lazy {
         ViewModelProvider(this)[GachaStringContentViewModel::class.java]
     }
@@ -67,16 +75,16 @@ class GachaStringContentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val id = intent.getStringExtra(SpecialContentListFragment.INTENT_SPECIAL_CONTENT_ID) ?: ""
+        val id = intent.getStringExtra(INTENT_SPECIAL_CONTENT_ID) ?: ""
         val asset = GachaItemAssetsRepository().fetch(id)
         vm.setAsset(asset!!)
 
-        val json = intent.getStringExtra(SpecialContentListFragment.INTENT_CHARACTER_STATE) ?: "";
+        val json = intent.getStringExtra(INTENT_CHARACTER_STATE) ?: "";
         val state = CharacterDetailsViewModelState.fromJson(json)
         vm.setAppearance(state.appearance)
         vm.setCharacterName(state.characterName)
 
-        val template = intent.getStringExtra(SpecialContentListFragment.INTENT_PLACE_HOLDER) ?: ""
+        val template = intent.getStringExtra(INTENT_PLACE_HOLDER) ?: ""
         vm.setPlaceHolder(PlaceholderParser(template))
 
         vm.observe(this)

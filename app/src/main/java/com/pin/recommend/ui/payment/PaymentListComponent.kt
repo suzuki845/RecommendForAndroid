@@ -34,7 +34,6 @@ import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.component.DeleteDialogFragment
 import com.pin.recommend.ui.component.DialogActionListener
 import com.pin.recommend.ui.component.composable.Section
-import com.pin.recommend.ui.main.PaymentListFragment.Companion.TAG
 import com.pin.recommend.util.toMdString
 import com.pin.recommend.util.toyyyyMString
 
@@ -177,5 +176,5 @@ private fun deletePayment(
             override fun onCancel() {
             }
         })
-    dialog.show(context.supportFragmentManager, TAG)
+    dialog.show(context.supportFragmentManager, "deletePayment")
 }

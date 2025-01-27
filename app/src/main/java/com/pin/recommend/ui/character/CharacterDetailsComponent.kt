@@ -1,4 +1,4 @@
-package com.pin.recommend.ui.main
+package com.pin.recommend.ui.character
 
 import android.content.Intent
 import android.widget.Toast
@@ -36,10 +36,6 @@ import androidx.compose.ui.unit.sp
 import com.pin.recommend.R
 import com.pin.recommend.domain.model.CharacterDetailsAction
 import com.pin.recommend.domain.model.CharacterDetailsStatus
-import com.pin.recommend.ui.character.CharacterAnniversaryComponent
-import com.pin.recommend.ui.character.CharacterDetailsViewModel
-import com.pin.recommend.ui.character.CharacterDetailsViewModelState
-import com.pin.recommend.ui.character.CharacterEditActivity
 import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.event.EventListComponent
 import com.pin.recommend.ui.gacha.SpecialContentListComponent

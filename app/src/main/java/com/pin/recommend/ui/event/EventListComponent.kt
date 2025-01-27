@@ -44,7 +44,6 @@ import com.pin.recommend.ui.component.DeleteDialogFragment
 import com.pin.recommend.ui.component.DialogActionListener
 import com.pin.recommend.ui.component.composable.MaterialCalendar
 import com.pin.recommend.ui.component.composable.Section
-import com.pin.recommend.ui.main.PaymentListFragment.Companion.TAG
 import com.pin.recommend.util.TimeUtil
 import com.pin.recommend.util.toMdString
 import com.prolificinteractive.materialcalendarview.CalendarDay
@@ -260,5 +259,5 @@ private fun deleteEvent(
             override fun onCancel() {
             }
         })
-    dialog.show(context.supportFragmentManager, TAG)
+    dialog.show(context.supportFragmentManager, "deleteEvent")
 }

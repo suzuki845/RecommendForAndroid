@@ -46,7 +46,6 @@ import com.pin.recommend.R
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
 import com.pin.recommend.ui.component.composable.AdaptiveBanner
 import com.pin.recommend.ui.component.composable.ToteBagViewComposable
-import com.pin.recommend.ui.main.SpecialContentListFragment
 import com.pin.recommend.util.SimpleDialogFragment
 import com.pin.recommend.util.admob.ContentResolverUtil
 import com.pin.util.admob.RewardAdStateAction
@@ -56,6 +55,11 @@ import com.pin.util.admob.reward.UserDidEarnRewardCounter
 
 class GachaBadgeActivity : AppCompatActivity() {
 
+    companion object {
+        val INTENT_CHARACTER_STATE =
+            "com.pin.recommend.SpecialContentListFragment.INTENT_CHARACTER_STATE"
+    }
+
     private val vm: GachaBadgeViewModel by lazy {
         ViewModelProvider(this)[GachaBadgeViewModel::class.java]
     }
@@ -63,7 +67,7 @@ class GachaBadgeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val json = intent.getStringExtra(SpecialContentListFragment.INTENT_CHARACTER_STATE) ?: "";
+        val json = intent.getStringExtra(INTENT_CHARACTER_STATE) ?: "";
         val state = CharacterDetailsViewModelState.fromJson(json)
         vm.setCharacterId(state.character?.id ?: -1)
         vm.setPrizeImage(state.appearance.iconImage)
