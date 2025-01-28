@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/sort"
-        android:orderInCategory="6"
-        android:title="並べ替え"
-        app:showAsAction="never" />
-</menu>

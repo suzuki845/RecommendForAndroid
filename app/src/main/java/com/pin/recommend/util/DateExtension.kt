@@ -9,3 +9,13 @@ fun Date.toFormattedString(): String {
     val format = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
     return format.format(this)
 }
+
+fun Date.toMdString(): String {
+    val format = SimpleDateFormat("M/d", Locale.getDefault())
+    return format.format(this)
+}
+
+fun Date.toyyyyMString(): String {
+    val format = SimpleDateFormat("yyyy/M", Locale.getDefault())
+    return format.format(this)
+}
