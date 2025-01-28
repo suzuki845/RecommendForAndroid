@@ -2,6 +2,7 @@ package com.pin.recommend.ui.character
 
 import android.content.Intent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,7 @@ fun CharacterAnniversaryComponent(
                 modifier = Modifier
                     .size(160.dp)
                     .clip(CircleShape)
+                    .background(Color.White)
                     .border(2.dp, Color(0xFFEEEEEE), CircleShape),
                 contentAlignment = Alignment.Center
             ) {

@@ -92,6 +92,7 @@ fun AnniversaryDetailScreen(
                 modifier = Modifier
                     .size(160.dp)
                     .clip(CircleShape)
+                    .background(Color.White)
                     .border(2.dp, Color(0xFFEEEEEE), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
