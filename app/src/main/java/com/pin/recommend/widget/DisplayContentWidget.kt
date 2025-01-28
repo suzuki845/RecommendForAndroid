@@ -8,10 +8,10 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import com.google.gson.Gson
-import com.pin.recommend.model.entity.ContentId
-import com.pin.recommend.model.entity.Event
-import com.pin.recommend.model.entity.SerializableAppearance
-import com.pin.recommend.model.entity.TypedEntity
+import com.pin.recommend.domain.entity.ContentId
+import com.pin.recommend.domain.entity.Event
+import com.pin.recommend.domain.entity.SerializableAppearance
+import com.pin.recommend.domain.entity.TypedEntity
 
 class DisplayContentWidget(
     val appWidgetId: Int,

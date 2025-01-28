@@ -1,17 +1,16 @@
-//apply plugin: 'com.android.application'
-///apply plugin: 'kotlin-android'
-//apply plugin: 'kotlin-kapt'
-//apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.plugin.compose' version '2.0.20'
+}
 
 android {
     namespace 'com.pin.recommend'
 
     signingConfigs {
         release {
-            storeFile file('/Users/turuwo/Documents/android/Memo.jks')
+            storeFile file('/Users/turuwo/Documents/android/release-build-keystore.jks')
             storePassword 'pinkichi1988'
             keyAlias = 'memo'
             keyPassword 'pinkichi7183'
@@ -24,8 +23,8 @@ android {
         applicationId "com.pin.recommend"
         minSdkVersion 26
         targetSdkVersion 34
-        versionCode 41
-        versionName "1.17.1"
+        versionCode 48
+        versionName "1.17.8"
         //vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -41,6 +40,10 @@ android {
         }
     }
 
+    buildFeatures {
+        compose true
+    }
+
     sourceSets {
         // Adds exported schema location as test app assets.
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
@@ -53,11 +56,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        /*
+
         debug {
             signingConfig signingConfigs.release // デバッグビルドでリリース署名を使用
         }
-         */
+
     }
 
     compileOptions {
@@ -91,9 +94,6 @@ dependencies {
         }
     }
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation project(':imageutil')
-    implementation project(':util')
 
     implementation 'com.google.android.gms:play-services-ads:23.3.0'
 
@@ -134,4 +134,57 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    /*
+    composeで使うライブラリ群:start
+    */
+    def composeBom = platform('androidx.compose:compose-bom:2024.12.01')
+    implementation composeBom
+    androidTestImplementation composeBom
+
+    // Choose one of the following:
+    // Material Design 3
+    implementation 'androidx.compose.material3:material3'
+    // or Material Design 2
+    implementation 'androidx.compose.material:material'
+    // or skip Material Design and build directly on top of foundational components
+    implementation 'androidx.compose.foundation:foundation'
+    // or only import the main APIs for the underlying toolkit systems,
+    // such as input and measurement/layout
+    implementation 'androidx.compose.ui:ui'
+
+    // Android Studio Preview support
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+
+    // UI Tests
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
+
+    // Optional - Included automatically by material, only add when you need
+    // the icons but not the material library (e.g. when using Material3 or a
+    // custom design system based on Foundation)
+    implementation 'androidx.compose.material:material-icons-core'
+    // Optional - Add full set of material icons
+    implementation 'androidx.compose.material:material-icons-extended'
+    // Optional - Add window size utils
+    implementation 'androidx.compose.material3.adaptive:adaptive'
+
+    // Optional - Integration with activities
+    implementation 'androidx.activity:activity-compose:1.9.2'
+    // Optional - Integration with ViewModels
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5'
+    // Optional - Integration with LiveData
+    implementation 'androidx.compose.runtime:runtime-livedata'
+    // Optional - Integration with RxJava
+    implementation 'androidx.compose.runtime:runtime-rxjava2'
+
+    implementation 'androidx.compose.material:material-icons-extended:x.x.x'
+
+    implementation "com.google.accompanist:accompanist-insets:0.30.1"
+
+    /*
+       composeで使うライブラリ群:end
+    */
+
 }

@@ -20,6 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepnames class com.pin.recommend.model.** { *; }
+-keepnames class com.pin.recommend.domain.** { *; }
 -keepnames class com.pin.recommend.widget.** { *; }
 

@@ -3,10 +3,10 @@ package com.pin.recommend.widget
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.gson.Gson
-import com.pin.recommend.model.entity.ContentId
-import com.pin.recommend.model.entity.Event
-import com.pin.recommend.model.entity.SerializableAppearance
-import com.pin.recommend.model.entity.TypedEntity
+import com.pin.recommend.domain.entity.ContentId
+import com.pin.recommend.domain.entity.Event
+import com.pin.recommend.domain.entity.SerializableAppearance
+import com.pin.recommend.domain.entity.TypedEntity
 
 data class ContentWidgetItem(
     val characterName: String,

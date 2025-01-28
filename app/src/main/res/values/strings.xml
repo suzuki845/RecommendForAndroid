@@ -26,9 +26,13 @@
     <string name="tab_text_4">Pay ＆ 貯金</string>
     <string name="tab_text_5">カレンダー</string>
 
+    <string name="permission_denied">の権限がないので、アプリ情報の「許可」から設定してください</string>
+    <string name="permission_app_info">アプリ情報</string>
+
+    <string name="cancel">Cancel</string>
+
     <!-- use pass code lock -->
     <string name="image_error">image</string>
-    <string name="cancel">Cancel</string>
     <string name="passcode_confirm">パスコードを入力してください</string>
     <string name="passcode_lock">パスコードロック</string>
     <string name="passcode_set">パスコードを設定してください</string>

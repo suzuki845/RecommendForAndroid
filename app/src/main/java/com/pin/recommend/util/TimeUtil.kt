@@ -2,7 +2,8 @@ package com.pin.recommend.util
 
 import java.time.Duration
 import java.time.Instant
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 class TimeUtil {
     companion object {
@@ -47,12 +48,12 @@ class TimeUtil {
         fun monthlyStartDate(currentDate: Date): Date {
             val cal = Calendar.getInstance()
 
-            //年月をセットする
             cal.time = currentDate
-            val year = cal[Calendar.YEAR]
-            val month = cal[Calendar.MONTH]
-            var day = 0
-            cal[year, month, day, 0, 0] = 0
+            cal.set(Calendar.DAY_OF_MONTH, 1)
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
 
             return cal.time
         }
@@ -65,7 +66,7 @@ class TimeUtil {
             cal.time = currentDate
             val year = cal[Calendar.YEAR]
             val month = cal[Calendar.MONTH]
-                //月末日を取得する
+            //月末日を取得する
             val day = cal.getActualMaximum(Calendar.DATE)
             cal[year, month, day, 0, 0] = 0
             return cal.time
