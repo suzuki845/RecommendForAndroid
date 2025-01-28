@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
@@ -42,7 +41,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import com.pin.recommend.R
 import com.pin.recommend.domain.model.gacha.GachaItemAssetsRepository
@@ -125,7 +123,7 @@ class GachaStringContentActivity : AppCompatActivity() {
                 Content(
                     state = state,
                     onRollGacha = {
-                        onRollGacha(null)
+                        onRollGacha()
                     },
                     onReset = {
                         vm.reset()
@@ -236,10 +234,8 @@ class GachaStringContentActivity : AppCompatActivity() {
                                     contentScale = ContentScale.Crop
                                 )
                             }
-
                             Text(
-                                text = state.result().toString(),
-                                fontSize = 16.sp,
+                                text = state.resultForComposable(),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(top = 10.dp)
                             )
@@ -276,7 +272,7 @@ class GachaStringContentActivity : AppCompatActivity() {
         return v
     }
 
-    fun onRollGacha(view: View?) {
+    fun onRollGacha() {
         val removeAdReward = RemoveAdReward.getInstance(this)
 
         if (removeAdReward.isBetweenRewardTime.value == true) {

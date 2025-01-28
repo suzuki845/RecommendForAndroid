@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -29,6 +30,7 @@ fun SpecialContentListComponent(state: CharacterDetailsViewModelState) {
     val context = LocalContext.current
     Column(
         Modifier
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .drawBehind { // 親の背景を描画
                 drawRect(Color.White.copy(alpha = 0.5f))
@@ -115,7 +117,7 @@ fun SpecialContentListComponent(state: CharacterDetailsViewModelState) {
 
         ListItem(
             "🏪",
-            "0.1%の確率で近所の公園で推しと遭遇するガチャ",
+            "0.1%の確率で近所のコンビニで推しと遭遇するガチャ",
             "ふらっと近所のコンビニに行くとそこにはまさかの・・・",
             {
                 val intent = Intent(context, GachaStringContentActivity::class.java)
@@ -133,6 +135,8 @@ fun SpecialContentListComponent(state: CharacterDetailsViewModelState) {
                 )
                 context.startActivity(intent)
             })
+
+        Divider()
     }
 }
 

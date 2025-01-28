@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,6 +43,7 @@ import com.pin.recommend.util.toyyyyMString
 fun PaymentListComponent(vm: CharacterDetailsViewModel, state: CharacterDetailsViewModelState) {
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .drawBehind { // 親の背景を描画
                 drawRect(Color.White.copy(alpha = 0.5f))
             }
@@ -75,7 +77,8 @@ fun DateSelector(vm: CharacterDetailsViewModel, state: CharacterDetailsViewModel
 fun Amount(vm: CharacterDetailsViewModel, state: CharacterDetailsViewModelState) {
     val context = LocalContext.current
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(fontSize = 16.sp, text = "今月のPay: ${state.payments.totalPayment}円")
@@ -143,7 +146,7 @@ fun Item(
                             color = if (it.payment.type == 0) Color.Red else Color.Blue,
                             text = it.payment.amount.toInt().toString() + "円"
                         )
-                        Text("タグ: ${it.payment.paymentTag?.tagName ?: ""}")
+                        Text("タグ: ${it.tag?.tagName ?: ""}")
                         Text("メモ: ${it.payment.memo ?: ""}")
                     }
                     Spacer(Modifier.weight(1f))

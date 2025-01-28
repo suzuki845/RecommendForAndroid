@@ -3,6 +3,8 @@ package com.pin.recommend.ui.gacha
 import android.app.Application
 import android.graphics.Typeface
 import android.text.SpannableStringBuilder
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
@@ -44,6 +46,15 @@ data class GachaStringContentViewModelState(
             arrayListOf(characterName, r),
             Typeface.DEFAULT,
             Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        )
+    }
+
+    fun resultForComposable(): AnnotatedString {
+        val r = state.result?.content ?: ""
+        return placeHolder.parseForComposable(
+            arrayListOf(characterName, r),
+            fontSize = 20.sp,
+            placeholderFontSize = 24.sp,
         )
     }
 }

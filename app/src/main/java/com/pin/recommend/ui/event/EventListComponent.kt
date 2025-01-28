@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -69,6 +70,7 @@ class EventDecorator(private val color: Int, dates: Collection<CalendarDay?>?) :
 fun EventListComponent(vm: CharacterDetailsViewModel, state: CharacterDetailsViewModelState) {
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .drawBehind { // 親の背景を描画
                 drawRect(Color.White.copy(alpha = 0.5f))
             }

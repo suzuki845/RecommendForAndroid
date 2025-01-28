@@ -3,7 +3,10 @@ package com.pin.recommend.ui.character
 import android.content.Intent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
@@ -31,7 +34,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.sp
 import com.pin.recommend.R
 import com.pin.recommend.domain.model.CharacterDetailsAction
@@ -41,6 +47,7 @@ import com.pin.recommend.ui.event.EventListComponent
 import com.pin.recommend.ui.gacha.SpecialContentListComponent
 import com.pin.recommend.ui.payment.PaymentCreateActivity
 import com.pin.recommend.ui.payment.PaymentListComponent
+import com.pin.recommend.ui.story.StoryCreateActivity
 import com.pin.recommend.ui.story.StoryListComponent
 
 
@@ -114,6 +121,16 @@ fun CharacterDetailsComponent(
                             }) {
                                 Text(if (state.isDeleteModeStories) "完了" else "編集")
                             }
+                            TextButton({
+                                val intent = Intent(activity, StoryCreateActivity::class.java)
+                                intent.putExtra(
+                                    StoryCreateActivity.INTENT_CHARACTER_ID,
+                                    state.character?.id
+                                )
+                                activity.startActivity(intent)
+                            }) {
+                                Text("作成")
+                            }
                         }
 
                         3 -> {
@@ -156,17 +173,19 @@ fun CharacterDetailsComponent(
                         label = { Text(fontSize = 8.sp, text = item) },
                         selected = selectedItem == index,
                         onClick = { selectedItem = index },
-                        selectedContentColor = MaterialTheme.colors.primary
+                        selectedContentColor = MaterialTheme.colors.primary,
+                        unselectedContentColor = Color.Gray
                     )
                 }
             }
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxWidth()
         ) {
+            Background(state)
             ErrorMessage(vm, state)
             ActionStatus(activity, state)
             when (selectedItem) {
@@ -195,11 +214,33 @@ fun CharacterDetailsComponent(
 }
 
 @Composable
+fun Background(
+    state: CharacterDetailsViewModelState
+) {
+    state.appearance.backgroundImage?.let {
+        Image(
+            bitmap = it.asImageBitmap(),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop,
+        )
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                color = Color(state.appearance.backgroundColor)
+            )
+            .alpha(state.appearance.backgroundImageOpacity)
+    )
+}
+
+@Composable
 fun ActionStatus(
     activity: AppCompatActivity,
     state: CharacterDetailsViewModelState
 ) {
-    print("test!!! ${state.action}, ${state.status}")
     if (state.action == CharacterDetailsAction.Pining && state.status == CharacterDetailsStatus.Success) {
         Toast.makeText(
             activity,
