@@ -9,6 +9,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.request.crossfade
 import com.pin.recommend.domain.model.CharacterPinningManager
 import com.pin.recommend.ui.MainActivity
 import com.pin.recommend.ui.passcode.PassCodeConfirmationActivity
@@ -16,7 +19,8 @@ import com.pin.recommend.util.PrefUtil
 import com.pin.util.admob.reward.RemoveAdReward
 import com.pin.util.admob.reward.UserDidEarnRewardCounter
 
-class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLifecycleCallbacks {
+class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLifecycleCallbacks,
+    SingletonImageLoader.Factory {
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
     }
@@ -72,6 +76,12 @@ class MyApplication : Application(), ViewModelStoreOwner, Application.ActivityLi
                 badgeGachaRardCounter.reset()
         */
         setupStatusBarColor(activity, Color.parseColor("#000000"), Color.parseColor("#FFFFFF"))
+    }
+
+    override fun newImageLoader(context: Context): ImageLoader {
+        return ImageLoader.Builder(context)
+            .crossfade(true)
+            .build()
     }
 
     override fun onActivityPaused(activity: Activity) {}

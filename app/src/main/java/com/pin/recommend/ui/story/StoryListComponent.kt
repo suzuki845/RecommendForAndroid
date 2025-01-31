@@ -2,7 +2,6 @@ package com.pin.recommend.ui.story
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,12 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.pin.recommend.domain.entity.StoryWithPictures
 import com.pin.recommend.ui.character.CharacterDetailsViewModel
 import com.pin.recommend.ui.character.CharacterDetailsViewModelState
@@ -159,27 +158,33 @@ fun ListItem(
             Text(
                 text = story.story.getShortComment(15)
             )
-            LazyRow(
-                Modifier
-                    .fillMaxWidth(0.7f)
-            ) {
-                items(story.pictures) {
-                    it.getBitmap(activity, 60, 60)?.asImageBitmap()?.let { image ->
-                        Image(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .size(60.dp),
-                            bitmap = image,
-                            contentScale = ContentScale.Crop,
-                            contentDescription = null,
-                        )
-                    }
-                }
-            }
+
+            StoryPicturesRow(story)
         }
+
         Spacer(Modifier.weight(1f))
         if (state.isDeleteModeStories) {
             DeleteButton(activity, vm, story)
+        }
+    }
+}
+
+@Composable
+fun StoryPicturesRow(story: StoryWithPictures) {
+    val context = LocalContext.current
+
+    LazyRow(
+        Modifier.fillMaxWidth(0.8f)
+    ) {
+        items(story.pictures) { picture ->
+            AsyncImage(
+                model = picture.getUri(context),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .size(60.dp),
+                contentScale = ContentScale.Crop,
+            )
         }
     }
 }
