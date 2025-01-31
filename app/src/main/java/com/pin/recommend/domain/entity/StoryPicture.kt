@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -30,9 +31,12 @@ class StoryPicture {
     var uri: String? = null
 
     fun getFile(context: Context): File {
-        return File(context.filesDir, uri)
+        return File(context.filesDir, uri ?: "")
     }
 
+    fun getUri(context: Context): Uri {
+        return Uri.fromFile(getFile(context))
+    }
 
     fun getBackgroundDrawable(context: Context, w: Int, h: Int): Drawable {
         val bitmap = BitmapUtility.readPrivateImage(context, uri, w, h)
